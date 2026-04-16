@@ -22,13 +22,13 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // ===== COMMENT OUT ALL ROUTES FIRST =====
-// const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth');
 // const userRoutes = require('./routes/users');
 // const subscriptionRoutes = require('./routes/subscriptions');
 // const googleRoutes = require('./routes/google');
 
 // ===== Routes (comment out all) =====
-// app.use('/api/auth', authRoutes);
+ app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);
 // app.use('/api/subscriptions', subscriptionRoutes);
 // app.use('/api/google', googleRoutes);
