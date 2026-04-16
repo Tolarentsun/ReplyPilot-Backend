@@ -2,30 +2,71 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 
-// Write startup log
-fs.writeFileSync('/tmp/startup.log', '=== Server Starting ===\n');
+fs.writeFileSync('/tmp/routes.log', '=== Testing Routes ===\n');
 
+// Load database
 try {
-  fs.appendFileSync('/tmp/startup.log', '1. Loading database...\n');
   const { pool } = require('./db');
-  fs.appendFileSync('/tmp/startup.log', '✅ Database loaded\n');
-} catch (dbError) {
-  fs.appendFileSync('/tmp/startup.log', `❌ Database error: ${dbError.message}\n`);
+  fs.appendFileSync('/tmp/routes.log', '✅ Database loaded\n');
+} catch (error) {
+  fs.appendFileSync('/tmp/routes.log', `❌ Database: ${error.message}\n`);
 }
 
-// Load all routes with error handling
-const loadRoute = (name, path) => {
+// Load ONLY auth first (we know this works)
+try {
+  const authRoutes = require('./routes/auth');
+  app.use('/api/auth', authRoutes);
+  fs.appendFileSync('/tmp/routes.log', '✅ auth.js loaded\n');
+} catch (error) {
+  fs.appendFileSync('/tmp/routes.log', `❌ auth.js: ${error.message}\n`);
+}
+
+// Test users.js
+try {
+  const userRoutes = require('./routes/users');
+  app.use('/api/users', userRoutes);
+  fs.appendFileSync('/tmp/routes.log', '✅ users.js loaded\n');
+} catch (error) {
+  fs.appendFileSync('/tmp/routes.log', `❌ users.js: ${error.message}\n`);
+}
+
+// Test subscriptions.js  
+try {
+  const subscriptionRoutes = require('./routes/subscriptions');
+  app.use('/api/subscriptions', subscriptionRoutes);
+  fs.appendFileSync('/tmp/routes.log', '✅ subscriptions.js loaded\n');
+} catch (error) {
+  fs.appendFileSync('/tmp/routes.log', `❌ subscriptions.js: ${error.message}\n`);
+}
+
+// Test google.js
+try {
+  const googleRoutes = require('./routes/google');
+  app.use('/api/google', googleRoutes);
+  fs.appendFileSync('/tmp/routes.log', '✅ google.js loaded\n');
+} catch (error) {
+  fs.appendFileSync('/tmp/routes.log', `❌ google.js: ${error.message}\n`);
+}
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// Route to view logs
+app.get('/debug/routes', (req, res) => {
   try {
-    fs.appendFileSync('/tmp/startup.log', `Loading ${name} route...\n`);
-    const route = require(path);
-    app.use(`/api/${name}`, route);
-    fs.appendFileSync('/tmp/startup.log', `✅ ${name} route loaded\n`);
-    return true;
-  } catch (error) {
-    fs.appendFileSync('/tmp/startup.log', `❌ ${name} route error: ${error.message}\n`);
-    return false;
+    const log = fs.readFileSync('/tmp/routes.log', 'utf8');
+    res.type('text/plain').send(log);
+  } catch {
+    res.send('No log found');
   }
-};
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // Load routes
 loadRoute('auth', './routes/auth');
