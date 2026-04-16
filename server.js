@@ -3,29 +3,56 @@ const express = require('express');
 const app = express();
 
 // Write startup log
-fs.writeFileSync('/tmp/errors.log', '=== Server Starting ===\n');
+fs.writeFileSync('/tmp/startup.log', '=== Server Starting ===\n');
 
 try {
-  fs.appendFileSync('/tmp/errors.log', '1. Loading database...\n');
+  fs.appendFileSync('/tmp/startup.log', '1. Loading database...\n');
   const { pool } = require('./db');
-  fs.appendFileSync('/tmp/errors.log', '✅ Database loaded\n');
+  fs.appendFileSync('/tmp/startup.log', '✅ Database loaded\n');
 } catch (dbError) {
-  fs.appendFileSync('/tmp/errors.log', `❌ Database error: ${dbError.message}\n${dbError.stack}\n`);
+  fs.appendFileSync('/tmp/startup.log', `❌ Database error: ${dbError.message}\n`);
 }
 
-try {
-  fs.appendFileSync('/tmp/errors.log', '2. Loading auth route...\n');
-  const authRoutes = require('./routes/auth');
-  fs.appendFileSync('/tmp/errors.log', '✅ Auth route loaded\n');
-  app.use('/api/auth', authRoutes);
-} catch (authError) {
-  fs.appendFileSync('/tmp/errors.log', `❌ Auth route error: ${authError.message}\n${authError.stack}\n`);
-}
+// Load all routes with error handling
+const loadRoute = (name, path) => {
+  try {
+    fs.appendFileSync('/tmp/startup.log', `Loading ${name} route...\n`);
+    const route = require(path);
+    app.use(`/api/${name}`, route);
+    fs.appendFileSync('/tmp/startup.log', `✅ ${name} route loaded\n`);
+    return true;
+  } catch (error) {
+    fs.appendFileSync('/tmp/startup.log', `❌ ${name} route error: ${error.message}\n`);
+    return false;
+  }
+};
+
+// Load routes
+loadRoute('auth', './routes/auth');
+loadRoute('users', './routes/users');
+loadRoute('subscriptions', './routes/subscriptions');
+loadRoute('google', './routes/google');
 
 // Simple health check
 app.get('/health', (req, res) => {
-  fs.appendFileSync('/tmp/errors.log', 'Health check called\n');
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', routes: ['auth', 'users', 'subscriptions', 'google'] });
+});
+
+// Debug endpoint
+app.get('/debug/routes', (req, res) => {
+  try {
+    const log = fs.readFileSync('/tmp/startup.log', 'utf8');
+    res.type('text/plain').send(log);
+  } catch {
+    res.send('No log found');
+  }
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  const msg = `✅ Server running on port ${PORT}\n`;
+  fs.appendFileSync('/tmp/startup.log', msg);
+  console.log(msg);
 });
 
 const PORT = process.env.PORT || 4000;
