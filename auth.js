@@ -5,36 +5,44 @@ const { pool } = require('../db');
 
 const router = express.Router();
 
-console.log('Auth route initialized');
+console.log('Auth route loaded');
 
-// Simple test endpoint
+// Test endpoint
 router.get('/test', (req, res) => {
   res.json({ message: 'Auth API working' });
 });
 
-// Register endpoint (simplified)
+// Register - simplified
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required' });
     }
+
+    // Test database connection
+    const testResult = await pool.query('SELECT 1 as test');
+    console.log('Database test:', testResult.rows);
     
-    // Simple response for now
+    // For now, just return success
     res.json({ 
       success: true, 
-      message: 'Registration would create user',
-      email: email 
+      message: 'Database connection works',
+      email: email,
+      name: name || 'No name provided'
     });
     
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    res.status(500).json({ 
+      error: 'Registration failed',
+      details: error.message 
+    });
   }
 });
 
-// Login endpoint (simplified)
+// Login - simplified  
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -43,11 +51,11 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' });
     }
     
-    // Simple response for now
     res.json({ 
       success: true, 
-      message: 'Login would validate user',
-      token: 'test-token-' + Date.now()
+      message: 'Login endpoint works',
+      email: email,
+      token: 'jwt-test-token-' + Date.now()
     });
     
   } catch (error) {
@@ -57,3 +65,4 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router;
+
