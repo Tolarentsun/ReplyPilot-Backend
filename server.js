@@ -1,70 +1,58 @@
-const fs = require('fs');
 const express = require('express');
 const app = express();
 
-fs.writeFileSync('/tmp/routes.log', '=== Testing Routes ===\n');
+app.use(express.json());
 
-// Load database
+console.log('1. Testing database connection...');
 try {
+  // Try to load database (if files are in correct location)
   const { pool } = require('./db');
-  fs.appendFileSync('/tmp/routes.log', '✅ Database loaded\n');
-} catch (error) {
-  fs.appendFileSync('/tmp/routes.log', `❌ Database: ${error.message}\n`);
+  console.log('✅ Database loaded successfully');
+} catch (dbError) {
+  console.log('❌ Database error:', dbError.message);
+  // Continue without database for now
 }
 
-// Load ONLY auth first (we know this works)
-try {
-  const authRoutes = require('./routes/auth');
-  app.use('/api/auth', authRoutes);
-  fs.appendFileSync('/tmp/routes.log', '✅ auth.js loaded\n');
-} catch (error) {
-  fs.appendFileSync('/tmp/routes.log', `❌ auth.js: ${error.message}\n`);
-}
-
-// Test users.js
-try {
-  const userRoutes = require('./routes/users');
-  app.use('/api/users', userRoutes);
-  fs.appendFileSync('/tmp/routes.log', '✅ users.js loaded\n');
-} catch (error) {
-  fs.appendFileSync('/tmp/routes.log', `❌ users.js: ${error.message}\n`);
-}
-
-// Test subscriptions.js  
-try {
-  const subscriptionRoutes = require('./routes/subscriptions');
-  app.use('/api/subscriptions', subscriptionRoutes);
-  fs.appendFileSync('/tmp/routes.log', '✅ subscriptions.js loaded\n');
-} catch (error) {
-  fs.appendFileSync('/tmp/routes.log', `❌ subscriptions.js: ${error.message}\n`);
-}
-
-// Test google.js
-try {
-  const googleRoutes = require('./routes/google');
-  app.use('/api/google', googleRoutes);
-  fs.appendFileSync('/tmp/routes.log', '✅ google.js loaded\n');
-} catch (error) {
-  fs.appendFileSync('/tmp/routes.log', `❌ google.js: ${error.message}\n`);
-}
-
-// Health check
+// Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ 
+    status: 'ok', 
+    service: 'ReplyPilot Backend',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    database: 'SQLite (testing)'
+  });
 });
 
-// Route to view logs
-app.get('/debug/routes', (req, res) => {
-  try {
-    const log = fs.readFileSync('/tmp/routes.log', 'utf8');
-    res.type('text/plain').send(log);
-  } catch {
-    res.send('No log found');
-  }
+// Root endpoint (what users see at /)
+app.get('/', (req, res) => {
+  res.json({
+    message: '🚀 ReplyPilot API is running!',
+    description: 'Google Review Response Service for Local Businesses',
+    version: '1.0.0',
+    status: 'operational',
+    endpoints: {
+      health: '/health',
+      documentation: 'Coming soon...',
+      upcoming: ['/api/auth', '/api/users', '/api/subscriptions', '/api/google']
+    },
+    deployment: {
+      platform: 'Railway',
+      status: 'online',
+      url: 'https://replypilot-backend-production.up.railway.app'
+    }
+  });
+});
+
+// Simple test endpoint for auth (if we add routes later)
+app.get('/api/auth/test', (req, res) => {
+  res.json({ message: 'Auth endpoint placeholder - add real routes later' });
 });
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 ReplyPilot Backend launched on port ${PORT}`);
+  console.log(`✅ Health check: http://localhost:${PORT}/health`);
+  console.log(`✅ Root endpoint: http://localhost:${PORT}/`);
+  console.log(`✅ Public URL: https://replypilot-backend-production.up.railway.app`);
 });
-
