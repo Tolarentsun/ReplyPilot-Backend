@@ -1,13 +1,17 @@
 const express = require('express');
 const app = express();
 
-console.log('1. Testing database...');
+console.log('1. Loading database...');
+const { pool } = require('./db');
+console.log('✅ Database loaded');
+
+console.log('2. Loading auth route...');
 try {
-  // Try to load database
-  const { pool } = require('./db');
-  console.log('✅ Database loaded');
+  const authRoutes = require('./routes/auth');
+  console.log('✅ Auth route loaded');
+  app.use('/api/auth', authRoutes);
 } catch (error) {
-  console.log('❌ Database error:', error.message);
+  console.log('❌ Auth route error:', error.message);
 }
 
 app.get('/health', (req, res) => {
