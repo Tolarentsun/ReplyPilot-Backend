@@ -25,14 +25,12 @@ app.use('/api/', limiter);
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const subscriptionRoutes = require('./routes/subscriptions');
-const reviewsRoutes = require('./routes/reviews');
 const googleRoutes = require('./routes/google');
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
-app.use('/api/reviews', reviewsRoutes);
 app.use('/api/google', googleRoutes);
 
 // Health check
@@ -49,7 +47,7 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       users: '/api/users',
       subscriptions: '/api/subscriptions',
-      reviews: '/api/reviews'
+      google: '/api/google'
     }
   });
 });
