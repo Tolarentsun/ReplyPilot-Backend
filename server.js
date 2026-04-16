@@ -3,56 +3,32 @@ const app = express();
 
 app.use(express.json());
 
-console.log('1. Testing database connection...');
-try {
-  // Try to load database (if files are in correct location)
-  const { pool } = require('./db');
-  console.log('✅ Database loaded successfully');
-} catch (dbError) {
-  console.log('❌ Database error:', dbError.message);
-  // Continue without database for now
-}
+// Load database
+const { pool } = require('./db');
 
-// Health check endpoint
+// Load routes (update paths based on your folder structure)
+const authRoutes = require('./db/routes/auth');  // or ./routes/auth if you moved it
+const userRoutes = require('./db/routes/users');
+const subscriptionRoutes = require('./db/routes/subscriptions');
+const googleRoutes = require('./db/routes/google');
+
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/google', googleRoutes);
+
+// Keep health and root endpoints
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    service: 'ReplyPilot Backend',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
-    database: 'SQLite (testing)'
-  });
+  res.json({ status: 'ok' });
 });
 
-// Root endpoint (what users see at /)
 app.get('/', (req, res) => {
-  res.json({
-    message: '🚀 ReplyPilot API is running!',
-    description: 'Google Review Response Service for Local Businesses',
-    version: '1.0.0',
-    status: 'operational',
-    endpoints: {
-      health: '/health',
-      documentation: 'Coming soon...',
-      upcoming: ['/api/auth', '/api/users', '/api/subscriptions', '/api/google']
-    },
-    deployment: {
-      platform: 'Railway',
-      status: 'online',
-      url: 'https://replypilot-backend-production.up.railway.app'
-    }
-  });
-});
-
-// Simple test endpoint for auth (if we add routes later)
-app.get('/api/auth/test', (req, res) => {
-  res.json({ message: 'Auth endpoint placeholder - add real routes later' });
+  res.json({ message: 'ReplyPilot API with real routes' });
 });
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 ReplyPilot Backend launched on port ${PORT}`);
-  console.log(`✅ Health check: http://localhost:${PORT}/health`);
-  console.log(`✅ Root endpoint: http://localhost:${PORT}/`);
-  console.log(`✅ Public URL: https://replypilot-backend-production.up.railway.app`);
+  console.log(`Server running on port ${PORT}`);
 });
+
