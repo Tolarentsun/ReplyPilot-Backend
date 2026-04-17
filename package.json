@@ -1,12 +1,23 @@
 {
   "name": "replypilot-backend",
-  "version": "1.0.0",
+  "version": "1.2.0",
+  "description": "AI-Powered Review Response Platform for Local Businesses",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "express": "^4.19.0",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.7",
+    "axios": "^1.7.0",
+    "stripe": "^16.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
