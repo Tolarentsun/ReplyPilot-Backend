@@ -1,9 +1,20 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
+
+// Enable CORS for your Netlify site
+app.use(cors({
+  origin: [
+    'https://sparkling-hotteok-2033b7.netlify.app', // Your Netlify URL
+    'http://localhost:3000' // For local testing
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
-// ========== ADD THESE AUTH ROUTES ==========
 // Simple auth test endpoint
 app.get('/api/auth/test', (req, res) => {
   res.json({ 
@@ -27,12 +38,6 @@ app.post('/api/auth/register', (req, res) => {
         error: 'Email and password are required' 
       });
     }
-    
-    // In a real app, you would:
-    // 1. Check if user exists
-    // 2. Hash password
-    // 3. Save to database
-    // 4. Create JWT token
     
     res.json({ 
       success: true,
@@ -63,7 +68,6 @@ app.post('/api/auth/login', (req, res) => {
       });
     }
     
-    // Simulate login validation
     res.json({ 
       success: true,
       message: 'Login successful (simulated)',
@@ -81,16 +85,16 @@ app.post('/api/auth/login', (req, res) => {
     res.status(500).json({ error: 'Login failed' });
   }
 });
-// ========== END AUTH ROUTES ==========
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     service: 'ReplyPilot Backend',
-    version: '1.0.1',
+    version: '1.0.2',
     timestamp: new Date().toISOString(),
-    features: ['auth-api', 'health-check']
+    cors: 'enabled',
+    allowed_origins: ['sparkling-hotteok-2033b7.netlify.app']
   });
 });
 
@@ -99,7 +103,7 @@ app.get('/', (req, res) => {
   res.json({
     message: '🚀 ReplyPilot API is running!',
     description: 'Google Review Response Service for Local Businesses',
-    version: '1.0.1',
+    version: '1.0.2',
     status: 'operational',
     endpoints: {
       health: '/health',
@@ -107,20 +111,15 @@ app.get('/', (req, res) => {
         test: 'GET /api/auth/test',
         register: 'POST /api/auth/register',
         login: 'POST /api/auth/login'
-      },
-      upcoming: ['/api/users', '/api/subscriptions', '/api/google']
+      }
     },
-    deployment: {
-      platform: 'Railway',
-      status: 'online',
-      url: 'https://replypilot-backend-production.up.railway.app'
-    }
+    frontend: 'https://sparkling-hotteok-2033b7.netlify.app'
   });
 });
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 ReplyPilot Backend launched on port ${PORT}`);
+  console.log(`✅ CORS enabled for: sparkling-hotteok-2033b7.netlify.app`);
   console.log(`✅ Health check: http://localhost:${PORT}/health`);
-  console.log(`✅ Auth test: http://localhost:${PORT}/api/auth/test`);
 });
