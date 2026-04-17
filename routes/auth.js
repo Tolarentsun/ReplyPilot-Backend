@@ -1,67 +1,26 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { pool } = require('../db');
 
-const router = express.Router();
-
-console.log('Auth route loaded');
-
-// Test endpoint
-router.get('/test', (req, res) => {
-  res.json({ message: 'Auth API working' });
-});
-
-// Register - simplified
-router.post('/register', async (req, res) => {
-  try {
-    const { email, password, name } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
-    }
-
-    // Test database connection
-    const testResult = await pool.query('SELECT 1 as test');
-    console.log('Database test:', testResult.rows);
-    
-    // For now, just return success
-    res.json({ 
-      success: true, 
-      message: 'Database connection works',
-      email: email,
-      name: name || 'No name provided'
-    });
-    
-  } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ 
-      error: 'Registration failed',
-      details: error.message 
-    });
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
-});
 
-// Login - simplified  
-router.post('/login', async (req, res) => {
+  const token = authHeader.split(' ')[1];
+
   try {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Login endpoint works',
-      email: email,
-      token: 'jwt-test-token-' + Date.now()
-    });
-    
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token.' });
   }
-});
+};
 
-module.exports = router;
+const requireSubscription = (req, res, next) => {
+  // TODO: Add real subscription check from DB later
+  // For now, allow all authenticated users (upgrade this for premium features)
+  next();
+};
+
+module.exports = { authMiddleware, requireSubscription };
