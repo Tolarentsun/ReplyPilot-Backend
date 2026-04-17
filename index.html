@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReplyPilot - AI Review Response for Local Businesses</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: bold; color: #4F46E5; }
+        .nav-links a { margin-left: 20px; text-decoration: none; color: #333; }
+        .hero { text-align: center; padding: 60px 20px; background: white; border-radius: 10px; margin-bottom: 20px; }
+        .hero h1 { font-size: 48px; color: #1F2937; }
+        .hero p { font-size: 20px; color: #6B7280; max-width: 600px; margin: 0 auto 30px; }
+        .cta-button { background: #4F46E5; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 40px 0; }
+        .feature-card { background: white; padding: 30px; border-radius: 10px; }
+        footer { text-align: center; margin-top: 40px; color: #6B7280; }
+        #api-status { margin-top: 20px; padding: 10px; border-radius: 5px; }
+        .status-online { background: #D1FAE5; color: #065F46; }
+        .status-offline { background: #FEE2E2; color: #991B1B; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav>
+                <div class="logo">🚀 ReplyPilot</div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="login.html">Login</a>
+                    <a href="register.html" class="cta-button">Get Started</a>
+                </div>
+            </nav>
+        </header>
+
+        <div class="hero">
+            <h1>AI-Powered Review Responses</h1>
+            <p>Automatically respond to Google reviews with personalized, professional replies. Save time and improve your online reputation.</p>
+            <button class="cta-button" onclick="window.location.href='register.html'">Start Free Trial</button>
+            <div id="api-status">Checking backend status...</div>
+        </div>
+
+        <div class="features" id="features">
+            <div class="feature-card">
+                <h3>⚡ Instant Responses</h3>
+                <p>Automatically respond to new reviews within minutes.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🤖 AI-Powered</h3>
+                <p>Smart replies tailored to each review's sentiment.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 Analytics</h3>
+                <p>Track response rates and customer satisfaction.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 ReplyPilot. Backend Status: <span id="backend-status">Checking...</span></p>
+            <p>API: <span id="api-url">https://replypilot-backend-production.up.railway.app</span></p>
+        </footer>
+    </div>
+
+    <script>
+        // Check if backend is online
+        async function checkBackend() {
+            try {
+                const response = await fetch('https://replypilot-backend-production.up.railway.app/health');
+                const data = await response.json();
+                
+                document.getElementById('api-status').innerHTML = 
+                    `<span class="status-online">✅ Backend online: ${data.status}</span>`;
+                document.getElementById('backend-status').innerHTML = '✅ Online';
+                document.getElementById('backend-status').style.color = 'green';
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = 
+                    `<span class="status-offline">❌ Backend offline</span>`;
+                document.getElementById('backend-status').innerHTML = '❌ Offline';
+                document.getElementById('backend-status').style.color = 'red';
+            }
+        }
+        
+        checkBackend();
+        setInterval(checkBackend, 30000);
+    </script>
+</body>
+</html>
