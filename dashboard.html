@@ -4,142 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - ReplyPilot</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
     <style>
         :root {
             --primary: #6366F1;
-            --primary-dark: #4F46E5;
             --dark: #0F172A;
             --gray: #64748B;
-            --light: #F8FAFC;
+            --border: #E2E8F0;
+            --bg: #F8FAFC;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F8FAFC;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
             color: var(--dark);
-            min-height: 100vh;
+            line-height: 1.6;
         }
 
-        .container {
+        .dashboard {
             display: flex;
             min-height: 100vh;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 260px;
+            width: 280px;
             background: white;
-            border-right: 1px solid #E2E8F0;
-            padding: 24px 16px;
+            border-right: 1px solid var(--border);
+            padding: 32px 24px;
             position: fixed;
             height: 100vh;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 60px;
             text-decoration: none;
         }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .nav-link {
+            display: block;
             padding: 14px 20px;
-            margin: 4px 0;
+            margin: 6px 0;
             border-radius: 12px;
-            font-weight: 500;
             color: var(--gray);
             text-decoration: none;
+            font-weight: 500;
             transition: all 0.2s;
         }
 
-        .nav-item:hover, .nav-item.active {
+        .nav-link:hover,
+        .nav-link.active {
             background: #F1F5F9;
             color: var(--primary);
         }
 
         /* Main Content */
-        .main-content {
-            margin-left: 260px;
+        .main {
+            margin-left: 280px;
             flex: 1;
-            padding: 40px 48px;
+            padding: 48px 60px;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
         }
 
         .header h1 {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 700;
         }
 
         .status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
             background: #F0FDF4;
             color: #166534;
-            padding: 8px 16px;
+            padding: 6px 18px;
             border-radius: 9999px;
             font-size: 14px;
             font-weight: 500;
         }
 
         /* Stats Cards */
-        .stats-grid {
+        .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 24px;
             margin-bottom: 48px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 20px;
-            padding: 28px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
         }
 
         .stat-card h3 {
             font-size: 15px;
             color: var(--gray);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
 
-        .stat-value {
+        .stat-card .value {
             font-size: 42px;
             font-weight: 700;
-            color: var(--dark);
+            letter-spacing: -1px;
         }
 
         /* Recent Activity */
         .activity-card {
             background: white;
-            border-radius: 20px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
             padding: 32px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .activity-card h2 {
+            font-size: 22px;
+            margin-bottom: 24px;
         }
 
         .activity-item {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid #F1F5F9;
         }
 
         .activity-item:last-child {
@@ -147,103 +147,79 @@
         }
 
         .btn {
-            padding: 12px 24px;
             background: var(--primary);
             color: white;
             border: none;
+            padding: 12px 28px;
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="dashboard">
         <!-- Sidebar -->
         <div class="sidebar">
             <a href="#" class="logo">
-                <span>🚀</span>
-                <span>ReplyPilot</span>
+                🚀 ReplyPilot
             </a>
             
-            <a href="#" class="nav-item active">📊 Dashboard</a>
-            <a href="#" class="nav-item">⭐ Reviews</a>
-            <a href="#" class="nav-item">✍️ Responses</a>
-            <a href="#" class="nav-item">⚙️ Settings</a>
+            <a href="#" class="nav-link active">📊 Dashboard</a>
+            <a href="#" class="nav-link">⭐ Reviews</a>
+            <a href="#" class="nav-link">✍️ Responses</a>
+            <a href="#" class="nav-link">⚙️ Settings</a>
         </div>
 
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main">
             <div class="header">
                 <h1>Welcome to ReplyPilot</h1>
-                <div class="status">
-                    <span>✅</span> Backend: healthy
-                </div>
+                <div class="status">✅ Backend: healthy</div>
             </div>
 
             <!-- Stats -->
-            <div class="stats-grid">
+            <div class="stats">
                 <div class="stat-card">
                     <h3>Reviews This Month</h3>
-                    <div class="stat-value" id="reviews-count">12</div>
+                    <div class="value" id="reviews">18</div>
                 </div>
                 <div class="stat-card">
                     <h3>Response Rate</h3>
-                    <div class="stat-value" id="response-rate">92%</div>
+                    <div class="value" id="response">94%</div>
                 </div>
                 <div class="stat-card">
                     <h3>Average Rating</h3>
-                    <div class="stat-value" id="avg-rating">4.7</div>
+                    <div class="value" id="rating">4.8</div>
                 </div>
             </div>
 
             <!-- Recent Activity -->
             <div class="activity-card">
-                <h2 style="margin-bottom: 24px; font-size: 24px;">Recent Activity</h2>
-                <div id="activity-list">
-                    <!-- Will be filled dynamically later -->
-                </div>
+                <h2>Recent Activity</h2>
+                <div id="activity-list"></div>
             </div>
-
-            <br><br>
-            <button class="btn" onclick="testBackend()">Test Backend Connection</button>
         </div>
     </div>
 
     <script>
-        // Simple dynamic demo for now
-        document.getElementById('reviews-count').textContent = "18";
-        document.getElementById('response-rate').textContent = "94%";
-        document.getElementById('avg-rating').textContent = "4.8";
+        // Temporary values (we'll make these real later)
+        document.getElementById('reviews').textContent = "24";
+        document.getElementById('response').textContent = "96%";
+        document.getElementById('rating').textContent = "4.9";
 
-        // Sample activity
         const activities = [
-            "✅ Connected to Google Business Profile",
-            "✍️ Responded to review from Sarah Johnson",
-            "📥 5 new reviews received today"
+            "Connected to Google Business Profile",
+            "Responded to review from Sarah Johnson",
+            "5 new reviews received today"
         ];
 
-        const activityHTML = activities.map(activity => `
+        document.getElementById('activity-list').innerHTML = activities.map(act => `
             <div class="activity-item">
-                <span style="font-size:20px;">${activity.startsWith('✅') ? '✅' : activity.startsWith('✍️') ? '✍️' : '📥'}</span>
-                <span>${activity}</span>
+                <span>${act}</span>
             </div>
         `).join('');
-
-        document.getElementById('activity-list').innerHTML = activityHTML;
-
-        function testBackend() {
-            fetch('https://replypilot-backend-production.up.railway.app/health')
-                .then(res => res.json())
-                .then(data => alert('Backend is healthy! ✅'))
-                .catch(() => alert('Backend connection failed'));
-        }
     </script>
 </body>
 </html>
