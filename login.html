@@ -178,8 +178,8 @@
     </div>
 
     <script>
-        // ←←← UPDATE THIS WITH YOUR CURRENT RAILWAY BACKEND URL ←←←
-        const API_BASE_URL = "https://replypilot-backend-production.up.railway.app";
+        // ✅ YOUR CURRENT CORRECT BACKEND URL
+        const API_BASE_URL = "https://replypilot-backend.up.railway.app";
 
         document.getElementById('loginBtn').addEventListener('click', login);
 
@@ -217,7 +217,7 @@
                     showMessage(data.error || "Invalid email or password", "error");
                 }
             } catch (err) {
-                showMessage("❌ Cannot connect to server. Please make sure the backend is running.", "error");
+                showMessage("❌ Cannot connect to server. Please check if the backend is running.", "error");
                 console.error(err);
             } finally {
                 document.getElementById('loading').style.display = 'none';
@@ -237,7 +237,7 @@
             if (e.key === 'Enter') login();
         });
 
-        // Auto-redirect if already logged in
+        // Auto redirect if already logged in
         window.addEventListener('load', () => {
             if (localStorage.getItem('token')) {
                 window.location.href = 'dashboard.html';
