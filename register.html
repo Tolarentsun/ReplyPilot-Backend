@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -203,6 +203,7 @@
     </div>
 
     <script>
+        // ✅ YOUR CORRECT BACKEND URL - MAKE SURE THIS IS ACCURATE
         const API_BASE_URL = "https://replypilot-backend.up.railway.app";
 
         document.getElementById('registerBtn').addEventListener('click', register);
@@ -245,11 +246,11 @@
 
                     setTimeout(() => window.location.href = 'dashboard.html', 1500);
                 } else {
-                    showMessage(data.error || "Registration failed", "error");
+                    showMessage(data.error || "Registration failed. Please try again.", "error");
                 }
             } catch (err) {
-                console.error(err);
-                showMessage("❌ Cannot connect to server. Is the backend running?", "error");
+                console.error("Connection error:", err);
+                showMessage("❌ Cannot connect to backend. Please check if the Railway backend is online and the URL is correct.", "error");
             } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('registerBtn').disabled = false;
