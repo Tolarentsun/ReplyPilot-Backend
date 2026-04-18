@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - ReplyPilot</title>
+    <title>Sign Up - ReplyPilot</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-dark: #4338CA;
-            --dark: #1F2937;
-            --gray: #6B7280;
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --dark: #1E2937;
+            --gray: #64748B;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -25,164 +25,185 @@
             padding: 20px;
         }
         
-        .container {
-            width: 100%;
-            max-width: 440px;
-        }
-        
         .card {
             background: white;
-            border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border-radius: 28px;
+            padding: 52px 48px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.18);
+            max-width: 480px;
+            width: 100%;
         }
         
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 40px;
             justify-content: center;
+            gap: 14px;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 32px;
             text-decoration: none;
         }
         
         h1 {
+            font-size: 28px;
             text-align: center;
             margin-bottom: 8px;
+            font-weight: 700;
             color: var(--dark);
         }
         
         .subtitle {
             text-align: center;
             color: var(--gray);
+            font-size: 15.5px;
+            margin-bottom: 36px;
+            line-height: 1.5;
+        }
+        
+        .benefits {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
             margin-bottom: 32px;
+            font-size: 13.5px;
+            color: var(--gray);
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
         
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--dark);
             font-size: 14px;
+            color: var(--dark);
         }
         
         input {
             width: 100%;
-            padding: 16px;
-            border: 2px solid #E5E7EB;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border: 2px solid #E2E8F0;
+            border-radius: 14px;
             font-size: 16px;
             transition: all 0.3s;
+            background: #F8FAFC;
         }
         
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
         }
         
         .btn {
             width: 100%;
-            padding: 16px;
-            background: var(--primary);
+            padding: 18px;
+            background: linear-gradient(90deg, var(--primary), #7C3AED);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 14px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
+            transition: all 0.3s;
         }
         
         .btn:hover {
-            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(99,102,241,0.35);
         }
         
         .message {
-            padding: 14px;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border-radius: 14px;
             margin: 20px 0;
             display: none;
+            font-size: 15px;
             text-align: center;
+            font-weight: 500;
         }
         
-        .success { background: #D1FAE5; color: #065F46; }
-        .error { background: #FEE2E2; color: #991B1B; }
+        .success { background: #DCFCE7; color: #166534; }
+        .error   { background: #FEE2E2; color: #991B1B; }
         
         .loading {
             display: none;
             text-align: center;
-            margin: 15px 0;
+            margin: 20px 0;
+            color: var(--gray);
         }
         
         .spinner {
-            width: 28px;
-            height: 28px;
-            border: 3px solid #f3f3f3;
+            width: 26px;
+            height: 26px;
+            border: 3px solid #E2E8F0;
             border-top: 3px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 12px;
         }
         
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <a href="index.html" class="logo">
-                <span style="font-size:32px">🚀</span>
-                <span>ReplyPilot</span>
-            </a>
-            
-            <h1>Create Your Account</h1>
-            <p class="subtitle">Start automating your review responses today</p>
+    <div class="card">
+        <a href="index.html" class="logo">
+            <span>🚀</span>
+            <span>ReplyPilot</span>
+        </a>
+        
+        <h1>Create Your Account</h1>
+        <p class="subtitle">Join businesses using AI to automatically reply to reviews and gain deep customer insights</p>
 
-            <div id="message" class="message"></div>
-
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" placeholder="John Smith" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" placeholder="••••••••" required>
-            </div>
-
-            <button class="btn" id="registerBtn">Create Account</button>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Creating your account...</p>
-            </div>
-
-            <p style="text-align:center; margin-top:24px; font-size:14px; color:var(--gray);">
-                Already have an account? <a href="login.html" style="color:var(--primary); font-weight:600;">Log in here</a>
-            </p>
+        <div class="benefits">
+            <span>✓ 14-day free trial</span>
+            <span>✓ No credit card required</span>
+            <span>✓ Cancel anytime</span>
         </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Christopher Wiley" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="••••••••" required>
+        </div>
+
+        <button class="btn" id="registerBtn">Create Free Account</button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Creating your account...</p>
+        </div>
+
+        <p style="text-align:center; margin-top:32px; font-size:14px; color:var(--gray);">
+            Already have an account? <a href="login.html" style="color:var(--primary); font-weight:600;">Sign in</a>
+        </p>
     </div>
 
     <script>
-        const API_BASE_URL = "https://replypilot-backend-production.up.railway.app";   // ← CHANGE THIS TO YOUR CURRENT RAILWAY URL
+        const API_BASE_URL = "https://replypilot-backend-production.up.railway.app";   // ← UPDATE THIS
 
         document.getElementById('registerBtn').addEventListener('click', register);
 
@@ -192,7 +213,6 @@
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // Basic validation
             if (!name || !email || !password || !confirmPassword) {
                 showMessage("Please fill in all fields", "error");
                 return;
@@ -206,7 +226,6 @@
                 return;
             }
 
-            // Show loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('registerBtn').disabled = true;
 
@@ -219,21 +238,17 @@
 
                 const data = await response.json();
 
-                if (response.ok && data.success) {
-                    showMessage("✅ Account created successfully! Redirecting...", "success");
-                    
+                if (response.ok && (data.success || data.token)) {
+                    showMessage("✅ Account created! Redirecting...", "success");
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('user', JSON.stringify({ name, email }));
 
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1500);
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
                 } else {
-                    showMessage("❌ " + (data.error || data.message || "Registration failed"), "error");
+                    showMessage(data.error || "Registration failed. Please try again.", "error");
                 }
             } catch (err) {
-                showMessage("❌ Network error. Please check your connection.", "error");
-                console.error(err);
+                showMessage("❌ Cannot connect to server. Is the backend running?", "error");
             } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('registerBtn').disabled = false;
@@ -247,10 +262,7 @@
             msg.style.display = 'block';
         }
 
-        // Allow pressing Enter key
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') register();
-        });
+        document.addEventListener('keypress', e => { if (e.key === 'Enter') register(); });
     </script>
 </body>
 </html>
