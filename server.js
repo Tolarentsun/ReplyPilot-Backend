@@ -1,29 +1,39 @@
-// server.js
+// server.js - Diagnostic Version
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 
 const app = express();
 
-console.log("✅ Server file loaded");
-console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
+console.log("=== Server Starting ===");
+console.log("JWT_SECRET loaded:", !!process.env.JWT_SECRET);
+console.log("NODE_ENV:", process.env.NODE_ENV || "not set");
+console.log("PORT:", process.env.PORT || 4000);
 
 app.use(express.json());
 
 app.use(cors({
-  origin: true,        // Allow all for now (we'll tighten later)
+  origin: true,
   credentials: true
 }));
 
-// Import auth routes
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
+// Import routes safely
+let authRoutes;
+try {
+  authRoutes = require('./routes/auth');
+  console.log("✅ Auth routes loaded successfully");
+  app.use('/api/auth', authRoutes);
+} catch (err) {
+  console.error("❌ Failed to load auth routes:", err.message);
+}
 
-// Health check - MUST respond quickly
+// Health check - must respond fast
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     version: '1.3.0',
+    jwt_loaded: !!process.env.JWT_SECRET,
     timestamp: new Date().toISOString()
   });
 });
@@ -36,7 +46,7 @@ const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server successfully started on port ${PORT}`);
-  console.log(`Health check available at /health`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
 }).on('error', (err) => {
-  console.error('❌ Server failed to start:', err.message);
+  console.error('❌ Failed to start server:', err.message);
 });
