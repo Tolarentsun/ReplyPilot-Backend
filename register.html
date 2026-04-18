@@ -203,7 +203,8 @@
     </div>
 
     <script>
-        const API_BASE_URL = "https://replypilot-backend-production.up.railway.app";   // ← UPDATE THIS
+        // ✅ UPDATED WITH YOUR CURRENT BACKEND URL
+        const API_BASE_URL = "https://replypilot-backend.up.railway.app";
 
         document.getElementById('registerBtn').addEventListener('click', register);
 
@@ -239,16 +240,17 @@
                 const data = await response.json();
 
                 if (response.ok && (data.success || data.token)) {
-                    showMessage("✅ Account created! Redirecting...", "success");
+                    showMessage("✅ Account created successfully! Redirecting...", "success");
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify({ name, email }));
+                    localStorage.setItem('user', JSON.stringify(data.user || { name, email }));
 
                     setTimeout(() => window.location.href = 'dashboard.html', 1500);
                 } else {
                     showMessage(data.error || "Registration failed. Please try again.", "error");
                 }
             } catch (err) {
-                showMessage("❌ Cannot connect to server. Is the backend running?", "error");
+                showMessage("❌ Cannot connect to server. Please check if the backend is running.", "error");
+                console.error(err);
             } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('registerBtn').disabled = false;
@@ -262,7 +264,9 @@
             msg.style.display = 'block';
         }
 
-        document.addEventListener('keypress', e => { if (e.key === 'Enter') register(); });
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') register();
+        });
     </script>
 </body>
 </html>
