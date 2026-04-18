@@ -178,10 +178,10 @@
     </div>
 
     <script>
-        // ✅ Update this with your real Railway backend URL
-        const API_BASE_URL = "https://replypilot-backend.up.railway.app";   // ← CHANGE IF DIFFERENT
+        // ✅ YOUR CORRECT RAILWAY BACKEND URL (already updated)
+        const API_BASE_URL = "https://replypilot-backend-production.up.railway.app";
 
-        // Wait until DOM is fully loaded before attaching events
+        // Wait for DOM to load before running script
         document.addEventListener('DOMContentLoaded', () => {
             const loginBtn = document.getElementById('loginBtn');
             loginBtn.addEventListener('click', login);
@@ -235,7 +235,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                showMessage("❌ Cannot connect to server. Check if backend is running.", "error");
+                showMessage("❌ Cannot connect to server. Check if backend is running on Railway.", "error");
             } finally {
                 loadingDiv.style.display = 'none';
                 loginBtn.disabled = false;
