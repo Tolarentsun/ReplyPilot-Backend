@@ -1,125 +1,55 @@
+// server.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
 const app = express();
 
-// Enable CORS for your Netlify site
-app.use(cors({
-  origin: [
-    'https://sparkling-hotteok-2033b7.netlify.app', // Your Netlify URL
-    'http://localhost:3000' // For local testing
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+// Middleware
 app.use(express.json());
 
-// Simple auth test endpoint
-app.get('/api/auth/test', (req, res) => {
-  res.json({ 
-    message: 'Auth API is working!',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      register: 'POST /api/auth/register',
-      login: 'POST /api/auth/login',
-      test: 'GET /api/auth/test'
-    }
-  });
-});
+// CORS - Update this with your Netlify URL later
+app.use(cors({
+  origin: [
+    "https://your-netlify-site.netlify.app",   // ← Change this when you deploy to Netlify
+    "http://localhost:3000",
+    "http://127.0.0.1:5500",
+    "http://localhost:4000"
+  ],
+  credentials: true
+}));
 
-// User registration endpoint
-app.post('/api/auth/register', (req, res) => {
-  try {
-    const { email, password, name } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ 
-        error: 'Email and password are required' 
-      });
-    }
-    
-    res.json({ 
-      success: true,
-      message: 'User registration successful (simulated)',
-      user: {
-        email: email,
-        name: name || 'Not provided',
-        id: 'user-' + Date.now(),
-        createdAt: new Date().toISOString()
-      },
-      token: 'jwt-simulated-token-' + Date.now()
-    });
-    
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed' });
-  }
-});
+// Import routes
+const authRoutes = require('./routes/auth');
 
-// User login endpoint
-app.post('/api/auth/login', (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ 
-        error: 'Email and password are required' 
-      });
-    }
-    
-    res.json({ 
-      success: true,
-      message: 'Login successful (simulated)',
-      user: {
-        email: email,
-        id: 'user-12345',
-        name: 'Test User'
-      },
-      token: 'jwt-simulated-token-' + Date.now(),
-      expiresIn: '24h'
-    });
-    
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
-  }
-});
+// Use routes
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     service: 'ReplyPilot Backend',
-    version: '1.0.2',
-    timestamp: new Date().toISOString(),
-    cors: 'enabled',
-    allowed_origins: ['sparkling-hotteok-2033b7.netlify.app']
+    version: '1.3.0',
+    timestamp: new Date().toISOString()
   });
 });
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: '🚀 ReplyPilot API is running!',
-    description: 'Google Review Response Service for Local Businesses',
-    version: '1.0.2',
-    status: 'operational',
+    message: '🚀 ReplyPilot Backend is running!',
+    version: '1.3.0',
     endpoints: {
-      health: '/health',
-      auth: {
-        test: 'GET /api/auth/test',
-        register: 'POST /api/auth/register',
-        login: 'POST /api/auth/login'
-      }
-    },
-    frontend: 'https://sparkling-hotteok-2033b7.netlify.app'
+      register: 'POST /api/auth/register',
+      login: 'POST /api/auth/login',
+      health: '/health'
+    }
   });
 });
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 ReplyPilot Backend launched on port ${PORT}`);
-  console.log(`✅ CORS enabled for: sparkling-hotteok-2033b7.netlify.app`);
+  console.log(`🚀 ReplyPilot Backend running on port ${PORT}`);
   console.log(`✅ Health check: http://localhost:${PORT}/health`);
 });
