@@ -1,5 +1,5 @@
-    <script>
-        // ✅ YOUR CORRECT BACKEND URL
+        <script>
+        // ✅ CORRECT BACKEND URL (updated April 17, 2026)
         const API_BASE_URL = "https://replypilot-backend.up.railway.app";
 
         document.getElementById('registerBtn').addEventListener('click', register);
@@ -46,7 +46,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                showMessage("❌ Cannot connect to server. Make sure the backend URL is correct.", "error");
+                showMessage("❌ Cannot connect to backend. Please make sure the backend is running and the URL is correct.", "error");
             } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('registerBtn').disabled = false;
