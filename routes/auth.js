@@ -1,103 +1,79 @@
-// routes/auth.js
 const express = require('express');
+const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { runQuery, getQuery } = require('../db/sqlite');
+const db = require('../db/database');
+const { authenticate } = require('../middleware/auth');
+const { seedDemoReviews } = require('../db/seedData');
 
-const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'replypilot-secret-change-in-production';
 
-// ======================
-// REGISTER NEW USER
-// ======================
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+}
+
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, business_name, business_type } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
+    if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
+    if (existing) return res.status(409).json({ error: 'Email already registered' });
 
-    // Check if user already exists
-    const existing = await getQuery('SELECT id FROM users WHERE email = ?', [email]);
-    if (existing) {
-      return res.status(409).json({ error: 'A user with this email already exists' });
-    }
+    const id = generateId();
+    const passwordHash = await bcrypt.hash(password, 12);
 
-    // Hash password securely
-    const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(password, salt);
+    db.prepare(`INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan) VALUES (?, ?, ?, ?, ?, ?, 'free')`)
+      .run(id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null);
 
-    // Create user
-    const result = await runQuery(
-      'INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)',
-      [email, password_hash, name || null]
-    );
+    await seedDemoReviews(id);
 
-    const userId = result.lastID;
+    const user = db.prepare('SELECT id, name, email, plan, business_name, business_type, created_at FROM users WHERE id = ?').get(id);
+    const token = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
 
-    // Create default trial subscription
-    await runQuery(
-      'INSERT INTO subscriptions (user_id, status, plan) VALUES (?, "trial", "free")',
-      [userId]
-    );
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: userId, email },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'Account created successfully',
-      token,
-      user: { id: userId, name: name || '', email }
-    });
-
-  } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ error: 'Failed to create account' });
+    res.json({ success: true, token, user });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Registration failed: ' + err.message });
   }
 });
 
-// ======================
-// LOGIN
-// ======================
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+    if (!user) return res.status(401).json({ error: 'Invalid email or password' });
 
-    const user = await getQuery('SELECT * FROM users WHERE email = ?', [email]);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
 
-    const validPassword = await bcrypt.compare(password, user.password_hash);
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+    const { password_hash, ...safeUser } = user;
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    res.json({ success: true, token, user: safeUser });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Login failed: ' + err.message });
+  }
+});
 
-    res.json({
-      success: true,
-      message: 'Login successful',
-      token,
-      user: { id: user.id, name: user.name || '', email: user.email }
-    });
+router.get('/me', authenticate, (req, res) => {
+  const { password_hash, ...safeUser } = req.user;
+  res.json({ success: true, user: safeUser });
+});
 
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+router.put('/profile', authenticate, (req, res) => {
+  try {
+    const { name, business_name, business_type } = req.body;
+    db.prepare(`UPDATE users SET name = ?, business_name = ?, business_type = ? WHERE id = ?`)
+      .run(name || req.user.name, business_name || null, business_type || null, req.user.id);
+    const updated = db.prepare('SELECT id, name, email, plan, business_name, business_type FROM users WHERE id = ?').get(req.user.id);
+    res.json({ success: true, user: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Profile update failed' });
   }
 });
 
