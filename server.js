@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err.message, err.stack);
@@ -9,16 +9,15 @@ process.on('unhandledRejection', (reason) => {
   console.error('UNHANDLED REJECTION:', reason);
 });
 
-// Health check FIRST — must respond before anything else loads
+// Health check FIRST
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', version: '2.0.0', timestamp: new Date().toISOString() });
 });
 
 app.get('/', (req, res) => {
-  res.json({ message: 'ReplyPilot API v2.0', status: 'running', health: '/health', api: '/api' });
+  res.json({ message: 'ReplyPilot API v2.0', status: 'running' });
 });
 
-// Load middleware
 try { require('dotenv').config(); } catch(e) {}
 
 try {
@@ -40,7 +39,6 @@ try {
   app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 } catch(e) { console.error('rateLimit failed:', e.message); }
 
-// Routes
 try {
   app.use('/api/auth', require('./routes/auth'));
   console.log('✅ Auth routes loaded');
@@ -74,8 +72,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
-// Always start — no matter what
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 ReplyPilot API running on port ${PORT}`);
-  console.log(`✅ Health check: /health`);
+  console.log(`✅ Health: /health`);
 });
