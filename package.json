@@ -1,7 +1,7 @@
 {
   "name": "replypilot-backend",
   "version": "2.0.0",
-  "description": "ReplyPilot backend - AI review response platform",
+  "description": "ReplyPilot backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -20,7 +20,7 @@
     "helmet": "^7.0.0",
     "uuid": "^9.0.0"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
