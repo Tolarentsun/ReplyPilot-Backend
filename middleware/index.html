@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReplyPilot — AI Review Intelligence for Local Businesses</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0A0A0F;
+      --cream: #FAF8F4;
+      --gold: #D4A853;
+      --gold-light: #F0D499;
+      --sage: #4A6741;
+      --coral: #E8624A;
+      --mist: #E8E4DC;
+      --text: #2A2A35;
+      --text-muted: #6B6878;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(250, 248, 244, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--mist);
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: var(--ink) !important;
+      color: var(--cream) !important;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover { background: var(--gold) !important; color: var(--ink) !important; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding-top: 80px;
+    }
+
+    .hero-left {
+      padding: 100px 60px 80px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(48px, 5vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      color: var(--ink);
+      margin-bottom: 28px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-width: 420px;
+      margin-bottom: 48px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 16px 36px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold);
+      color: var(--ink);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+
+    .btn-ghost:hover { color: var(--gold); }
+
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 64px;
+      padding-top: 48px;
+      border-top: 1px solid var(--mist);
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    /* HERO RIGHT - Dashboard Preview */
+    .hero-right {
+      background: var(--ink);
+      padding: 80px 60px 80px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-right::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(212,168,83,0.15) 0%, transparent 60%);
+    }
+
+    .dashboard-preview {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .preview-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .preview-badge {
+      font-size: 11px;
+      background: rgba(74,103,65,0.4);
+      color: #7FC67A;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .preview-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .preview-stat {
+      text-align: center;
+    }
+
+    .preview-stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .preview-stat-lbl {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .preview-reviews {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .preview-review {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .preview-review-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .preview-reviewer {
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .preview-stars { color: var(--gold); font-size: 12px; }
+
+    .preview-review-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+    }
+
+    .preview-ai-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--gold);
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    /* MARQUEE */
+    .marquee-section {
+      background: var(--ink);
+      padding: 20px 0;
+      overflow: hidden;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 60px;
+      animation: marquee 20s linear infinite;
+      white-space: nowrap;
+    }
+
+    .marquee-item {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .marquee-dot { color: var(--gold); }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* HOW IT WORKS */
+    .section { padding: 120px 60px; }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 500px;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.6s ease;
+    }
+
+    .step.visible { opacity: 1; transform: translateX(0); }
+
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--mist);
+      line-height: 1;
+      flex-shrink: 0;
+      width: 60px;
+    }
+
+    .step-content h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .step-content p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* DEMO PANEL */
+    .demo-panel {
+      background: var(--ink);
+      border-radius: 24px;
+      padding: 40px;
+      color: white;
+    }
+
+    .demo-review-in {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .demo-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 12px;
+    }
+
+    .demo-stars-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .star-filled { color: var(--gold); }
+    .star-empty { color: rgba(255,255,255,0.2); }
+
+    .demo-review-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .demo-arrow {
+      text-align: center;
+      font-size: 24px;
+      margin: 16px 0;
+      color: var(--gold);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    .demo-response-out {
+      background: rgba(212,168,83,0.1);
+      border: 1px solid rgba(212,168,83,0.3);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .demo-response-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.7;
+    }
+
+    .demo-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .demo-meta-item {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .demo-meta-val {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* FEATURES */
+    .features-section {
+      background: var(--ink);
+      padding: 120px 60px;
+    }
+
+    .features-section .section-title { color: white; }
+    .features-section .section-sub { color: rgba(255,255,255,0.5); }
+    .features-section .section-label { color: var(--gold); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 80px;
+    }
+
+    .feature-tile {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 48px 40px;
+      transition: background 0.3s;
+    }
+
+    .feature-tile:hover { background: rgba(255,255,255,0.06); }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .feature-tile h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .feature-tile p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+    }
+
+    /* PRICING */
+    .pricing-section { padding: 120px 60px; }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 80px auto 0;
+    }
+
+    .pricing-card {
+      border: 1px solid var(--mist);
+      border-radius: 16px;
+      padding: 40px 36px;
+      position: relative;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+    }
+
+    .pricing-card.featured {
+      background: var(--ink);
+      border-color: transparent;
+      color: white;
+    }
+
+    .pricing-tag {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gold);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 5px 16px;
+      border-radius: 20px;
+    }
+
+    .pricing-plan {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .pricing-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .pricing-period {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .pricing-card.featured .pricing-period { color: rgba(255,255,255,0.5); }
+
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .pricing-features li {
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--text);
+    }
+
+    .pricing-card.featured .pricing-features li { color: rgba(255,255,255,0.75); }
+
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--gold);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pricing-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s;
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .pricing-btn:hover { background: var(--ink); color: white; }
+
+    .pricing-card.featured .pricing-btn {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+
+    .pricing-card.featured .pricing-btn:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-light);
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-section { padding: 100px 60px; background: var(--mist); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+
+    .testimonial-card {
+      background: white;
+      border-radius: 16px;
+      padding: 36px;
+    }
+
+    .testimonial-stars {
+      color: var(--gold);
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .testimonial-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .author-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .author-role {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 120px 60px;
+      text-align: center;
+      background: var(--ink);
+    }
+
+    .cta-section .section-title { color: white; font-size: 56px; }
+    .cta-section .section-sub { color: rgba(255,255,255,0.5); max-width: 500px; margin: 0 auto 48px; }
+
+    .cta-actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--ink);
+      padding: 18px 40px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-white {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 16px 36px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+
+    .btn-outline-white:hover { border-color: white; }
+
+    /* FOOTER */
+    footer {
+      background: #06060A;
+      color: rgba(255,255,255,0.5);
+      padding: 60px 60px 40px;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 32px;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: white;
+      text-decoration: none;
+    }
+
+    .footer-logo span { color: var(--gold); }
+
+    .footer-tagline {
+      font-size: 13px;
+      margin-top: 8px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    /* ANIMATIONS */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.7s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      nav { padding: 16px 24px; }
+      .hero-left { padding: 60px 24px; }
+      .how-grid { grid-template-columns: 1fr; gap: 48px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .section { padding: 80px 24px; }
+      .features-section, .cta-section { padding: 80px 24px; }
+      .nav-links { display: none; }
+      .cta-actions { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">Reply<span>Pilot</span></a>
+    <ul class="nav-links">
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="login.html">Log In</a></li>
+      <li><a href="register.html" class="nav-cta">Start Free Trial</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <span class="hero-eyebrow">AI-Powered Review Intelligence</span>
+      <h1 class="hero-title">Turn Reviews Into <em>Revenue</em></h1>
+      <p class="hero-sub">ReplyPilot analyzes your customer reviews, generates professional AI responses, and delivers actionable insights — all on autopilot.</p>
+      <div class="hero-actions">
+        <a href="register.html" class="btn-primary">Start 14-Day Free Trial</a>
+        <a href="#how" class="btn-ghost">See how it works →</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">4.8×</div>
+          <div class="stat-label">Faster Responses</div>
+        </div>
+        <div>
+          <div class="stat-num">94%</div>
+          <div class="stat-label">Response Rate</div>
+        </div>
+        <div>
+          <div class="stat-num">+0.6★</div>
+          <div class="stat-label">Rating Improvement</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="dashboard-preview">
+        <div class="preview-card">
+          <div class="preview-header">
+            <span class="preview-title">Business Overview</span>
+            <span class="preview-badge">● Live</span>
+          </div>
+          <div class="preview-stats">
+            <div class="preview-stat">
+              <div class="preview-stat-val">4.7</div>
+              <div class="preview-stat-lbl">Avg Rating</div>
+            </div>
+            <div class="preview-stat">
+              <div class="preview-stat-val">142</div>
+              <div class="preview-stat-lbl">Reviews</div>
+            </div>
+            <div class="preview-stat">
+              <div class="preview-stat-val">96%</div>
+              <div class="preview-stat-lbl">Responded</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-card">
+          <div class="preview-title" style="margin-bottom:16px">Recent Reviews</div>
+          <div class="preview-reviews">
+            <div class="preview-review">
+              <div class="preview-review-top">
+                <span class="preview-reviewer">Sarah M.</span>
+                <span class="preview-stars">★★★★★</span>
+              </div>
+              <div class="preview-review-text">"Absolutely phenomenal experience. The team went above and beyond..."</div>
+              <div class="preview-ai-tag">✨ AI Response Generated</div>
+            </div>
+            <div class="preview-review">
+              <div class="preview-review-top">
+                <span class="preview-reviewer">James C.</span>
+                <span class="preview-stars">★★☆☆☆</span>
+              </div>
+              <div class="preview-review-text">"Service was slower than expected and the staff seemed disinterested..."</div>
+              <div class="preview-ai-tag">⚡ Responding Now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span class="marquee-item">Google Reviews <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Yelp Integration <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">AI Response Generation <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Sentiment Analysis <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Monthly Reports <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Competitor Benchmarking <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Real-Time Alerts <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Google Reviews <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Yelp Integration <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">AI Response Generation <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Sentiment Analysis <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Monthly Reports <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Competitor Benchmarking <span class="marquee-dot">✦</span></span>
+      <span class="marquee-item">Real-Time Alerts <span class="marquee-dot">✦</span></span>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="how-grid">
+      <div>
+        <p class="section-label fade-up">How It Works</p>
+        <h2 class="section-title fade-up">From raw reviews to <em style="font-style:italic; color:var(--gold)">smart action</em> in minutes</h2>
+        <p class="section-sub fade-up">ReplyPilot connects to your review platforms and does the heavy lifting — analyzing, responding, and reporting so you don't have to.</p>
+        <div class="steps" style="margin-top:60px">
+          <div class="step">
+            <span class="step-num">01</span>
+            <div class="step-content">
+              <h3>Connect Your Business</h3>
+              <p>Link your Google Business Profile, Yelp, or paste reviews manually. Setup takes under 5 minutes.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">02</span>
+            <div class="step-content">
+              <h3>AI Analyzes Every Review</h3>
+              <p>Our AI reads sentiment, extracts themes, scores each review, and identifies urgent issues that need attention.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">03</span>
+            <div class="step-content">
+              <h3>Generate Perfect Responses</h3>
+              <p>One click generates a professional, personalized response. Edit or send directly — your choice.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">04</span>
+            <div class="step-content">
+              <h3>Track & Improve Monthly</h3>
+              <p>Monthly reports surface trends, compare to competitors, and show your reputation improving over time.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-up">
+        <div class="demo-panel">
+          <div class="demo-label">Sample Review</div>
+          <div class="demo-review-in">
+            <div class="demo-stars-row">
+              <span class="star-filled">★</span>
+              <span class="star-filled">★</span>
+              <span class="star-empty">★</span>
+              <span class="star-empty">★</span>
+              <span class="star-empty">★</span>
+            </div>
+            <div class="demo-review-text">"The wait was over 45 minutes and when I finally got help, the staff seemed completely uninterested in my issue. Very disappointed for the price."</div>
+          </div>
+          <div class="demo-arrow">↓</div>
+          <div class="demo-label">AI-Generated Response</div>
+          <div class="demo-response-out">
+            <div class="demo-review-text" style="color:rgba(255,255,255,0.4); font-size:10px; margin-bottom:8px; font-style:normal">Sentiment: Negative • Score: 0.18 • Keywords: wait, price, disappointed</div>
+            <div class="demo-response-text">"Thank you for taking the time to share your experience. We sincerely apologize for the wait time and that our team didn't meet your expectations. This is not the standard we hold ourselves to, and we'd genuinely like to make this right. Please reach out to us directly — we value your business and want to turn this experience around."</div>
+            <div class="demo-meta">
+              <div>
+                <span class="demo-meta-item">Generated in </span>
+                <span class="demo-meta-val">1.2s</span>
+              </div>
+              <div>
+                <span class="demo-meta-item">Tone: </span>
+                <span class="demo-meta-val">Professional</span>
+              </div>
+              <div>
+                <span class="demo-meta-item">Words: </span>
+                <span class="demo-meta-val">72</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div style="max-width:1200px; margin:0 auto;">
+      <p class="section-label">Features</p>
+      <h2 class="section-title">Everything you need to<br>dominate your reputation</h2>
+      <div class="features-grid">
+        <div class="feature-tile fade-up">
+          <span class="feature-icon">🧠</span>
+          <h3>Sentiment Intelligence</h3>
+          <p>Deep NLP analysis scores every review, detects emotion, and flags urgent negative feedback instantly.</p>
+        </div>
+        <div class="feature-tile fade-up">
+          <span class="feature-icon">✍️</span>
+          <h3>AI Response Writer</h3>
+          <p>Generate human-quality, brand-consistent responses in seconds. Choose tone: professional, friendly, or apologetic.</p>
+        </div>
+        <div class="feature-tile fade-up">
+          <span class="feature-icon">📈</span>
+          <h3>Trend Analytics</h3>
+          <p>Visualize your rating trajectory, sentiment shift, and peak review periods across months.</p>
+        </div>
+        <div class="feature-tile fade-up">
+          <span class="feature-icon">🏆</span>
+          <h3>Theme Extraction</h3>
+          <p>Automatically identify what customers love and hate — so you can double down on strengths and fix weak spots.</p>
+        </div>
+        <div class="feature-tile fade-up">
+          <span class="feature-icon">📋</span>
+          <h3>Monthly Reports</h3>
+          <p>Beautiful PDF reports delivered to your inbox summarizing your reputation health, wins, and recommended actions.</p>
+        </div>
+        <div class="feature-tile fade-up">
+          <span class="feature-icon">🌐</span>
+          <h3>Multi-Platform</h3>
+          <p>Google, Yelp, Facebook, TripAdvisor — manage reviews from all platforms in one unified dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section">
+    <div style="max-width:1100px; margin:0 auto;">
+      <p class="section-label">Customer Stories</p>
+      <h2 class="section-title">Trusted by local businesses</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-up">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"ReplyPilot changed how we manage our online reputation. We went from a 3.8 to a 4.6 average in just 4 months."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">A</div>
+            <div>
+              <div class="author-name">Amanda R.</div>
+              <div class="author-role">Owner, Riverside Café</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-up">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"I used to spend 3 hours a week responding to reviews. Now it takes me 20 minutes and the responses are better than what I'd write myself."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">M</div>
+            <div>
+              <div class="author-name">Marcus T.</div>
+              <div class="author-role">Manager, AutoFix Pro</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-up">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"The monthly insights report showed us that customers were consistently mentioning wait times. We fixed it. Our ratings jumped."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">P</div>
+            <div>
+              <div class="author-name">Patricia L.</div>
+              <div class="author-role">Director, MedWell Clinic</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div style="max-width:1100px; margin:0 auto; text-align:center">
+      <p class="section-label">Pricing</p>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <p class="section-sub" style="margin:0 auto">Start free, upgrade when you're ready. No long-term contracts. Cancel anytime.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card fade-up">
+          <p class="pricing-plan">Starter</p>
+          <div class="pricing-price">$0</div>
+          <p class="pricing-period">Free forever</p>
+          <ul class="pricing-features">
+            <li>Up to 25 reviews/month</li>
+            <li>Basic sentiment analysis</li>
+            <li>5 AI responses/month</li>
+            <li>Email support</li>
+          </ul>
+          <a href="register.html" class="pricing-btn">Get Started Free</a>
+        </div>
+        <div class="pricing-card featured fade-up">
+          <span class="pricing-tag">Most Popular</span>
+          <p class="pricing-plan">Professional</p>
+          <div class="pricing-price">$49</div>
+          <p class="pricing-period">per month</p>
+          <ul class="pricing-features">
+            <li>Unlimited reviews</li>
+            <li>Advanced AI analysis</li>
+            <li>Unlimited AI responses</li>
+            <li>Monthly insight reports</li>
+            <li>Priority support</li>
+            <li>Competitor benchmarking</li>
+          </ul>
+          <a href="register.html" class="pricing-btn" id="pro-btn">Start Free Trial</a>
+        </div>
+        <div class="pricing-card fade-up">
+          <p class="pricing-plan">Business</p>
+          <div class="pricing-price">$149</div>
+          <p class="pricing-period">per month</p>
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>Multi-location support</li>
+            <li>White-label reports</li>
+            <li>API access</li>
+            <li>Custom templates</li>
+            <li>Dedicated account manager</li>
+          </ul>
+          <a href="register.html" class="pricing-btn">Start Free Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <p class="section-label" style="color:var(--gold)">Get Started Today</p>
+    <h2 class="section-title">Ready to take control<br>of your reputation?</h2>
+    <p class="section-sub">Join hundreds of local businesses using ReplyPilot to respond faster, improve ratings, and understand their customers better.</p>
+    <div class="cta-actions">
+      <a href="register.html" class="btn-gold">Start Free 14-Day Trial</a>
+      <a href="login.html" class="btn-outline-white">Sign In</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <a href="index.html" class="footer-logo">Reply<span>Pilot</span></a>
+        <p class="footer-tagline">AI-powered review intelligence for local businesses</p>
+      </div>
+      <div class="footer-links">
+        <a href="#how">How It Works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ReplyPilot. All rights reserved.</span>
+      <span id="status-indicator">Checking system...</span>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script>
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.fade-up, .step').forEach(el => observer.observe(el));
+
+    // Status check
+    async function checkStatus() {
+      try {
+        const { data } = await API.get('/health');
+        document.getElementById('status-indicator').innerHTML = '● System Online';
+        document.getElementById('status-indicator').style.color = '#7FC67A';
+      } catch {
+        document.getElementById('status-indicator').textContent = '⚠ Offline';
+      }
+    }
+
+    // Redirect to dashboard if logged in
+    if (Auth.isLoggedIn()) {
+      document.querySelector('.nav-cta').href = 'dashboard.html';
+      document.querySelector('.nav-cta').textContent = 'Dashboard →';
+    }
+
+    document.addEventListener('DOMContentLoaded', checkStatus);
+  </script>
+</body>
+</html>
