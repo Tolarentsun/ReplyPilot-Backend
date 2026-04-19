@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — ReplyPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0A0A0F;
+      --cream: #FAF8F4;
+      --gold: #D4A853;
+      --sage: #4A6741;
+      --mist: #E8E4DC;
+      --text: #2A2A35;
+      --text-muted: #6B6878;
+      --error: #DC3545;
+      --success: #28a745;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--ink);
+    }
+    .auth-left {
+      background: linear-gradient(135deg, #0A0A0F 0%, #1A1A2E 100%);
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -20%;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 60%);
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: white;
+      text-decoration: none;
+      position: relative;
+      z-index: 1;
+    }
+    .logo span { color: var(--gold); }
+    .auth-quote {
+      position: relative;
+      z-index: 1;
+    }
+    .quote-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+    .quote-author {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+    }
+    .quote-author strong { color: rgba(255,255,255,0.8); }
+    .auth-stat-row {
+      display: flex;
+      gap: 48px;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .auth-stat-lbl {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+    .auth-right {
+      background: var(--cream);
+      padding: 60px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-form {
+      width: 100%;
+      max-width: 380px;
+    }
+    .form-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .form-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+    .form-group {
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--mist);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      background: white;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212,168,83,0.15);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.25s;
+      margin-top: 8px;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: var(--gold);
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-message {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    .form-message.error { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    .form-message.success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .form-message.show { display: block; }
+    .form-footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .form-footer a { color: var(--ink); font-weight: 600; text-decoration: none; }
+    .form-footer a:hover { color: var(--gold); }
+    .forgot {
+      text-align: right;
+      margin-top: -12px;
+      margin-bottom: 24px;
+    }
+    .forgot a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .forgot a:hover { color: var(--gold); }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .auth-left { display: none; }
+      .auth-right { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-left">
+    <a href="index.html" class="logo">Reply<span>Pilot</span></a>
+    <div class="auth-quote">
+      <p class="quote-text">"We went from a 3.8 to a 4.6 average rating in just four months — ReplyPilot made it effortless."</p>
+      <p class="quote-author"><strong>Amanda R.</strong> — Owner, Riverside Café</p>
+    </div>
+    <div class="auth-stat-row">
+      <div>
+        <div class="auth-stat-val">4.8×</div>
+        <div class="auth-stat-lbl">Faster responses</div>
+      </div>
+      <div>
+        <div class="auth-stat-val">94%</div>
+        <div class="auth-stat-lbl">Avg response rate</div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form">
+      <h1 class="form-heading">Welcome back.</h1>
+      <p class="form-sub">Sign in to your ReplyPilot account</p>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@yourbusiness.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="forgot"><a href="#">Forgot password?</a></div>
+
+      <button class="btn-submit" id="submit-btn" onclick="login()">Sign In</button>
+      <div class="form-message" id="message"></div>
+
+      <div class="form-footer">
+        Don't have an account? <a href="register.html">Create one free</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('submit-btn');
+
+      if (!email || !password) { showMsg('Please fill in all fields.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+      try {
+        const { data, ok } = await API.post('/api/auth/login', { email, password });
+        if (ok && data.success) {
+          Auth.save(data.token, data.user);
+          showMsg('✓ Success! Redirecting...', 'success');
+          setTimeout(() => window.location.href = 'dashboard.html', 800);
+        } else {
+          showMsg('❌ ' + (data.error || 'Login failed. Please try again.'), 'error');
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
+        }
+      } catch (e) {
+        showMsg('❌ Network error. Is the backend running?', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    function showMsg(text, type) {
+      const el = document.getElementById('message');
+      el.textContent = text;
+      el.className = `form-message ${type} show`;
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  </script>
+</body>
+</html>
