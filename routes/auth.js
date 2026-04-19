@@ -18,18 +18,20 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
+    const existing = await db.asyncGet('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
     const id = generateId();
     const passwordHash = await bcrypt.hash(password, 12);
 
-    db.prepare(`INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan) VALUES (?, ?, ?, ?, ?, ?, 'free')`)
-      .run(id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null);
+    await db.asyncRun(
+      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan) VALUES (?, ?, ?, ?, ?, ?, 'free')`,
+      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null]
+    );
 
     await seedDemoReviews(id);
 
-    const user = db.prepare('SELECT id, name, email, plan, business_name, business_type, created_at FROM users WHERE id = ?').get(id);
+    const user = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, created_at FROM users WHERE id = ?', [id]);
     const token = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
 
     res.json({ success: true, token, user });
@@ -44,7 +46,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+    const user = await db.asyncGet('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
     if (!user) return res.status(401).json({ error: 'Invalid email or password' });
 
     const valid = await bcrypt.compare(password, user.password_hash);
@@ -65,12 +67,14 @@ router.get('/me', authenticate, (req, res) => {
   res.json({ success: true, user: safeUser });
 });
 
-router.put('/profile', authenticate, (req, res) => {
+router.put('/profile', authenticate, async (req, res) => {
   try {
     const { name, business_name, business_type } = req.body;
-    db.prepare(`UPDATE users SET name = ?, business_name = ?, business_type = ? WHERE id = ?`)
-      .run(name || req.user.name, business_name || null, business_type || null, req.user.id);
-    const updated = db.prepare('SELECT id, name, email, plan, business_name, business_type FROM users WHERE id = ?').get(req.user.id);
+    await db.asyncRun(
+      `UPDATE users SET name = ?, business_name = ?, business_type = ? WHERE id = ?`,
+      [name || req.user.name, business_name || null, business_type || null, req.user.id]
+    );
+    const updated = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type FROM users WHERE id = ?', [req.user.id]);
     res.json({ success: true, user: updated });
   } catch (err) {
     res.status(500).json({ error: 'Profile update failed' });
