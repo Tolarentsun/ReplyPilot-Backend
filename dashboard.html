@@ -3,223 +3,1166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - ReplyPilot</title>
+    <title>Dashboard · ReplyPilot</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
     <style>
         :root {
-            --primary: #6366F1;
-            --dark: #0F172A;
-            --gray: #64748B;
+            --primary: #4F46E5;
+            --primary-600: #4338CA;
+            --primary-50: #EEF2FF;
+            --success: #10B981;
+            --success-50: #ECFDF5;
+            --warn: #F59E0B;
+            --warn-50: #FFFBEB;
+            --danger: #EF4444;
+            --danger-50: #FEF2F2;
+            --ink: #0F172A;
+            --ink-2: #1E293B;
+            --muted: #64748B;
+            --muted-2: #94A3B8;
             --border: #E2E8F0;
+            --border-2: #F1F5F9;
             --bg: #F8FAFC;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--dark);
-            line-height: 1.6;
+            --card: #FFFFFF;
+            --radius: 16px;
+            --radius-lg: 20px;
+            --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.04);
+            --shadow-lg: 0 10px 30px rgba(15,23,42,.08);
         }
 
-        .dashboard {
-            display: flex;
-            min-height: 100vh;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
+
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; }
+
+        .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
-            background: white;
+            background: var(--card);
             border-right: 1px solid var(--border);
-            padding: 32px 24px;
-            position: fixed;
+            padding: 28px 18px;
+            position: sticky;
+            top: 0;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-
-        .logo {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--primary);
+        .brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 60px;
-            text-decoration: none;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 14px 20px;
-            margin: 6px 0;
-            border-radius: 12px;
-            color: var(--gray);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: #F1F5F9;
+            padding: 6px 10px 24px;
+            font-weight: 700;
+            font-size: 20px;
             color: var(--primary);
         }
-
-        /* Main Content */
-        .main {
-            margin-left: 280px;
-            flex: 1;
-            padding: 48px 60px;
+        .brand-badge {
+            width: 34px; height: 34px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: white;
+            font-size: 18px;
         }
+        .nav { display: flex; flex-direction: column; gap: 2px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 14.5px;
+            cursor: pointer;
+            transition: background .15s ease, color .15s ease;
+            user-select: none;
+        }
+        .nav-item:hover { background: var(--border-2); color: var(--ink-2); }
+        .nav-item.active {
+            background: var(--primary-50);
+            color: var(--primary);
+        }
+        .nav-item .dot {
+            width: 18px; text-align: center; font-size: 15px;
+        }
+        .side-footer {
+            margin-top: auto;
+            padding: 14px 10px 0;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .user-chip {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--border-2);
+            margin-bottom: 10px;
+        }
+        .avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, #6366F1, #A855F7);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 13px;
+        }
+        .user-chip .meta { line-height: 1.2; }
+        .user-chip .meta strong { color: var(--ink); font-size: 13.5px; }
+        .user-chip .meta span { color: var(--muted); font-size: 12px; }
+        .signout {
+            width: 100%;
+            padding: 9px 10px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .signout:hover { background: var(--border-2); color: var(--ink); }
 
-        .header {
+        /* Main */
+        .main { padding: 32px 40px 64px; }
+
+        .topbar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 48px;
-        }
-
-        .header h1 {
-            font-size: 30px;
-            font-weight: 700;
-        }
-
-        .status {
-            background: #F0FDF4;
-            color: #166534;
-            padding: 6px 18px;
-            border-radius: 9999px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* Stats Cards */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin-bottom: 48px;
-        }
-
-        .stat-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px 32px;
-        }
-
-        .stat-card h3 {
-            font-size: 15px;
-            color: var(--gray);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .stat-card .value {
-            font-size: 42px;
-            font-weight: 700;
-            letter-spacing: -1px;
-        }
-
-        /* Recent Activity */
-        .activity-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-        }
-
-        .activity-card h2 {
-            font-size: 22px;
-            margin-bottom: 24px;
-        }
-
-        .activity-item {
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
+            margin-bottom: 28px;
             gap: 16px;
         }
+        .topbar h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .topbar p {
+            color: var(--muted);
+            font-size: 14.5px;
+            margin-top: 4px;
+        }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--success-50);
+            color: #065F46;
+        }
+        .status-pill::before {
+            content: "";
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 4px rgba(16,185,129,.18);
+        }
+        .status-pill.offline { background: var(--danger-50); color: #991B1B; }
+        .status-pill.offline::before { background: var(--danger); box-shadow: 0 0 0 4px rgba(239,68,68,.18); }
 
-        .activity-item:last-child {
-            border-bottom: none;
+        /* Section */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .section-title {
+            display: flex; align-items: baseline; justify-content: space-between;
+            margin: 32px 0 16px;
+        }
+        .section-title h2 { font-size: 18px; font-weight: 600; }
+        .section-title .hint { color: var(--muted); font-size: 13px; }
+
+        /* Stat cards */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+        .stat .label {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .stat .label .icon {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            background: var(--primary-50);
+            color: var(--primary);
+            font-size: 15px;
+        }
+        .stat .value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        .stat .sub {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .stat .trend { font-weight: 600; }
+        .trend.up { color: var(--success); }
+        .trend.down { color: var(--danger); }
+
+        /* Panels */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .panel h3 {
+            font-size: 15.5px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel h3 .hint { font-size: 12px; font-weight: 500; color: var(--muted); }
+
+        /* Activity feed */
+        .activity {
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .activity-row {
+            display: grid;
+            grid-template-columns: 32px 1fr auto;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-2);
+            align-items: center;
+        }
+        .activity-row:last-child { border-bottom: none; }
+        .activity-row .icon {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            background: var(--primary-50);
+            color: var(--primary);
+            font-size: 14px;
+        }
+        .activity-row .title { font-weight: 500; font-size: 14px; color: var(--ink-2); }
+        .activity-row .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+        .activity-row .time { font-size: 12px; color: var(--muted-2); }
+
+        .tag {
+            display: inline-flex;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .tag-positive { background: var(--success-50); color: #065F46; }
+        .tag-negative { background: var(--danger-50); color: #991B1B; }
+        .tag-neutral { background: #EEF2FF; color: #3730A3; }
+        .tag-pending { background: var(--warn-50); color: #92400E; }
+        .tag-responded { background: var(--success-50); color: #065F46; }
+
+        /* Charts */
+        .chart-wrap { display: flex; flex-direction: column; gap: 14px; }
+        .bar-chart {
+            display: grid;
+            grid-template-columns: 60px 1fr 48px;
+            gap: 12px;
+            align-items: center;
+            font-size: 13px;
+        }
+        .bar-chart .bar-track {
+            height: 10px;
+            border-radius: 999px;
+            background: var(--border-2);
+            overflow: hidden;
+        }
+        .bar-chart .bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #6366F1, #8B5CF6);
+            transition: width .5s ease;
+        }
+        .bar-chart .bar-count { color: var(--muted); font-weight: 600; text-align: right; }
+        .bar-chart .bar-label { color: var(--ink-2); font-weight: 500; }
+
+        .sent-pie {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 18px;
+            align-items: center;
+        }
+        .donut {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--border) 0 100%);
+            position: relative;
+        }
+        .donut::after {
+            content: "";
+            position: absolute;
+            inset: 16px;
+            background: var(--card);
+            border-radius: 50%;
+        }
+        .donut-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .donut-center .big { font-size: 22px; font-weight: 700; }
+        .donut-center .small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+        .legend { display: flex; flex-direction: column; gap: 10px; }
+        .legend-row {
+            display: grid;
+            grid-template-columns: 10px 1fr auto;
+            gap: 10px;
+            align-items: center;
+            font-size: 13.5px;
+        }
+        .legend-swatch { width: 10px; height: 10px; border-radius: 3px; }
+        .legend-value { color: var(--muted); font-weight: 600; }
+
+        .spark-grid {
+            display: grid;
+            grid-template-columns: repeat(30, 1fr);
+            gap: 3px;
+            align-items: end;
+            height: 80px;
+            margin-top: 8px;
+        }
+        .spark-col {
+            background: var(--border-2);
+            border-radius: 3px;
+            min-height: 4px;
+            position: relative;
+        }
+        .spark-col::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #818CF8, #4F46E5);
+            border-radius: 3px;
+            height: var(--h, 0%);
+            bottom: 0;
+            top: auto;
+        }
+
+        /* Reviews list */
+        .review-table {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .review-item {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 14px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card);
+        }
+        .review-item .stars { font-size: 13px; color: #F59E0B; letter-spacing: 1px; }
+        .review-item .customer { font-weight: 600; font-size: 14px; color: var(--ink); }
+        .review-item .preview { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+        .review-item .actions { display: flex; align-items: center; gap: 10px; }
+        .review-item .date { color: var(--muted-2); font-size: 12px; }
+
+        /* AI Reply view */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+        .field label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+        .field input, .field textarea, .field select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 14.5px;
+            transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+        }
+        .field textarea { min-height: 140px; resize: vertical; font-family: inherit; }
+        .field input:focus, .field textarea:focus, .field select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--card);
+            box-shadow: 0 0 0 4px rgba(79,70,229,.12);
+        }
+        .inline-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip {
+            padding: 8px 14px;
+            border: 1.5px solid var(--border);
+            background: var(--card);
+            border-radius: 999px;
+            color: var(--ink-2);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+        .chip:hover { border-color: var(--primary); color: var(--primary); }
+        .chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79,70,229,.25);
         }
 
         .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 28px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 22px;
             border-radius: 12px;
             font-weight: 600;
+            font-size: 14.5px;
             cursor: pointer;
-            margin-top: 20px;
+            border: none;
+            transition: transform .08s ease, box-shadow .15s ease, background .15s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: white;
+            box-shadow: 0 4px 16px rgba(79,70,229,.25);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(79,70,229,.35); }
+        .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-ghost {
+            background: var(--border-2);
+            color: var(--ink-2);
+        }
+        .btn-ghost:hover { background: #E2E8F0; }
+
+        .reply-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            animation: fadeUp .3s ease;
+        }
+        .reply-card:last-child { margin-bottom: 0; }
+        .reply-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .reply-label { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em; }
+        .reply-text { font-size: 14.5px; color: var(--ink-2); line-height: 1.6; white-space: pre-wrap; }
+        .reply-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .reply-actions .btn-ghost { padding: 8px 14px; font-size: 13px; }
+
+        .toast-area {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .toast {
+            background: var(--ink);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+            animation: fadeUp .25s ease;
+        }
+        .toast.error { background: #991B1B; }
+        .toast.success { background: #065F46; }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .empty-state .emoji { font-size: 32px; margin-bottom: 8px; }
+
+        .skeleton {
+            background: linear-gradient(90deg, #F1F5F9, #E2E8F0, #F1F5F9);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s linear infinite;
+            border-radius: 8px;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 980px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; gap: 8px; }
+            .brand { padding-bottom: 0; }
+            .nav { flex-direction: row; }
+            .side-footer { display: none; }
+            .main { padding: 24px 18px 48px; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .grid-2, .two-col { grid-template-columns: 1fr; }
+            .inline-row { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <a href="#" class="logo">
-                🚀 ReplyPilot
-            </a>
-            
-            <a href="#" class="nav-link active">📊 Dashboard</a>
-            <a href="#" class="nav-link">⭐ Reviews</a>
-            <a href="#" class="nav-link">✍️ Responses</a>
-            <a href="#" class="nav-link">⚙️ Settings</a>
-        </div>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-badge">🚀</span>
+                <span>ReplyPilot</span>
+            </div>
+            <nav class="nav" id="nav">
+                <div class="nav-item active" data-view="overview"><span class="dot">📊</span><span>Overview</span></div>
+                <div class="nav-item" data-view="analytics"><span class="dot">📈</span><span>Data Analysis</span></div>
+                <div class="nav-item" data-view="generate"><span class="dot">✨</span><span>AI Reply Generator</span></div>
+                <div class="nav-item" data-view="reviews"><span class="dot">⭐</span><span>Reviews</span></div>
+            </nav>
+            <div class="side-footer">
+                <div class="user-chip">
+                    <div class="avatar" id="userAvatar">–</div>
+                    <div class="meta">
+                        <strong id="userName">Loading…</strong><br>
+                        <span id="userEmail">–</span>
+                    </div>
+                </div>
+                <button class="signout" id="signoutBtn">Sign out</button>
+            </div>
+        </aside>
 
-        <!-- Main Content -->
-        <div class="main">
-            <div class="header">
-                <h1>Welcome to ReplyPilot</h1>
-                <div class="status">✅ Backend: healthy</div>
+        <main class="main">
+            <div class="topbar">
+                <div>
+                    <h1 id="pageTitle">Overview</h1>
+                    <p id="pageSubtitle">A snapshot of your reviews and AI activity.</p>
+                </div>
+                <div id="statusPill" class="status-pill">Backend: healthy</div>
             </div>
 
-            <!-- Stats -->
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Reviews This Month</h3>
-                    <div class="value" id="reviews">18</div>
+            <!-- Overview -->
+            <section class="view active" data-view="overview">
+                <div class="stats" id="overviewStats">
+                    <div class="stat"><div class="label">Total Reviews <span class="icon">⭐</span></div><div class="value" id="stTotal">–</div><div class="sub">Reviews analyzed by AI</div></div>
+                    <div class="stat"><div class="label">Response Rate <span class="icon">💬</span></div><div class="value" id="stRate">–</div><div class="sub">Replies selected or marked sent</div></div>
+                    <div class="stat"><div class="label">Average Rating <span class="icon">✨</span></div><div class="value" id="stRating">–</div><div class="sub">Across saved reviews</div></div>
+                    <div class="stat"><div class="label">Pending Replies <span class="icon">🕒</span></div><div class="value" id="stPending">–</div><div class="sub">Waiting for a response</div></div>
                 </div>
-                <div class="stat-card">
-                    <h3>Response Rate</h3>
-                    <div class="value" id="response">94%</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Average Rating</h3>
-                    <div class="value" id="rating">4.8</div>
-                </div>
-            </div>
 
-            <!-- Recent Activity -->
-            <div class="activity-card">
-                <h2>Recent Activity</h2>
-                <div id="activity-list"></div>
-            </div>
-        </div>
+                <div class="grid-2">
+                    <div class="panel">
+                        <h3>Recent Reviews <span class="hint">Last 5</span></h3>
+                        <div id="recentList" class="activity">
+                            <div class="empty-state"><div class="emoji">📥</div>No reviews yet. Generate your first AI reply to get started.</div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>Quick Actions</h3>
+                        <div class="activity">
+                            <div class="activity-row" style="cursor:pointer" onclick="switchView('generate')">
+                                <div class="icon">✨</div>
+                                <div><div class="title">Generate AI replies</div><div class="meta">Paste a review and get 4 on-brand response options.</div></div>
+                                <div class="time">→</div>
+                            </div>
+                            <div class="activity-row" style="cursor:pointer" onclick="switchView('analytics')">
+                                <div class="icon">📈</div>
+                                <div><div class="title">View data analysis</div><div class="meta">Sentiment, ratings, tone mix, and 30-day activity.</div></div>
+                                <div class="time">→</div>
+                            </div>
+                            <div class="activity-row" style="cursor:pointer" onclick="switchView('reviews')">
+                                <div class="icon">📚</div>
+                                <div><div class="title">Review history</div><div class="meta">See every review you've analyzed and its AI replies.</div></div>
+                                <div class="time">→</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics -->
+            <section class="view" data-view="analytics">
+                <div class="stats">
+                    <div class="stat"><div class="label">Total Reviews <span class="icon">⭐</span></div><div class="value" id="anTotal">–</div></div>
+                    <div class="stat"><div class="label">Response Rate <span class="icon">💬</span></div><div class="value" id="anRate">–</div></div>
+                    <div class="stat"><div class="label">Average Rating <span class="icon">✨</span></div><div class="value" id="anRating">–</div></div>
+                    <div class="stat"><div class="label">Pending <span class="icon">🕒</span></div><div class="value" id="anPending">–</div></div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="panel">
+                        <h3>Sentiment Breakdown <span class="hint">AI-classified</span></h3>
+                        <div class="sent-pie">
+                            <div class="donut" id="sentDonut">
+                                <div class="donut-center">
+                                    <div class="big" id="donutPct">0%</div>
+                                    <div class="small">Positive</div>
+                                </div>
+                            </div>
+                            <div class="legend" id="sentLegend"></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>Rating Distribution <span class="hint">1 – 5 stars</span></h3>
+                        <div class="chart-wrap" id="ratingChart"></div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="panel">
+                        <h3>Tone Usage <span class="hint">Most-used reply tones</span></h3>
+                        <div class="chart-wrap" id="toneChart"></div>
+                    </div>
+                    <div class="panel">
+                        <h3>30-Day Activity <span class="hint">Reviews per day</span></h3>
+                        <div class="spark-grid" id="sparkGrid"></div>
+                        <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:6px;">
+                            <span id="spark30">30 days ago</span>
+                            <span id="sparkToday">Today</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Generate -->
+            <section class="view" data-view="generate">
+                <div class="grid-2">
+                    <div class="panel">
+                        <h3>New Review</h3>
+                        <div class="field">
+                            <label for="reviewText">Customer Review</label>
+                            <textarea id="reviewText" placeholder="Paste the customer's review here…"></textarea>
+                        </div>
+                        <div class="inline-row">
+                            <div class="field">
+                                <label for="customerName">Customer name <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+                                <input id="customerName" type="text" placeholder="Jane D." maxlength="80">
+                            </div>
+                            <div class="field">
+                                <label for="businessName">Business name <span style="color:var(--muted); font-weight:500;">(optional)</span></label>
+                                <input id="businessName" type="text" placeholder="Your business" maxlength="120">
+                            </div>
+                            <div class="field">
+                                <label for="reviewRating">Rating</label>
+                                <select id="reviewRating">
+                                    <option value="">Unspecified</option>
+                                    <option value="5">★★★★★ · 5</option>
+                                    <option value="4">★★★★☆ · 4</option>
+                                    <option value="3">★★★☆☆ · 3</option>
+                                    <option value="2">★★☆☆☆ · 2</option>
+                                    <option value="1">★☆☆☆☆ · 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Tone</label>
+                            <div class="chips" id="toneChips"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
+                            <button class="btn btn-primary" id="generateBtn">✨ Generate AI Replies</button>
+                            <button class="btn btn-ghost" id="clearBtn">Clear</button>
+                            <label style="display:inline-flex; align-items:center; gap:8px; font-size:13.5px; color:var(--muted); margin-left:auto;">
+                                <input type="checkbox" id="saveToggle" checked> Save to history
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h3>Suggested Replies <span class="hint" id="genStatus">Waiting for a review…</span></h3>
+                        <div id="replies">
+                            <div class="empty-state">
+                                <div class="emoji">🤖</div>
+                                Paste a review and click <strong>Generate</strong>. You'll get 4 on-brand options in seconds.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reviews -->
+            <section class="view" data-view="reviews">
+                <div class="panel">
+                    <h3>Review History <span class="hint" id="reviewCount"></span></h3>
+                    <div id="reviewList" class="review-table">
+                        <div class="empty-state"><div class="emoji">📚</div>Loading…</div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
+    <div class="toast-area" id="toasts"></div>
+
     <script>
-        // Temporary values (we'll make these real later)
-        document.getElementById('reviews').textContent = "24";
-        document.getElementById('response').textContent = "96%";
-        document.getElementById('rating').textContent = "4.9";
-
-        const activities = [
-            "Connected to Google Business Profile",
-            "Responded to review from Sarah Johnson",
-            "5 new reviews received today"
+        const API = "";
+        const TONES = [
+            { id: "Professional", emoji: "🧑‍💼" },
+            { id: "Friendly", emoji: "🙂" },
+            { id: "Empathetic", emoji: "💙" },
+            { id: "Short & Direct", emoji: "⚡" },
+            { id: "Enthusiastic", emoji: "🎉" },
+            { id: "Apologetic", emoji: "🙏" },
         ];
+        let selectedTone = "Professional";
+        let token = localStorage.getItem("token");
+        let currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
-        document.getElementById('activity-list').innerHTML = activities.map(act => `
-            <div class="activity-item">
-                <span>${act}</span>
-            </div>
-        `).join('');
+        if (!token) {
+            window.location.href = "login.html";
+        }
+
+        const $ = (id) => document.getElementById(id);
+        const authHeaders = () => ({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        });
+
+        function toast(msg, type = "") {
+            const el = document.createElement("div");
+            el.className = `toast ${type}`;
+            el.textContent = msg;
+            $("toasts").appendChild(el);
+            setTimeout(() => el.remove(), 3200);
+        }
+
+        function initials(nameOrEmail) {
+            if (!nameOrEmail) return "?";
+            const parts = nameOrEmail.replace(/@.*$/, "").split(/[\s._-]+/).filter(Boolean);
+            return (parts[0]?.[0] || "?").toUpperCase() + (parts[1]?.[0] || "").toUpperCase();
+        }
+
+        function timeAgo(iso) {
+            const d = new Date(iso);
+            const s = Math.floor((Date.now() - d.getTime()) / 1000);
+            if (s < 60) return `${s}s ago`;
+            if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+            if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+            if (s < 604800) return `${Math.floor(s / 86400)}d ago`;
+            return d.toLocaleDateString();
+        }
+
+        function stars(n) {
+            if (!n) return "";
+            return "★".repeat(n) + "☆".repeat(5 - n);
+        }
+
+        function sentimentTag(s) {
+            const label = { positive: "Positive", negative: "Negative", neutral: "Neutral" }[s] || "Neutral";
+            return `<span class="tag tag-${s || "neutral"}">${label}</span>`;
+        }
+
+        function switchView(name) {
+            document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.dataset.view === name));
+            document.querySelectorAll(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.view === name));
+            const titles = {
+                overview: ["Overview", "A snapshot of your reviews and AI activity."],
+                analytics: ["Data Analysis", "Sentiment, ratings, tone usage, and activity trends."],
+                generate: ["AI Reply Generator", "Turn any review into polished, on-brand replies."],
+                reviews: ["Reviews", "Every review you've analyzed and its AI replies."],
+            };
+            const [t, s] = titles[name] || titles.overview;
+            $("pageTitle").textContent = t;
+            $("pageSubtitle").textContent = s;
+            if (name === "analytics") loadAnalytics();
+            if (name === "reviews") loadReviews();
+            if (name === "overview") loadAnalytics();
+        }
+        window.switchView = switchView;
+
+        document.getElementById("nav").addEventListener("click", (e) => {
+            const item = e.target.closest(".nav-item");
+            if (item && item.dataset.view) switchView(item.dataset.view);
+        });
+
+        $("signoutBtn").addEventListener("click", () => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        });
+
+        function renderToneChips() {
+            const host = $("toneChips");
+            host.innerHTML = "";
+            TONES.forEach((t) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = `chip ${t.id === selectedTone ? "active" : ""}`;
+                chip.innerHTML = `<span style="margin-right:6px;">${t.emoji}</span>${t.id}`;
+                chip.onclick = () => {
+                    selectedTone = t.id;
+                    renderToneChips();
+                };
+                host.appendChild(chip);
+            });
+        }
+
+        async function checkBackend() {
+            try {
+                const res = await fetch(`${API}/api/health`);
+                const data = await res.json();
+                $("statusPill").className = "status-pill";
+                $("statusPill").textContent = `Backend: ${data.status}`;
+            } catch {
+                $("statusPill").className = "status-pill offline";
+                $("statusPill").textContent = "Backend: unreachable";
+            }
+        }
+
+        async function fetchMe() {
+            try {
+                const res = await fetch(`${API}/api/auth/me`, { headers: authHeaders() });
+                if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    window.location.href = "login.html";
+                    return;
+                }
+                const data = await res.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem("user", JSON.stringify(currentUser));
+                    $("userName").textContent = currentUser.name || currentUser.email;
+                    $("userEmail").textContent = currentUser.email;
+                    $("userAvatar").textContent = initials(currentUser.name || currentUser.email);
+                }
+            } catch (err) {
+                console.warn("me fetch failed", err);
+            }
+        }
+
+        async function loadAnalytics() {
+            try {
+                const res = await fetch(`${API}/api/analytics`, { headers: authHeaders() });
+                const data = await res.json();
+                if (!data.success) return;
+                renderAnalytics(data);
+            } catch (err) {
+                console.warn("analytics failed", err);
+            }
+        }
+
+        function renderAnalytics(d) {
+            const s = d.summary;
+            const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+            set("stTotal", s.total_reviews);
+            set("stRate", `${s.response_rate}%`);
+            set("stRating", s.average_rating ? s.average_rating.toFixed(1) : "–");
+            set("stPending", s.pending);
+            set("anTotal", s.total_reviews);
+            set("anRate", `${s.response_rate}%`);
+            set("anRating", s.average_rating ? s.average_rating.toFixed(1) : "–");
+            set("anPending", s.pending);
+
+            // Sentiment donut
+            const sent = d.sentiment_breakdown || { positive: 0, neutral: 0, negative: 0 };
+            const total = sent.positive + sent.neutral + sent.negative;
+            const pos = total ? Math.round((sent.positive / total) * 100) : 0;
+            const neu = total ? Math.round((sent.neutral / total) * 100) : 0;
+            const neg = total ? 100 - pos - neu : 0;
+            const donut = $("sentDonut");
+            if (donut) {
+                donut.style.background = total
+                    ? `conic-gradient(#10B981 0 ${pos}%, #6366F1 ${pos}% ${pos + neu}%, #EF4444 ${pos + neu}% 100%)`
+                    : `conic-gradient(var(--border) 0 100%)`;
+                $("donutPct").textContent = `${pos}%`;
+            }
+            $("sentLegend").innerHTML = [
+                ["#10B981", "Positive", sent.positive],
+                ["#6366F1", "Neutral", sent.neutral],
+                ["#EF4444", "Negative", sent.negative],
+            ].map(([c, l, n]) => `
+                <div class="legend-row">
+                    <span class="legend-swatch" style="background:${c}"></span>
+                    <span>${l}</span>
+                    <span class="legend-value">${n}</span>
+                </div>
+            `).join("");
+
+            // Rating chart
+            const rd = d.rating_distribution || {};
+            const maxR = Math.max(1, ...[5,4,3,2,1].map((k) => rd[k] || 0));
+            $("ratingChart").innerHTML = [5,4,3,2,1].map((k) => {
+                const n = rd[k] || 0;
+                const pct = Math.round((n / maxR) * 100);
+                return `
+                    <div class="bar-chart">
+                        <div class="bar-label">${stars(k)}</div>
+                        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                        <div class="bar-count">${n}</div>
+                    </div>
+                `;
+            }).join("");
+
+            // Tone chart
+            const tones = Object.entries(d.tone_usage || {}).sort((a,b) => b[1] - a[1]);
+            if (tones.length === 0) {
+                $("toneChart").innerHTML = `<div class="empty-state">No tones used yet.</div>`;
+            } else {
+                const maxT = Math.max(...tones.map(([,v]) => v));
+                $("toneChart").innerHTML = tones.map(([name, n]) => {
+                    const pct = Math.round((n / maxT) * 100);
+                    return `
+                        <div class="bar-chart">
+                            <div class="bar-label">${name}</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background: linear-gradient(90deg, #10B981, #0EA5E9);"></div></div>
+                            <div class="bar-count">${n}</div>
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            // Sparkline
+            const days = d.daily_activity || [];
+            const maxDay = Math.max(1, ...days.map((x) => x.count));
+            $("sparkGrid").innerHTML = days.map((x) => {
+                const h = Math.max(6, Math.round((x.count / maxDay) * 100));
+                return `<div class="spark-col" title="${x.date}: ${x.count}" style="--h:${h}%"></div>`;
+            }).join("");
+            if (days.length) {
+                $("spark30").textContent = new Date(days[0].date).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                $("sparkToday").textContent = "Today";
+            }
+
+            // Recent list on overview
+            const recent = d.recent_reviews || [];
+            if (recent.length === 0) {
+                $("recentList").innerHTML = `<div class="empty-state"><div class="emoji">📥</div>No reviews yet. Generate your first AI reply to get started.</div>`;
+            } else {
+                $("recentList").innerHTML = recent.map((r) => `
+                    <div class="activity-row">
+                        <div class="icon">${r.rating >= 4 ? "🌟" : r.rating <= 2 ? "⚠️" : "📝"}</div>
+                        <div>
+                            <div class="title">${escapeHtml(r.customer_name || "Anonymous")} ${r.rating ? `<span style="color:#F59E0B; font-size:12px; margin-left:6px;">${stars(r.rating)}</span>` : ""}</div>
+                            <div class="meta">${escapeHtml(r.preview || "")}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            ${sentimentTag(r.sentiment)}
+                            <div class="time" style="margin-top:4px;">${timeAgo(r.created_at)}</div>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
+
+        async function loadReviews() {
+            const host = $("reviewList");
+            host.innerHTML = `<div class="empty-state">Loading…</div>`;
+            try {
+                const res = await fetch(`${API}/api/reviews`, { headers: authHeaders() });
+                const data = await res.json();
+                const reviews = (data.reviews || []);
+                $("reviewCount").textContent = `${reviews.length} saved`;
+                if (reviews.length === 0) {
+                    host.innerHTML = `<div class="empty-state"><div class="emoji">📚</div>No saved reviews yet. Generate one from the AI Reply Generator.</div>`;
+                    return;
+                }
+                host.innerHTML = reviews.map(renderReviewRow).join("");
+                host.querySelectorAll("[data-delete]").forEach((btn) => {
+                    btn.onclick = async () => {
+                        const id = btn.dataset.delete;
+                        if (!confirm("Delete this review from history?")) return;
+                        await fetch(`${API}/api/reviews/${id}`, { method: "DELETE", headers: authHeaders() });
+                        toast("Review deleted");
+                        loadReviews();
+                        loadAnalytics();
+                    };
+                });
+                host.querySelectorAll("[data-toggle]").forEach((btn) => {
+                    btn.onclick = async () => {
+                        const id = btn.dataset.toggle;
+                        const current = btn.dataset.status;
+                        const next = current === "responded" ? "pending" : "responded";
+                        await fetch(`${API}/api/reviews/${id}`, {
+                            method: "PATCH",
+                            headers: authHeaders(),
+                            body: JSON.stringify({ status: next }),
+                        });
+                        toast(next === "responded" ? "Marked as responded" : "Marked as pending", "success");
+                        loadReviews();
+                        loadAnalytics();
+                    };
+                });
+            } catch (err) {
+                host.innerHTML = `<div class="empty-state">Couldn't load reviews. ${err.message}</div>`;
+            }
+        }
+
+        function renderReviewRow(r) {
+            const emoji = r.rating >= 4 ? "🌟" : r.rating <= 2 ? "⚠️" : "📝";
+            const statusTag = r.status === "responded"
+                ? `<span class="tag tag-responded">Responded</span>`
+                : `<span class="tag tag-pending">Pending</span>`;
+            const repliesHtml = (r.replies || []).map((rep) => `
+                <div class="reply-card" style="margin-top:10px; background:var(--bg);">
+                    <div class="reply-head"><span class="reply-label">${escapeHtml(rep.label)}</span></div>
+                    <div class="reply-text">${escapeHtml(rep.reply)}</div>
+                </div>
+            `).join("");
+            return `
+                <details class="review-item" style="display:block;">
+                    <summary style="list-style:none; cursor:pointer; display:grid; grid-template-columns:44px 1fr auto; gap:14px; align-items:flex-start;">
+                        <div class="icon" style="width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:var(--primary-50); border-radius:10px;">${emoji}</div>
+                        <div>
+                            <div class="customer">${escapeHtml(r.customer_name || "Anonymous")} ${r.rating ? `<span class="stars">${stars(r.rating)}</span>` : ""}</div>
+                            <div class="preview">${escapeHtml((r.text || "").slice(0, 180))}${r.text && r.text.length > 180 ? "…" : ""}</div>
+                            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                                ${sentimentTag(r.sentiment)}
+                                ${statusTag}
+                                ${r.tone ? `<span class="tag tag-neutral">${escapeHtml(r.tone)}</span>` : ""}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <span class="date">${timeAgo(r.created_at)}</span>
+                        </div>
+                    </summary>
+                    <div style="padding-top:14px;">
+                        ${repliesHtml || `<div class="empty-state">No saved replies.</div>`}
+                        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+                            <button class="btn btn-ghost" data-toggle="${r.id}" data-status="${r.status || "pending"}">
+                                ${r.status === "responded" ? "Mark as pending" : "Mark as responded"}
+                            </button>
+                            <button class="btn btn-ghost" data-delete="${r.id}" style="color:#991B1B;">Delete</button>
+                        </div>
+                    </div>
+                </details>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return String(str || "").replace(/[&<>"']/g, (c) => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;",
+            })[c]);
+        }
+
+        async function generate() {
+            const text = $("reviewText").value.trim();
+            if (!text) return toast("Paste a review first", "error");
+            const customer_name = $("customerName").value.trim();
+            const business_name = $("businessName").value.trim();
+            const ratingVal = $("reviewRating").value;
+            const rating = ratingVal ? parseInt(ratingVal, 10) : null;
+            const save = $("saveToggle").checked;
+
+            const btn = $("generateBtn");
+            btn.disabled = true;
+            btn.innerHTML = "⏳ Generating…";
+            $("genStatus").textContent = "Generating with Claude…";
+            $("replies").innerHTML = `
+                ${[0,1,2,3].map(() => `
+                    <div class="reply-card">
+                        <div class="skeleton" style="height:14px; width:45%; margin-bottom:10px;"></div>
+                        <div class="skeleton" style="height:12px; width:95%; margin-bottom:6px;"></div>
+                        <div class="skeleton" style="height:12px; width:85%;"></div>
+                    </div>
+                `).join("")}
+            `;
+
+            try {
+                const res = await fetch(`${API}/api/generate-replies`, {
+                    method: "POST",
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        text,
+                        tone: selectedTone,
+                        count: 4,
+                        rating,
+                        customer_name,
+                        business_name,
+                        save,
+                    }),
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || "Generation failed");
+
+                $("genStatus").textContent = `${data.replies.length} options · ${data.sentiment}`;
+                $("replies").innerHTML = data.replies.map((r, i) => `
+                    <div class="reply-card">
+                        <div class="reply-head">
+                            <span class="reply-label">${escapeHtml(r.label)}</span>
+                            <span class="tag tag-${data.sentiment}">${data.sentiment}</span>
+                        </div>
+                        <div class="reply-text">${escapeHtml(r.reply)}</div>
+                        <div class="reply-actions">
+                            <button class="btn btn-ghost" data-copy="${i}">📋 Copy</button>
+                        </div>
+                    </div>
+                `).join("");
+
+                $("replies").querySelectorAll("[data-copy]").forEach((btn) => {
+                    btn.onclick = async () => {
+                        const idx = +btn.dataset.copy;
+                        await navigator.clipboard.writeText(data.replies[idx].reply);
+                        toast("Copied to clipboard", "success");
+                    };
+                });
+
+                if (save) {
+                    toast("Reply saved to history", "success");
+                    loadAnalytics();
+                }
+            } catch (err) {
+                $("genStatus").textContent = "Failed";
+                $("replies").innerHTML = `<div class="empty-state" style="color:#991B1B;"><div class="emoji">⚠️</div>${escapeHtml(err.message)}</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "✨ Generate AI Replies";
+            }
+        }
+
+        $("generateBtn").addEventListener("click", generate);
+        $("clearBtn").addEventListener("click", () => {
+            $("reviewText").value = "";
+            $("customerName").value = "";
+            $("businessName").value = "";
+            $("reviewRating").value = "";
+            $("replies").innerHTML = `
+                <div class="empty-state">
+                    <div class="emoji">🤖</div>
+                    Paste a review and click <strong>Generate</strong>. You'll get 4 on-brand options in seconds.
+                </div>
+            `;
+            $("genStatus").textContent = "Waiting for a review…";
+        });
+
+        if (currentUser) {
+            $("userName").textContent = currentUser.name || currentUser.email;
+            $("userEmail").textContent = currentUser.email;
+            $("userAvatar").textContent = initials(currentUser.name || currentUser.email);
+        }
+
+        renderToneChips();
+        checkBackend();
+        setInterval(checkBackend, 30000);
+        fetchMe();
+        loadAnalytics();
     </script>
 </body>
 </html>
