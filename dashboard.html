@@ -681,32 +681,109 @@
 
     <!-- ===== SETTINGS TAB ===== -->
     <div class="tab-content" id="content-settings">
-      <div class="chart-card" style="max-width:600px">
-        <div class="chart-title" style="margin-bottom:24px">Business Settings</div>
-        <div class="form-group" style="margin-bottom:20px">
-          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:7px">Your Name</label>
-          <input id="settings-name" type="text" style="width:100%; padding:12px 16px; border:1.5px solid var(--mist); border-radius:8px; font-size:14px; font-family:DM Sans,sans-serif">
+      <div style="max-width:640px; display:flex; flex-direction:column; gap:24px;">
+
+        <!-- Profile -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:6px">Profile</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Update your name and business information</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div>
+              <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Your Name</label>
+              <input id="settings-name" type="text" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+            </div>
+            <div>
+              <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Business Name</label>
+              <input id="settings-biz" type="text" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+            </div>
+          </div>
+          <div style="margin-bottom:16px">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Email Address</label>
+            <input id="settings-email" type="email" disabled style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif;background:#f5f5f5;color:var(--text-muted)">
+          </div>
+          <div style="margin-bottom:24px">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Business Type</label>
+            <select id="settings-type" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif;background:white">
+              <option value="">Select industry...</option>
+              <option value="restaurant">Restaurant / Café</option>
+              <option value="retail">Retail / Shop</option>
+              <option value="healthcare">Healthcare / Medical</option>
+              <option value="automotive">Automotive</option>
+              <option value="salon">Salon / Spa / Beauty</option>
+              <option value="hotel">Hotel / Hospitality</option>
+              <option value="legal">Legal / Professional</option>
+              <option value="fitness">Fitness / Wellness</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
         </div>
-        <div class="form-group" style="margin-bottom:20px">
-          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:7px">Business Name</label>
-          <input id="settings-biz" type="text" style="width:100%; padding:12px 16px; border:1.5px solid var(--mist); border-radius:8px; font-size:14px; font-family:DM Sans,sans-serif">
+
+        <!-- Preferences -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:6px">AI Response Preferences</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Set your default tone for AI-generated responses</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div id="tone-professional" onclick="setTone('professional')" style="padding:16px;border:2px solid var(--ink);border-radius:10px;cursor:pointer;background:var(--ink);color:white">
+              <div style="font-weight:700;margin-bottom:4px">Professional</div>
+              <div style="font-size:12px;opacity:0.7">Formal and courteous</div>
+            </div>
+            <div id="tone-friendly" onclick="setTone('friendly')" style="padding:16px;border:2px solid var(--mist);border-radius:10px;cursor:pointer">
+              <div style="font-weight:700;margin-bottom:4px">Friendly</div>
+              <div style="font-size:12px;color:var(--text-muted)">Warm and approachable</div>
+            </div>
+            <div id="tone-apologetic" onclick="setTone('apologetic')" style="padding:16px;border:2px solid var(--mist);border-radius:10px;cursor:pointer">
+              <div style="font-weight:700;margin-bottom:4px">Apologetic</div>
+              <div style="font-size:12px;color:var(--text-muted)">Empathetic and understanding</div>
+            </div>
+            <div id="tone-enthusiastic" onclick="setTone('enthusiastic')" style="padding:16px;border:2px solid var(--mist);border-radius:10px;cursor:pointer">
+              <div style="font-weight:700;margin-bottom:4px">Enthusiastic</div>
+              <div style="font-size:12px;color:var(--text-muted)">Energetic and grateful</div>
+            </div>
+          </div>
         </div>
-        <div class="form-group" style="margin-bottom:24px">
-          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:7px">Business Type</label>
-          <select id="settings-type" style="width:100%; padding:12px 16px; border:1.5px solid var(--mist); border-radius:8px; font-size:14px; font-family:DM Sans,sans-serif; background:white">
-            <option value="">Select industry...</option>
-            <option value="restaurant">Restaurant / Café</option>
-            <option value="retail">Retail / Shop</option>
-            <option value="healthcare">Healthcare / Medical</option>
-            <option value="automotive">Automotive</option>
-            <option value="salon">Salon / Spa / Beauty</option>
-            <option value="hotel">Hotel / Hospitality</option>
-            <option value="legal">Legal / Professional</option>
-            <option value="fitness">Fitness / Wellness</option>
-            <option value="other">Other</option>
-          </select>
+
+        <!-- Security -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:6px">Change Password</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Update your password to keep your account secure</p>
+          <div style="margin-bottom:16px">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Current Password</label>
+            <input id="settings-current-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+          </div>
+          <div style="margin-bottom:16px">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">New Password</label>
+            <input id="settings-new-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+          </div>
+          <div style="margin-bottom:24px">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Confirm New Password</label>
+            <input id="settings-confirm-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+          </div>
+          <button class="btn-primary" onclick="changePassword()">Update Password</button>
         </div>
-        <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
+
+        <!-- Danger Zone -->
+        <div class="chart-card" style="border:1.5px solid #FCA5A5;">
+          <div class="chart-title" style="margin-bottom:6px;color:var(--negative)">Danger Zone</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">These actions are permanent and cannot be undone</p>
+          
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#FEF2F2;border-radius:10px;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--ink)">Delete All Reviews</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:2px">Permanently delete all your review data</div>
+            </div>
+            <button onclick="deleteAllReviews()" style="padding:10px 20px;background:white;border:1.5px solid var(--negative);color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">Delete Reviews</button>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#FEF2F2;border-radius:10px">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--ink)">Delete Account</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:2px">Permanently delete your account and all data</div>
+            </div>
+            <button onclick="deleteAccount()" style="padding:10px 20px;background:var(--negative);border:none;color:white;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">Delete Account</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1165,10 +1242,37 @@
   }
 
   // ===== SETTINGS =====
+  let selectedTone = localStorage.getItem('rp_tone') || 'professional';
+
   function loadSettings() {
     document.getElementById('settings-name').value = currentUser.name || '';
     document.getElementById('settings-biz').value = currentUser.business_name || '';
+    document.getElementById('settings-email').value = currentUser.email || '';
     document.getElementById('settings-type').value = currentUser.business_type || '';
+    setTone(selectedTone, false);
+  }
+
+  function setTone(tone, save = true) {
+    selectedTone = tone;
+    if (save) localStorage.setItem('rp_tone', tone);
+    ['professional','friendly','apologetic','enthusiastic'].forEach(t => {
+      const el = document.getElementById('tone-' + t);
+      if (!el) return;
+      if (t === tone) {
+        el.style.border = '2px solid var(--ink)';
+        el.style.background = 'var(--ink)';
+        el.style.color = 'white';
+        el.querySelector('div:last-child').style.opacity = '0.7';
+        el.querySelector('div:last-child').style.color = 'white';
+      } else {
+        el.style.border = '2px solid var(--mist)';
+        el.style.background = 'white';
+        el.style.color = 'var(--text)';
+        el.querySelector('div:last-child').style.color = 'var(--text-muted)';
+        el.querySelector('div:last-child').style.opacity = '1';
+      }
+    });
+    if (save) toast('✓ Default tone set to ' + tone, 'success');
   }
 
   async function saveSettings() {
@@ -1183,6 +1287,47 @@
       toast('✓ Settings saved!', 'success');
     } else {
       toast('Failed to save settings', 'error');
+    }
+  }
+
+  async function changePassword() {
+    const current = document.getElementById('settings-current-pw').value;
+    const newPw = document.getElementById('settings-new-pw').value;
+    const confirm = document.getElementById('settings-confirm-pw').value;
+    if (!current || !newPw || !confirm) { toast('Please fill in all password fields', 'error'); return; }
+    if (newPw !== confirm) { toast('New passwords do not match', 'error'); return; }
+    if (newPw.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
+    const { data, ok } = await API.post('/api/auth/change-password', { current_password: current, new_password: newPw });
+    if (ok && data.success) {
+      toast('✓ Password updated!', 'success');
+      document.getElementById('settings-current-pw').value = '';
+      document.getElementById('settings-new-pw').value = '';
+      document.getElementById('settings-confirm-pw').value = '';
+    } else {
+      toast(data.error || 'Failed to update password', 'error');
+    }
+  }
+
+  async function deleteAllReviews() {
+    if (!confirm('Are you sure you want to delete ALL your reviews? This cannot be undone.')) return;
+    const { data, ok } = await API.delete('/api/reviews/all');
+    if (ok && data.success) {
+      toast('✓ All reviews deleted', 'success');
+      allReviews = [];
+      loadOverview();
+    } else {
+      toast(data.error || 'Failed to delete reviews', 'error');
+    }
+  }
+
+  async function deleteAccount() {
+    if (!confirm('Are you sure you want to permanently delete your account? ALL data will be lost and this cannot be undone.')) return;
+    if (!confirm('This is your final confirmation. Delete account permanently?')) return;
+    const { data, ok } = await API.delete('/api/auth/account');
+    if (ok && data.success) {
+      Auth.logout();
+    } else {
+      toast(data.error || 'Failed to delete account', 'error');
     }
   }
 
