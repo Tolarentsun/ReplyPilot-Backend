@@ -810,13 +810,34 @@
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Yelp</div>
-                  <div style="font-size:12px;color:var(--text-muted)">Analysis only — Yelp does not allow 3rd party posting</div>
+                  <div style="font-size:12px;color:var(--text-muted)" id="yelp-status-text">Not connected — search for your business below</div>
                 </div>
               </div>
-              <span style="padding:6px 14px;background:#FEF3C7;color:#92400E;border-radius:20px;font-size:11px;font-weight:700">Read Only</span>
+              <span style="padding:6px 14px;background:#FEF3C7;color:#92400E;border-radius:20px;font-size:11px;font-weight:700">Auto-Import</span>
             </div>
+
+            <!-- Yelp Search -->
+            <div id="yelp-search-panel" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <input id="yelp-business-name" type="text" placeholder="Business name..." style="padding:10px 14px;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
+                <input id="yelp-location" type="text" placeholder="City, State (e.g. Tampa, FL)" style="padding:10px 14px;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
+              </div>
+              <button onclick="searchYelp()" style="padding:10px 20px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Search Yelp</button>
+            </div>
+
+            <!-- Yelp Search Results -->
+            <div id="yelp-results" style="margin-top:12px"></div>
+
+            <!-- Yelp Connected Panel -->
+            <div id="yelp-connected-panel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
+              <div style="display:flex;gap:12px">
+                <button onclick="syncYelp()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Sync Reviews</button>
+                <button onclick="disconnectYelp()" style="padding:9px 18px;background:white;border:1.5px solid #FCA5A5;color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
+              </div>
+            </div>
+
             <div style="margin-top:12px;padding:10px 14px;background:#FEF9EC;border-radius:8px;font-size:12px;color:#92400E">
-              ⚠️ <strong>Yelp does not allow 3rd party integrations for posting responses.</strong> You can add Yelp reviews manually for analysis and AI-generated responses to copy. <strong>We recommend connecting Google</strong> for full automation.
+              ⚠️ <strong>Yelp does not allow automated posting.</strong> ReplyPilot will import your reviews and generate AI responses — copy and paste them into Yelp manually. Connect Google for full automation.
             </div>
           </div>
 
@@ -1379,6 +1400,7 @@
 
   function loadSettings() {
     loadGoogleStatus();
+    loadYelpStatus();
     document.getElementById('settings-name').value = currentUser.name || '';
     document.getElementById('settings-biz').value = currentUser.business_name || '';
     document.getElementById('settings-email').value = currentUser.email || '';
@@ -1504,6 +1526,86 @@
       toast('✓ Subscription upgraded successfully!', 'success');
       history.replaceState({}, '', window.location.pathname);
     }
+  }
+
+  // ===== YELP INTEGRATION =====
+  let selectedYelpBusiness = null;
+
+  async function loadYelpStatus() {
+    try {
+      const { data, ok } = await API.get('/api/yelp/status');
+      if (ok && data.connected) {
+        document.getElementById('yelp-status-text').textContent = `Connected: ${data.business_name}`;
+        document.getElementById('yelp-search-panel').style.display = 'none';
+        document.getElementById('yelp-connected-panel').style.display = 'block';
+      }
+    } catch(e) {}
+  }
+
+  async function searchYelp() {
+    const term = document.getElementById('yelp-business-name').value.trim();
+    const location = document.getElementById('yelp-location').value.trim();
+    if (!term || !location) { toast('Enter business name and location', 'error'); return; }
+
+    document.getElementById('yelp-results').innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:10px">Searching Yelp...</div>';
+
+    const { data, ok } = await API.get(`/api/yelp/search?term=${encodeURIComponent(term)}&location=${encodeURIComponent(location)}`);
+    if (!ok || !data.success) {
+      document.getElementById('yelp-results').innerHTML = `<div style="font-size:13px;color:var(--negative);padding:10px">${data.error || 'Search failed'}</div>`;
+      return;
+    }
+
+    if (!data.businesses.length) {
+      document.getElementById('yelp-results').innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:10px">No businesses found. Try a different search.</div>';
+      return;
+    }
+
+    document.getElementById('yelp-results').innerHTML = data.businesses.map(b => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1.5px solid var(--mist);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="selectYelpBusiness('${b.id}', '${b.name.replace(/'/g, "\'")}')">
+        <div>
+          <div style="font-weight:700;font-size:14px">${b.name}</div>
+          <div style="font-size:12px;color:var(--text-muted)">${b.address}</div>
+          <div style="font-size:12px;color:var(--gold)">★ ${b.rating} · ${b.review_count} reviews</div>
+        </div>
+        <button style="padding:8px 16px;background:var(--ink);color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Select</button>
+      </div>`).join('');
+  }
+
+  async function selectYelpBusiness(businessId, businessName) {
+    toast('Connecting to Yelp and importing reviews...', '');
+    const { data, ok } = await API.post(`/api/yelp/sync/${businessId}`, { business_name: businessName });
+    if (ok && data.success) {
+      document.getElementById('yelp-status-text').textContent = `Connected: ${businessName}`;
+      document.getElementById('yelp-search-panel').style.display = 'none';
+      document.getElementById('yelp-results').innerHTML = '';
+      document.getElementById('yelp-connected-panel').style.display = 'block';
+      toast(`✓ ${data.message}`, 'success');
+      loadOverview();
+    } else {
+      toast(data.error || 'Failed to connect Yelp', 'error');
+    }
+  }
+
+  async function syncYelp() {
+    const { data: status } = await API.get('/api/yelp/status');
+    if (!status.business_id) { toast('No Yelp business connected', 'error'); return; }
+    toast('Syncing Yelp reviews...', '');
+    const { data, ok } = await API.post(`/api/yelp/sync/${status.business_id}`, { business_name: status.business_name });
+    if (ok && data.success) {
+      toast(`✓ ${data.message}`, 'success');
+      loadOverview();
+    } else {
+      toast(data.error || 'Sync failed', 'error');
+    }
+  }
+
+  async function disconnectYelp() {
+    if (!confirm('Disconnect Yelp?')) return;
+    await API.post('/api/yelp/disconnect', {});
+    document.getElementById('yelp-status-text').textContent = 'Not connected — search for your business below';
+    document.getElementById('yelp-search-panel').style.display = 'block';
+    document.getElementById('yelp-connected-panel').style.display = 'none';
+    toast('Yelp disconnected', 'success');
   }
 
   async function postToGoogle(reviewId) {
