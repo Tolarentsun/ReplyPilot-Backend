@@ -104,6 +104,17 @@ router.post('/change-password', authenticate, async (req, res) => {
 // Delete account
 router.delete('/account', authenticate, async (req, res) => {
   try {
+    // Cancel Stripe subscription if exists
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (stripeKey && !stripeKey.includes('...') && req.user.stripe_subscription_id) {
+      try {
+        const stripe = require('stripe')(stripeKey);
+        await stripe.subscriptions.cancel(req.user.stripe_subscription_id);
+      } catch(e) {
+        console.error('Stripe cancel error:', e.message);
+      }
+    }
+    // Delete all user data
     await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
     await db.asyncRun('DELETE FROM users WHERE id = ?', [req.user.id]);
     res.json({ success: true });
