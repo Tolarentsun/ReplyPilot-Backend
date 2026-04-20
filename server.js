@@ -52,7 +52,7 @@ try {
 } catch(e) { console.error('❌ Review routes failed:', e.message); }
 
 try {
-  app.use('/api/subscriptions', require('./routes/subscriptions'));
+  app.use('/api/subscriptions', require('./routes/Subscriptions'));
   console.log('✅ Subscription routes loaded');
 } catch(e) { console.error('❌ Subscription routes failed:', e.message); }
 
