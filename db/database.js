@@ -36,6 +36,11 @@ async function initSchema() {
         subscription_ends_at TEXT,
         business_name TEXT,
         business_type TEXT,
+        google_connected BOOLEAN DEFAULT false,
+        google_access_token TEXT,
+        google_refresh_token TEXT,
+        google_location_id TEXT,
+        google_business_name TEXT,
         created_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
         updated_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
       );
@@ -54,6 +59,7 @@ async function initSchema() {
         response_status TEXT DEFAULT 'pending',
         responded_at TEXT,
         source TEXT DEFAULT 'manual',
+        google_review_id TEXT,
         created_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
       );
       CREATE TABLE IF NOT EXISTS ai_generations (
@@ -69,6 +75,15 @@ async function initSchema() {
       CREATE INDEX IF NOT EXISTS idx_reviews_sentiment ON reviews(sentiment);
       CREATE INDEX IF NOT EXISTS idx_reviews_rating ON reviews(rating);
     `);
+    // Add new columns if they don't exist (migration)
+    try {
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS google_connected BOOLEAN DEFAULT false');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS google_access_token TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS google_refresh_token TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS google_location_id TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS google_business_name TEXT');
+      await client.query('ALTER TABLE reviews ADD COLUMN IF NOT EXISTS google_review_id TEXT');
+    } catch(e) {}
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {
     console.error('Schema init error:', e.message);
