@@ -2,18 +2,22 @@ const { Pool } = require('pg');
 
 let pool = null;
 
-if (process.env.DATABASE_URL) {
-  const isInternal = process.env.DATABASE_URL.includes('.railway.internal');
+const DB_URL = process.env.POSTGRES_CONNECTION_STRING || process.env.DATABASE_URL || '';
+
+if (DB_URL && DB_URL.length > 10) {
+  const isInternal = DB_URL.includes('.railway.internal');
+  console.log('Connecting to DB:', DB_URL.replace(/:([^:@]+)@/, ':****@').substring(0, 60));
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: DB_URL,
     ssl: isInternal ? false : { rejectUnauthorized: false },
     connectionTimeoutMillis: 15000,
     idleTimeoutMillis: 30000,
     max: 10
   });
-  console.log('✅ PostgreSQL connected', isInternal ? '(internal)' : '(external)');
+  console.log('✅ PostgreSQL pool created');
+} else {
+  console.log('⚠️  No DATABASE_URL set, using in-memory store');
 }
-
 async function initSchema() {
   if (!pool) return;
   let client;
