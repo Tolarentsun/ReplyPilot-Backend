@@ -670,9 +670,19 @@
 
     <!-- ===== SUBSCRIPTION TAB ===== -->
     <div class="tab-content" id="content-subscription">
-      <div class="chart-card" style="margin-bottom:24px">
-        <div class="chart-title">Your Current Plan</div>
-        <p style="margin-top:8px; font-size:14px; color:var(--text-muted)">Manage your subscription and billing</p>
+      <div class="chart-card" style="margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="chart-title">Your Current Plan</div>
+          <p style="margin-top:8px; font-size:14px; color:var(--text-muted)">Manage your subscription and billing</p>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <button onclick="openBillingPortal()" style="padding:10px 20px; background:white; border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:DM Sans,sans-serif; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--ink)'" onmouseout="this.style.borderColor='var(--border)'">
+            💳 Manage Billing
+          </button>
+          <button onclick="cancelSubscription()" id="cancel-sub-btn" style="padding:10px 20px; background:white; border:1.5px solid #FCA5A5; color:var(--negative); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:DM Sans,sans-serif; display:none;">
+            Cancel Subscription
+          </button>
+        </div>
       </div>
       <div class="plan-cards" id="plan-cards">
         <div class="loading-spinner" style="grid-column:1/-1"><div class="spinner"></div></div>
@@ -1205,6 +1215,9 @@
   async function loadSubscriptionPlans() {
     const { data } = await API.get('/api/subscriptions/plans');
     const userPlan = currentUser.plan || 'free';
+    // Show cancel button only for paid plans
+    const cancelBtn = document.getElementById('cancel-sub-btn');
+    if (cancelBtn) cancelBtn.style.display = userPlan !== 'free' ? 'block' : 'none';
 
     document.getElementById('plan-cards').innerHTML = data.plans.map(plan => `
       <div class="plan-card ${plan.id === userPlan ? 'current' : ''}">
@@ -1238,6 +1251,33 @@
       }
     } else {
       toast(data.error || 'Upgrade failed', 'error');
+    }
+  }
+
+  async function openBillingPortal() {
+    const { data, ok } = await API.post('/api/subscriptions/portal', {});
+    if (ok && data.success) {
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast(data.message || 'Billing portal not available in demo mode', 'error');
+      }
+    } else {
+      toast(data.error || 'Failed to open billing portal', 'error');
+    }
+  }
+
+  async function cancelSubscription() {
+    if (!confirm('Are you sure you want to cancel your subscription? You will lose access to Pro features at the end of your billing period.')) return;
+    const { data, ok } = await API.post('/api/subscriptions/cancel', {});
+    if (ok && data.success) {
+      currentUser.plan = 'free';
+      Auth.save(Auth.getToken(), currentUser);
+      updateSidebar();
+      loadSubscriptionPlans();
+      toast('Subscription cancelled. You will retain access until the end of your billing period.', 'success');
+    } else {
+      toast(data.error || 'Failed to cancel', 'error');
     }
   }
 
