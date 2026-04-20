@@ -133,6 +133,3 @@ router.post('/portal', authenticate, async (req, res) => {
 });
 
 module.exports = router;
-    res.status(500).json({ error: 'Failed to open billing portal: ' + err.message });
-  }
-});
