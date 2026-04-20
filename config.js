@@ -35,6 +35,6 @@ const Auth = {
   getUser: () => { try { return JSON.parse(localStorage.getItem('rp_user') || '{}'); } catch { return {}; } },
   isLoggedIn: () => !!localStorage.getItem('rp_token'),
   save: (token, user) => { localStorage.setItem('rp_token', token); localStorage.setItem('rp_user', JSON.stringify(user)); },
-  logout: () => { localStorage.removeItem('rp_token'); localStorage.removeItem('rp_user'); window.location.href = '/index.html'; },
+  logout: () => { localStorage.removeItem('rp_token'); localStorage.removeItem('rp_user'); window.location.href = './index.html'; },
   requireAuth: () => { if (!localStorage.getItem('rp_token')) { window.location.href = '/login.html'; return false; } return true; }
 };
