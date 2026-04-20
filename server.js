@@ -9,11 +9,13 @@ process.on('unhandledRejection', (reason) => {
   console.error('UNHANDLED REJECTION:', reason);
 });
 
+// Trust Railway's proxy
+app.set('trust proxy', 1);
+
 // Health check FIRST
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', version: '2.0.0', timestamp: new Date().toISOString() });
 });
-
 app.get('/', (req, res) => {
   res.json({ message: 'ReplyPilot API v2.0', status: 'running' });
 });
@@ -36,31 +38,31 @@ app.use(express.urlencoded({ extended: true }));
 
 try {
   const rateLimit = require('express-rate-limit');
-  app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+  app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
 } catch(e) { console.error('rateLimit failed:', e.message); }
 
 try {
   app.use('/api/auth', require('./routes/auth'));
   console.log('✅ Auth routes loaded');
-} catch(e) { console.error('❌ Auth routes failed:', e.message, e.stack); }
+} catch(e) { console.error('❌ Auth routes failed:', e.message); }
 
 try {
   app.use('/api/reviews', require('./routes/reviews'));
   console.log('✅ Review routes loaded');
-} catch(e) { console.error('❌ Review routes failed:', e.message, e.stack); }
+} catch(e) { console.error('❌ Review routes failed:', e.message); }
 
 try {
   app.use('/api/subscriptions', require('./routes/subscriptions'));
   console.log('✅ Subscription routes loaded');
-} catch(e) { console.error('❌ Subscription routes failed:', e.message, e.stack); }
+} catch(e) { console.error('❌ Subscription routes failed:', e.message); }
 
 try {
   app.use('/api/insights', require('./routes/insights'));
   console.log('✅ Insights routes loaded');
-} catch(e) { console.error('❌ Insights routes failed:', e.message, e.stack); }
+} catch(e) { console.error('❌ Insights routes failed:', e.message); }
 
 app.get('/api', (req, res) => {
-  res.json({ message: 'ReplyPilot API v2.0', endpoints: ['/api/auth', '/api/reviews', '/api/subscriptions', '/api/insights'] });
+  res.json({ message: 'ReplyPilot API v2.0' });
 });
 
 app.use((req, res) => {
@@ -74,5 +76,4 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 ReplyPilot API running on port ${PORT}`);
-  console.log(`✅ Health: /health`);
 });
