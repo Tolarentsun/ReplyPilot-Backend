@@ -1,27 +1,25 @@
-// PostgreSQL database with in-memory fallback
-let usePostgres = false;
+const { Pool } = require('pg');
+
 let pool = null;
 
-// Try to connect to PostgreSQL
 if (process.env.DATABASE_URL) {
-  try {
-    const { Pool } = require('pg');
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
-    });
-    usePostgres = true;
-    console.log('✅ PostgreSQL connected');
-  } catch(e) {
-    console.error('PostgreSQL failed, using memory store:', e.message);
-  }
+  const isInternal = process.env.DATABASE_URL.includes('.railway.internal');
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: isInternal ? false : { rejectUnauthorized: false },
+    connectionTimeoutMillis: 15000,
+    idleTimeoutMillis: 30000,
+    max: 10
+  });
+  console.log('✅ PostgreSQL connected', isInternal ? '(internal)' : '(external)');
 }
 
-// Initialize PostgreSQL schema
 async function initSchema() {
-  if (!usePostgres) return;
+  if (!pool) return;
+  let client;
   try {
-    await pool.query(`
+    client = await pool.connect();
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -34,12 +32,12 @@ async function initSchema() {
         subscription_ends_at TEXT,
         business_name TEXT,
         business_type TEXT,
-        created_at TEXT DEFAULT now()::text,
-        updated_at TEXT DEFAULT now()::text
+        created_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+        updated_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
       );
       CREATE TABLE IF NOT EXISTS reviews (
         id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         platform TEXT DEFAULT 'google',
         reviewer_name TEXT NOT NULL,
         rating INTEGER NOT NULL,
@@ -52,17 +50,16 @@ async function initSchema() {
         response_status TEXT DEFAULT 'pending',
         responded_at TEXT,
         source TEXT DEFAULT 'manual',
-        created_at TEXT DEFAULT now()::text,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        created_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
       );
       CREATE TABLE IF NOT EXISTS ai_generations (
         id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
+        user_id TEXT,
         review_id TEXT,
         prompt TEXT,
         response TEXT,
         model TEXT,
-        created_at TEXT DEFAULT now()::text
+        created_at TEXT DEFAULT to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
       );
       CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id);
       CREATE INDEX IF NOT EXISTS idx_reviews_sentiment ON reviews(sentiment);
@@ -71,175 +68,134 @@ async function initSchema() {
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {
     console.error('Schema init error:', e.message);
+  } finally {
+    if (client) client.release();
   }
 }
 
-// Run schema init
-initSchema();
+// Wait 3 seconds for Railway internal network to be ready then init
+setTimeout(initSchema, 3000);
 
-// ─── PostgreSQL query helpers ───────────────────────────────────────────────
-async function pgQuery(sql, params = []) {
-  const result = await pool.query(sql, params);
-  return result.rows;
+function convertSQL(sql) {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
 }
 
 async function pgGet(sql, params = []) {
-  const result = await pool.query(sql, params);
-  return result.rows[0] || null;
+  const client = await pool.connect();
+  try {
+    const result = await client.query(convertSQL(sql), params);
+    return result.rows[0] || null;
+  } finally { client.release(); }
+}
+
+async function pgAll(sql, params = []) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(convertSQL(sql), params);
+    return result.rows;
+  } finally { client.release(); }
 }
 
 async function pgRun(sql, params = []) {
-  const result = await pool.query(sql, params);
-  return { changes: result.rowCount };
+  const client = await pool.connect();
+  try {
+    const result = await client.query(convertSQL(sql), params);
+    return { changes: result.rowCount };
+  } finally { client.release(); }
 }
 
-// ─── In-memory fallback store ────────────────────────────────────────────────
-const store = { users: [], reviews: [], ai_generations: [] };
+// In-memory fallback store
+const store = { users: [], reviews: [] };
 const now = () => new Date().toISOString();
 
-function memPrepare(sql) {
-  const sl = sql.trim().toLowerCase();
-  return {
-    run(...params) {
-      if (sl.startsWith('insert into users')) {
-        store.users.push({ id:params[0],name:params[1],email:params[2],password_hash:params[3],business_name:params[4]||null,business_type:params[5]||null,plan:params[6]||'free',stripe_customer_id:null,stripe_subscription_id:null,subscription_status:'inactive',subscription_ends_at:null,created_at:now(),updated_at:now() });
-        return { changes: 1 };
-      }
-      if (sl.startsWith('insert into reviews')) {
-        store.reviews.push({ id:params[0],user_id:params[1],platform:params[2],reviewer_name:params[3],rating:parseInt(params[4]),review_text:params[5],review_date:params[6],sentiment:params[7],sentiment_score:params[8],keywords:params[9],response_status:params[10]||'pending',source:params[11]||'manual',ai_response:null,responded_at:null,created_at:now() });
-        return { changes: 1 };
-      }
-      if (sl.startsWith('insert into ai_generations')) {
-        store.ai_generations.push({ id:params[0],user_id:params[1],review_id:params[2],prompt:params[3],response:params[4],model:params[5],created_at:now() });
-        return { changes: 1 };
-      }
-      if (sl.startsWith('update users') && sl.includes('set plan')) {
-        const u = store.users.find(u => u.id === params[params.length-1]);
-        if (u) { u.plan=params[0]; u.subscription_status=params[1]||'active'; u.subscription_ends_at=params[2]||null; u.updated_at=now(); }
-        return { changes: 1 };
-      }
-      if (sl.startsWith('update users') && sl.includes('set name')) {
-        const u = store.users.find(u => u.id === params[params.length-1]);
-        if (u) { u.name=params[0]; u.business_name=params[1]; u.business_type=params[2]; u.updated_at=now(); }
-        return { changes: 1 };
-      }
-      if (sl.startsWith('update reviews') && sl.includes('ai_response')) {
-        const r = store.reviews.find(r => r.id === params[params.length-1]);
-        if (r) { r.ai_response=params[0]; r.response_status='generated'; }
-        return { changes: 1 };
-      }
-      if (sl.startsWith('update reviews') && sl.includes('responded')) {
-        const r = store.reviews.find(r => r.id === params[params.length-1]);
-        if (r) { r.response_status='responded'; r.responded_at=now(); if(params[0]) r.ai_response=params[0]; }
-        return { changes: 1 };
-      }
-      if (sl.startsWith('delete from reviews')) {
-        const before = store.reviews.length;
-        store.reviews = store.reviews.filter(r => r.id !== params[0]);
-        return { changes: before - store.reviews.length };
-      }
-      return { changes: 0 };
-    },
-    get(...params) {
-      if (sl.includes('from users where id')) return store.users.find(u => u.id === params[0]) || null;
-      if (sl.includes('from users where email')) return store.users.find(u => u.email === params[0]) || null;
-      if (sl.includes('select id from users')) return store.users.find(u => u.email === params[0]) || null;
-      if (sl.includes('from reviews where id') && params.length >= 2) return store.reviews.find(r => r.id===params[0] && r.user_id===params[1]) || null;
-      if (sl.includes('from reviews where id')) return store.reviews.find(r => r.id === params[0]) || null;
-      if (sl.includes('count(*)') || sl.includes('avg(rating)')) {
-        const uid = params[0];
-        const reviews = store.reviews.filter(r => r.user_id === uid);
-        const total = reviews.length;
-        if (sl.includes('count(*) as total') && !sl.includes('avg')) return { total };
-        return { total_reviews:total, avg_rating: total ? reviews.reduce((a,r)=>a+r.rating,0)/total : 0, positive_count:reviews.filter(r=>r.sentiment==='positive').length, negative_count:reviews.filter(r=>r.sentiment==='negative').length, neutral_count:reviews.filter(r=>r.sentiment==='neutral').length, responded_count:reviews.filter(r=>r.response_status==='responded').length, pending_count:reviews.filter(r=>r.response_status==='pending').length };
-      }
-      return null;
-    },
-    all(...params) {
-      const uid = params[0];
-      if (sl.includes('from reviews')) {
-        let results = store.reviews.filter(r => r.user_id === uid);
-        if (sl.includes('order by review_date desc')) results.sort((a,b) => b.review_date.localeCompare(a.review_date));
-        else if (sl.includes('order by rating desc')) results.sort((a,b) => b.rating - a.rating);
-        else if (sl.includes('order by rating asc')) results.sort((a,b) => a.rating - b.rating);
-        else results.sort((a,b) => b.review_date.localeCompare(a.review_date));
-        const limitMatch = sl.match(/limit (\d+)/);
-        const offsetMatch = sl.match(/offset (\d+)/);
-        const offset = offsetMatch ? parseInt(offsetMatch[1]) : 0;
-        const limit = limitMatch ? parseInt(limitMatch[1]) : 50;
-        return results.slice(offset, offset + limit);
-      }
-      if (sl.includes('group by rating')) {
-        const reviews = store.reviews.filter(r => r.user_id === uid);
-        const dist = {};
-        reviews.forEach(r => { dist[r.rating] = (dist[r.rating]||0)+1; });
-        return Object.entries(dist).map(([rating,count]) => ({ rating:parseInt(rating), count })).sort((a,b) => b.rating-a.rating);
-      }
-      if (sl.includes('group by platform')) {
-        const reviews = store.reviews.filter(r => r.user_id === uid);
-        const dist = {};
-        reviews.forEach(r => { if(!dist[r.platform]) dist[r.platform]={platform:r.platform,count:0,total_rating:0}; dist[r.platform].count++; dist[r.platform].total_rating+=r.rating; });
-        return Object.values(dist).map(d => ({ platform:d.platform, count:d.count, avg_rating:d.total_rating/d.count }));
-      }
-      if (sl.includes('keywords is not null')) return store.reviews.filter(r => r.user_id===uid && r.keywords);
-      if (sl.includes('from users')) return store.users;
-      return [];
-    }
-  };
+function memGet(sql, params) {
+  const sl = sql.toLowerCase();
+  if (sl.includes('from users where id')) return store.users.find(u => u.id === params[0]) || null;
+  if (sl.includes('from users where email') || sl.includes('select id from users')) return store.users.find(u => u.email === params[0]) || null;
+  if (sl.includes('from reviews where id') && params.length >= 2) return store.reviews.find(r => r.id===params[0] && r.user_id===params[1]) || null;
+  if (sl.includes('from reviews where id')) return store.reviews.find(r => r.id === params[0]) || null;
+  if (sl.includes('count(*)') || sl.includes('avg(rating)')) {
+    const uid = params[0];
+    const reviews = store.reviews.filter(r => r.user_id === uid);
+    const total = reviews.length;
+    if (sl.includes('count(*) as total') && !sl.includes('avg')) return { total };
+    return { total_reviews:total, avg_rating: total ? reviews.reduce((a,r)=>a+r.rating,0)/total : 0, positive_count:reviews.filter(r=>r.sentiment==='positive').length, negative_count:reviews.filter(r=>r.sentiment==='negative').length, neutral_count:reviews.filter(r=>r.sentiment==='neutral').length, responded_count:reviews.filter(r=>r.response_status==='responded').length, pending_count:reviews.filter(r=>r.response_status==='pending').length };
+  }
+  return null;
 }
 
-// ─── Unified async DB interface ──────────────────────────────────────────────
-// All route files call db.prepare(sql).run/get/all synchronously
-// We wrap postgres in a sync-like interface using a queue trick
-// Actually: expose async versions and update routes to use them
+function memAll(sql, params) {
+  const sl = sql.toLowerCase();
+  const uid = params[0];
+  if (sl.includes('from reviews')) {
+    let results = store.reviews.filter(r => r.user_id === uid);
+    if (sl.includes('order by review_date desc')) results.sort((a,b) => b.review_date.localeCompare(a.review_date));
+    else if (sl.includes('order by rating desc')) results.sort((a,b) => b.rating - a.rating);
+    else if (sl.includes('order by rating asc')) results.sort((a,b) => a.rating - b.rating);
+    else results.sort((a,b) => b.review_date.localeCompare(a.review_date));
+    const limitMatch = sl.match(/limit (\d+)/);
+    const offsetMatch = sl.match(/offset (\d+)/);
+    const offset = offsetMatch ? parseInt(offsetMatch[1]) : 0;
+    const limit = limitMatch ? parseInt(limitMatch[1]) : 50;
+    return results.slice(offset, offset + limit);
+  }
+  if (sl.includes('group by rating')) {
+    const dist = {};
+    store.reviews.filter(r=>r.user_id===uid).forEach(r => { dist[r.rating]=(dist[r.rating]||0)+1; });
+    return Object.entries(dist).map(([rating,count])=>({rating:parseInt(rating),count})).sort((a,b)=>b.rating-a.rating);
+  }
+  if (sl.includes('group by platform')) {
+    const dist = {};
+    store.reviews.filter(r=>r.user_id===uid).forEach(r => { if(!dist[r.platform]) dist[r.platform]={platform:r.platform,count:0,total_rating:0}; dist[r.platform].count++; dist[r.platform].total_rating+=r.rating; });
+    return Object.values(dist).map(d=>({platform:d.platform,count:d.count,avg_rating:d.total_rating/d.count}));
+  }
+  if (sl.includes('keywords is not null')) return store.reviews.filter(r=>r.user_id===uid && r.keywords);
+  if (sl.includes('substring(review_date')) {
+    const months = {};
+    store.reviews.filter(r=>r.user_id===uid).forEach(r => {
+      const month = r.review_date ? r.review_date.substring(0,7) : '2024-01';
+      if(!months[month]) months[month]={month,count:0,total_rating:0,positive:0};
+      months[month].count++; months[month].total_rating+=r.rating;
+      if(r.sentiment==='positive') months[month].positive++;
+    });
+    return Object.values(months).map(m=>({month:m.month,count:m.count,avg_rating:m.total_rating/m.count,positive:m.positive})).sort((a,b)=>a.month.localeCompare(b.month)).slice(-12);
+  }
+  return [];
+}
+
+function memRun(sql, params) {
+  const sl = sql.toLowerCase();
+  if (sl.startsWith('insert into users')) {
+    store.users.push({id:params[0],name:params[1],email:params[2],password_hash:params[3],business_name:params[4]||null,business_type:params[5]||null,plan:'free',subscription_status:'inactive',created_at:now(),updated_at:now()});
+    return { changes: 1 };
+  }
+  if (sl.startsWith('insert into reviews')) {
+    store.reviews.push({id:params[0],user_id:params[1],platform:params[2],reviewer_name:params[3],rating:parseInt(params[4]),review_text:params[5],review_date:params[6],sentiment:params[7],sentiment_score:params[8],keywords:params[9],response_status:params[10]||'pending',source:params[11]||'manual',ai_response:null,created_at:now()});
+    return { changes: 1 };
+  }
+  if (sl.startsWith('update users') && sl.includes('set plan')) { const u=store.users.find(u=>u.id===params[params.length-1]); if(u){u.plan=params[0];u.subscription_status=params[1]||'active';} return {changes:1}; }
+  if (sl.startsWith('update users') && sl.includes('set name')) { const u=store.users.find(u=>u.id===params[params.length-1]); if(u){u.name=params[0];u.business_name=params[1];u.business_type=params[2];} return {changes:1}; }
+  if (sl.startsWith('update reviews') && sl.includes('ai_response')) { const r=store.reviews.find(r=>r.id===params[params.length-1]); if(r){r.ai_response=params[0];r.response_status='generated';} return {changes:1}; }
+  if (sl.startsWith('update reviews') && sl.includes('responded')) { const r=store.reviews.find(r=>r.id===params[params.length-1]); if(r){r.response_status='responded';r.responded_at=now();if(params[0])r.ai_response=params[0];} return {changes:1}; }
+  if (sl.startsWith('delete from reviews')) { store.reviews=store.reviews.filter(r=>r.id!==params[0]); return {changes:1}; }
+  return { changes: 0 };
+}
 
 const db = {
-  usePostgres,
-  _store: store,
-
-  // Async methods for PostgreSQL (used in routes)
   async asyncGet(sql, params = []) {
-    if (usePostgres) {
-      // Convert ? placeholders to $1, $2...
-      let i = 0;
-      const pgSql = sql.replace(/\?/g, () => `$${++i}`);
-      return pgGet(pgSql, params);
-    }
-    return memPrepare(sql).get(...params);
+    try { if (pool) return await pgGet(sql, params); } catch(e) { console.error('pgGet error:', e.message); }
+    return memGet(sql, params);
   },
-
   async asyncAll(sql, params = []) {
-    if (usePostgres) {
-      let i = 0;
-      const pgSql = sql.replace(/\?/g, () => `$${++i}`);
-      return pgQuery(pgSql, params);
-    }
-    return memPrepare(sql).all(...params);
+    try { if (pool) return await pgAll(sql, params); } catch(e) { console.error('pgAll error:', e.message); return []; }
+    return memAll(sql, params);
   },
-
   async asyncRun(sql, params = []) {
-    if (usePostgres) {
-      let i = 0;
-      const pgSql = sql.replace(/\?/g, () => `$${++i}`);
-      return pgRun(pgSql, params);
-    }
-    return memPrepare(sql).run(...params);
+    try { if (pool) return await pgRun(sql, params); } catch(e) { console.error('pgRun error:', e.message); }
+    return memRun(sql, params);
   },
-
-  // Sync-compatible prepare (falls back to memory if postgres)
-  prepare(sql) {
-    if (!usePostgres) return memPrepare(sql);
-    // Return async-wrapped sync-looking interface
-    return {
-      run: (...params) => db.asyncRun(sql, params),
-      get: (...params) => db.asyncGet(sql, params),
-      all: (...params) => db.asyncAll(sql, params)
-    };
-  },
-
-  exec() { return this; },
-  pragma() { return this; },
-  transaction(fn) { return (...args) => fn(...args); },
+  _store: store,
   pool
 };
 
