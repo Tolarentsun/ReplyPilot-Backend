@@ -215,3 +215,13 @@ function generateTemplateResponse(review, businessName) {
 }
 
 module.exports = router;
+
+// Delete all reviews for user
+router.delete('/all', authenticate, async (req, res) => {
+  try {
+    await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
+    res.json({ success: true, message: 'All reviews deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete reviews' });
+  }
+});
