@@ -61,6 +61,11 @@ try {
   console.log('✅ Insights routes loaded');
 } catch(e) { console.error('❌ Insights routes failed:', e.message); }
 
+try {
+  app.use('/api/google', require('./routes/google'));
+  console.log('✅ Google routes loaded');
+} catch(e) { console.error('❌ Google routes failed:', e.message); }
+
 app.get('/api', (req, res) => {
   res.json({ message: 'ReplyPilot API v2.0' });
 });
