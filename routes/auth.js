@@ -82,3 +82,32 @@ router.put('/profile', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+
+// Change password
+router.post('/change-password', authenticate, async (req, res) => {
+  try {
+    const { current_password, new_password } = req.body;
+    if (!current_password || !new_password) return res.status(400).json({ error: 'Both passwords are required' });
+    if (new_password.length < 6) return res.status(400).json({ error: 'New password must be at least 6 characters' });
+
+    const valid = await bcrypt.compare(current_password, req.user.password_hash);
+    if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+
+    const newHash = await bcrypt.hash(new_password, 12);
+    await db.asyncRun('UPDATE users SET password_hash = ? WHERE id = ?', [newHash, req.user.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+// Delete account
+router.delete('/account', authenticate, async (req, res) => {
+  try {
+    await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
+    await db.asyncRun('DELETE FROM users WHERE id = ?', [req.user.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
+});
