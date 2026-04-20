@@ -66,6 +66,11 @@ try {
   console.log('✅ Google routes loaded');
 } catch(e) { console.error('❌ Google routes failed:', e.message); }
 
+try {
+  app.use('/api/yelp', require('./routes/yelp'));
+  console.log('✅ Yelp routes loaded');
+} catch(e) { console.error('❌ Yelp routes failed:', e.message); }
+
 app.get('/api', (req, res) => {
   res.json({ message: 'ReplyPilot API v2.0' });
 });
