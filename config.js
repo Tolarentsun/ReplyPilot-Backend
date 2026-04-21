@@ -16,7 +16,8 @@ const API = {
       },
       ...options
     });
-    const data = await response.json();
+    let data;
+    try { data = await response.json(); } catch (e) { data = { error: 'Server returned an unexpected response (status ' + response.status + ')' }; }
     if (response.status === 401) {
       localStorage.removeItem('rp_token');
       localStorage.removeItem('rp_user');
