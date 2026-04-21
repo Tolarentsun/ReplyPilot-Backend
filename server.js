@@ -24,8 +24,10 @@ try { require('dotenv').config(); } catch(e) {}
 
 try {
   const cors = require('cors');
-  const allowedOrigins = process.env.FRONTEND_URL
-    ? [process.env.FRONTEND_URL]
+  const rawOrigin = process.env.FRONTEND_URL || '';
+  const toOrigin = url => { try { const u = new URL(url); return u.origin; } catch { return url; } };
+  const allowedOrigins = rawOrigin
+    ? [toOrigin(rawOrigin), 'https://reply-pilot.net', 'https://www.reply-pilot.net']
     : ['http://localhost:3000', 'http://localhost:5500', 'http://127.0.0.1:5500'];
   app.use(cors({ origin: allowedOrigins, credentials: true }));
 } catch(e) { console.error('cors failed:', e.message); }
