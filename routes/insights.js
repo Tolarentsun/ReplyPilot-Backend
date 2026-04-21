@@ -12,22 +12,22 @@ router.post('/generate', authenticate, async (req, res) => {
 
     // Gather data
     const reviews = await db.asyncAll(
-      'SELECT * FROM reviews WHERE user_id = $1 ORDER BY review_date DESC LIMIT 50',
+      'SELECT * FROM reviews WHERE user_id = ? ORDER BY review_date DESC LIMIT 50',
       [userId]
     );
-    
+
     if (!reviews || reviews.length === 0) {
       return res.json({ success: true, insights: getDefaultInsights() });
     }
 
     const analytics = await db.asyncGet(`
-      SELECT 
+      SELECT
         COUNT(*) as total,
         AVG(rating) as avg_rating,
         SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive,
         SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative,
         SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral
-      FROM reviews WHERE user_id = $1
+      FROM reviews WHERE user_id = ?
     `, [userId]);
 
     const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -71,7 +71,7 @@ Provide a JSON response with this exact structure:
 Respond with ONLY the JSON, no other text.`;
 
     const response = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 800,
       messages: [{ role: 'user', content: prompt }]
     }, {

@@ -165,6 +165,16 @@ router.put('/:id/respond', authenticate, async (req, res) => {
   }
 });
 
+// Delete all reviews — must be before /:id to avoid being swallowed as an id param
+router.delete('/all', authenticate, async (req, res) => {
+  try {
+    await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
+    res.json({ success: true, message: 'All reviews deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete reviews' });
+  }
+});
+
 // Delete review
 router.delete('/:id', authenticate, async (req, res) => {
   try {
@@ -200,7 +210,7 @@ async function generateAIResponse(review, businessName, tone, userId) {
   const prompt = `You are a customer response specialist for ${businessName}. Write a ${toneMap[tone]||'professional'} response to this ${review.rating}-star review: "${review.review_text}". Keep it 80-150 words, address specific points, and sign off naturally. Respond with ONLY the response text.`;
 
   const response = await axios.post('https://api.anthropic.com/v1/messages', {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     max_tokens: 300,
     messages: [{ role: 'user', content: prompt }]
   }, { headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' } });
@@ -215,13 +225,3 @@ function generateTemplateResponse(review, businessName) {
 }
 
 module.exports = router;
-
-// Delete all reviews for user
-router.delete('/all', authenticate, async (req, res) => {
-  try {
-    await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
-    res.json({ success: true, message: 'All reviews deleted' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete reviews' });
-  }
-});

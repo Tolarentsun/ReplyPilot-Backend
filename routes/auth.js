@@ -81,8 +81,6 @@ router.put('/profile', authenticate, async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // Change password
 router.post('/change-password', authenticate, async (req, res) => {
   try {
@@ -104,7 +102,6 @@ router.post('/change-password', authenticate, async (req, res) => {
 // Delete account
 router.delete('/account', authenticate, async (req, res) => {
   try {
-    // Cancel Stripe subscription if exists
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (stripeKey && !stripeKey.includes('...') && req.user.stripe_subscription_id) {
       try {
@@ -114,7 +111,6 @@ router.delete('/account', authenticate, async (req, res) => {
         console.error('Stripe cancel error:', e.message);
       }
     }
-    // Delete all user data
     await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
     await db.asyncRun('DELETE FROM users WHERE id = ?', [req.user.id]);
     res.json({ success: true });
@@ -122,3 +118,5 @@ router.delete('/account', authenticate, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete account' });
   }
 });
+
+module.exports = router;

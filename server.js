@@ -24,7 +24,10 @@ try { require('dotenv').config(); } catch(e) {}
 
 try {
   const cors = require('cors');
-  app.use(cors({ origin: '*', credentials: true }));
+  const allowedOrigins = process.env.FRONTEND_URL
+    ? [process.env.FRONTEND_URL]
+    : ['http://localhost:3000', 'http://localhost:5500', 'http://127.0.0.1:5500'];
+  app.use(cors({ origin: allowedOrigins, credentials: true }));
 } catch(e) { console.error('cors failed:', e.message); }
 
 try {
