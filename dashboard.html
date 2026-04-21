@@ -413,20 +413,13 @@
     .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
     .insight-card { background: white; border-radius: 14px; padding: 28px; border: 1px solid var(--border); }
     .insight-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; margin-bottom: 16px; }
-    .health-score {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
+    .health-score { display: flex; align-items: center; gap: 24px; }
     .score-circle {
-      width: 90px;
-      height: 90px;
+      width: 90px; height: 90px;
       border-radius: 50%;
       border: 5px solid var(--gold);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .score-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--ink); line-height: 1; }
@@ -451,9 +444,6 @@
     .action-impact { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
     .strengths-list, .improvements-list { display: flex; flex-direction: column; gap: 10px; }
     .list-item { display: flex; gap: 10px; font-size: 14px; align-items: flex-start; }
-    .list-item::before { content: ''; flex-shrink: 0; margin-top: 7px; }
-    .strengths-list .list-item::before { color: var(--positive); }
-    .improvements-list .list-item::before { color: var(--negative); }
 
     /* UPGRADE BANNER */
     .upgrade-banner {
@@ -776,7 +766,7 @@
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:6px">Platform Connections</div>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Connect your review platforms to enable automatic syncing and posting</p>
-          
+
           <!-- Google -->
           <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -796,7 +786,6 @@
                 <button onclick="syncGoogleReviews()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Sync Reviews Now</button>
                 <button onclick="disconnectGoogle()" style="padding:9px 18px;background:white;border:1.5px solid #FCA5A5;color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
               </div>
-              <div id="google-locations" style="margin-top:16px"></div>
             </div>
             <div style="margin-top:12px;padding:10px 14px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1D4ED8">
               ✅ <strong>Full Integration:</strong> Auto-sync reviews + post responses directly to Google
@@ -810,34 +799,30 @@
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Yelp</div>
-                  <div style="font-size:12px;color:var(--text-muted)" id="yelp-status-text">Not connected — search for your business below</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Manual import — AI response generation</div>
                 </div>
               </div>
-              <span style="padding:6px 14px;background:#FEF3C7;color:#92400E;border-radius:20px;font-size:11px;font-weight:700">Auto-Import</span>
+              <span style="padding:6px 14px;background:#FEF3C7;color:#92400E;border-radius:20px;font-size:11px;font-weight:700">Manual Only</span>
             </div>
 
-            <!-- Yelp Search -->
-            <div id="yelp-search-panel" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-                <input id="yelp-business-name" type="text" placeholder="Business name..." style="padding:10px 14px;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
-                <input id="yelp-location" type="text" placeholder="City, State (e.g. Tampa, FL)" style="padding:10px 14px;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
+            <div style="margin-top:16px;padding:20px;background:#FFFBEB;border-radius:10px;border:1.5px solid #FDE68A">
+              <div style="font-weight:700;font-size:14px;color:#92400E;margin-bottom:8px">📋 How to import Yelp reviews</div>
+              <div style="font-size:13px;color:#78350F;line-height:1.8">
+                <div>1. Go to your business page on <strong>yelp.com</strong></div>
+                <div>2. Copy a customer review</div>
+                <div>3. Click <strong>"+ Add Review"</strong> above and select <strong>Yelp</strong> as the platform</div>
+                <div>4. Paste the review — ReplyPilot will analyze it and generate an AI response</div>
+                <div>5. Copy the AI response and paste it back into Yelp manually</div>
               </div>
-              <button onclick="searchYelp()" style="padding:10px 20px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Search Yelp</button>
             </div>
 
-            <!-- Yelp Search Results -->
-            <div id="yelp-results" style="margin-top:12px"></div>
-
-            <!-- Yelp Connected Panel -->
-            <div id="yelp-connected-panel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
-              <div style="display:flex;gap:12px">
-                <button onclick="syncYelp()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Sync Reviews</button>
-                <button onclick="disconnectYelp()" style="padding:9px 18px;background:white;border:1.5px solid #FCA5A5;color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
-              </div>
+            <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+              <button onclick="openAddReview()" style="padding:10px 20px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">+ Add Yelp Review</button>
+              <a href="https://www.yelp.com/login" target="_blank" style="padding:10px 20px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none">Open Yelp ↗</a>
             </div>
 
             <div style="margin-top:12px;padding:10px 14px;background:#FEF9EC;border-radius:8px;font-size:12px;color:#92400E">
-              ⚠️ <strong>Yelp does not allow automated posting.</strong> ReplyPilot will import your reviews and generate AI responses — copy and paste them into Yelp manually. Connect Google for full automation.
+              ⚠️ <strong>Yelp does not allow automated review imports or response posting.</strong> Even paid Yelp API plans only provide 7 reviews max. Manual copy-paste is the most reliable method — connect <strong>Google</strong> for full automation.
             </div>
           </div>
 
@@ -880,7 +865,6 @@
         <div class="chart-card" style="border:1.5px solid #FCA5A5;">
           <div class="chart-title" style="margin-bottom:6px;color:var(--negative)">Danger Zone</div>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">These actions are permanent and cannot be undone</p>
-          
           <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#FEF2F2;border-radius:10px;margin-bottom:12px">
             <div>
               <div style="font-weight:700;font-size:14px;color:var(--ink)">Delete All Reviews</div>
@@ -888,7 +872,6 @@
             </div>
             <button onclick="deleteAllReviews()" style="padding:10px 20px;background:white;border:1.5px solid var(--negative);color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">Delete Reviews</button>
           </div>
-
           <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#FEF2F2;border-radius:10px">
             <div>
               <div style="font-weight:700;font-size:14px;color:var(--ink)">Delete Account</div>
@@ -987,14 +970,8 @@
   async function loadOverview() {
     try {
       const { data } = await API.get('/api/reviews/analytics');
-      if (!data.success) {
-        showEmptyDashboard();
-        return;
-      }
-      if (data.analytics.totals.total_reviews === 0) {
-        showEmptyDashboard();
-        return;
-      }
+      if (!data.success) { showEmptyDashboard(); return; }
+      if (data.analytics.totals.total_reviews === 0) { showEmptyDashboard(); return; }
       renderStats(data.analytics);
       renderBarChart(data.analytics.monthly_trend);
       renderRatingDist(data.analytics.rating_distribution);
@@ -1109,7 +1086,10 @@
   }
 
   function renderKeywords(keywords) {
-    if (!keywords || keywords.length === 0) { document.getElementById('keywords-cloud').innerHTML = '<p style="color:var(--text-muted);font-size:13px">Add more reviews to see themes</p>'; return; }
+    if (!keywords || keywords.length === 0) {
+      document.getElementById('keywords-cloud').innerHTML = '<p style="color:var(--text-muted);font-size:13px">Add more reviews to see themes</p>';
+      return;
+    }
     const max = Math.max(...keywords.map(k => k.count));
     document.getElementById('keywords-cloud').innerHTML = keywords.map(k => {
       const size = k.count >= max * 0.7 ? 'large' : '';
@@ -1175,7 +1155,7 @@
       const isGoogle = r.platform === 'google' && r.google_review_id;
       const platformNotice = !isGoogle && r.ai_response ? `
         <div style="margin-top:10px;padding:8px 12px;background:#FEF9EC;border-radius:6px;font-size:12px;color:#92400E">
-          ⚠️ ${r.platform.charAt(0).toUpperCase()+r.platform.slice(1)} does not support automated posting. 
+          ⚠️ ${r.platform.charAt(0).toUpperCase()+r.platform.slice(1)} does not support automated posting.
           Copy this response and paste it manually${r.platform !== 'google' ? ` — or <strong>connect Google</strong> for full automation` : ''}.
         </div>` : '';
 
@@ -1218,7 +1198,6 @@
     try {
       const { data, ok } = await API.post(`/api/reviews/${reviewId}/generate-response`, { tone: 'professional' });
       if (ok && data.success) {
-        // Update the review in our local array
         const rev = allReviews.find(r => r.id === reviewId);
         if (rev) { rev.ai_response = data.response; rev.response_status = 'generated'; }
         renderReviews(allReviews);
@@ -1254,7 +1233,6 @@
   // ===== INSIGHTS =====
   async function generateInsights() {
     document.getElementById('insights-content').innerHTML = '<div class="loading-spinner"><div class="spinner"></div>Analyzing your reviews with AI...</div>';
-
     try {
       const { data, ok } = await API.post('/api/insights/generate', {});
       if (ok && data.success) {
@@ -1269,7 +1247,6 @@
 
   function renderInsights(ins) {
     const healthColor = { 'Excellent': 'var(--positive)', 'Good': 'var(--gold)', 'Needs Attention': 'var(--neutral)', 'Critical': 'var(--negative)' }[ins.overall_health] || 'var(--gold)';
-
     document.getElementById('insights-content').innerHTML = `
       <div class="insights-grid">
         <div class="insight-card">
@@ -1329,7 +1306,6 @@
   async function loadSubscriptionPlans() {
     const { data } = await API.get('/api/subscriptions/plans');
     const userPlan = currentUser.plan || 'free';
-    // Show cancel button only for paid plans
     const cancelBtn = document.getElementById('cancel-sub-btn');
     if (cancelBtn) cancelBtn.style.display = userPlan !== 'free' ? 'block' : 'none';
 
@@ -1371,11 +1347,8 @@
   async function openBillingPortal() {
     const { data, ok } = await API.post('/api/subscriptions/portal', {});
     if (ok && data.success) {
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        toast(data.message || 'Billing portal not available in demo mode', 'error');
-      }
+      if (data.url) { window.location.href = data.url; }
+      else { toast(data.message || 'Billing portal not available in demo mode', 'error'); }
     } else {
       toast(data.error || 'Failed to open billing portal', 'error');
     }
@@ -1400,7 +1373,6 @@
 
   function loadSettings() {
     loadGoogleStatus();
-    loadYelpStatus();
     document.getElementById('settings-name').value = currentUser.name || '';
     document.getElementById('settings-biz').value = currentUser.business_name || '';
     document.getElementById('settings-email').value = currentUser.email || '';
@@ -1510,7 +1482,6 @@
     }
   }
 
-  // Check for Google connection success/error on load
   function checkGoogleCallback() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('google_connected')) {
@@ -1526,86 +1497,6 @@
       toast('✓ Subscription upgraded successfully!', 'success');
       history.replaceState({}, '', window.location.pathname);
     }
-  }
-
-  // ===== YELP INTEGRATION =====
-  let selectedYelpBusiness = null;
-
-  async function loadYelpStatus() {
-    try {
-      const { data, ok } = await API.get('/api/yelp/status');
-      if (ok && data.connected) {
-        document.getElementById('yelp-status-text').textContent = `Connected: ${data.business_name}`;
-        document.getElementById('yelp-search-panel').style.display = 'none';
-        document.getElementById('yelp-connected-panel').style.display = 'block';
-      }
-    } catch(e) {}
-  }
-
-  async function searchYelp() {
-    const term = document.getElementById('yelp-business-name').value.trim();
-    const location = document.getElementById('yelp-location').value.trim();
-    if (!term || !location) { toast('Enter business name and location', 'error'); return; }
-
-    document.getElementById('yelp-results').innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:10px">Searching Yelp...</div>';
-
-    const { data, ok } = await API.get(`/api/yelp/search?term=${encodeURIComponent(term)}&location=${encodeURIComponent(location)}`);
-    if (!ok || !data.success) {
-      document.getElementById('yelp-results').innerHTML = `<div style="font-size:13px;color:var(--negative);padding:10px">${data.error || 'Search failed'}</div>`;
-      return;
-    }
-
-    if (!data.businesses.length) {
-      document.getElementById('yelp-results').innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:10px">No businesses found. Try a different search.</div>';
-      return;
-    }
-
-    document.getElementById('yelp-results').innerHTML = data.businesses.map(b => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1.5px solid var(--mist);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="selectYelpBusiness('${b.id}', '${b.name.replace(/'/g, "\'")}')">
-        <div>
-          <div style="font-weight:700;font-size:14px">${b.name}</div>
-          <div style="font-size:12px;color:var(--text-muted)">${b.address}</div>
-          <div style="font-size:12px;color:var(--gold)">★ ${b.rating} · ${b.review_count} reviews</div>
-        </div>
-        <button style="padding:8px 16px;background:var(--ink);color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Select</button>
-      </div>`).join('');
-  }
-
-  async function selectYelpBusiness(businessId, businessName) {
-    toast('Connecting to Yelp and importing reviews...', '');
-    const { data, ok } = await API.post(`/api/yelp/sync/${businessId}`, { business_name: businessName });
-    if (ok && data.success) {
-      document.getElementById('yelp-status-text').textContent = `Connected: ${businessName}`;
-      document.getElementById('yelp-search-panel').style.display = 'none';
-      document.getElementById('yelp-results').innerHTML = '';
-      document.getElementById('yelp-connected-panel').style.display = 'block';
-      toast(`✓ ${data.message}`, 'success');
-      loadOverview();
-    } else {
-      toast(data.error || 'Failed to connect Yelp', 'error');
-    }
-  }
-
-  async function syncYelp() {
-    const { data: status } = await API.get('/api/yelp/status');
-    if (!status.business_id) { toast('No Yelp business connected', 'error'); return; }
-    toast('Syncing Yelp reviews...', '');
-    const { data, ok } = await API.post(`/api/yelp/sync/${status.business_id}`, { business_name: status.business_name });
-    if (ok && data.success) {
-      toast(`✓ ${data.message}`, 'success');
-      loadOverview();
-    } else {
-      toast(data.error || 'Sync failed', 'error');
-    }
-  }
-
-  async function disconnectYelp() {
-    if (!confirm('Disconnect Yelp?')) return;
-    await API.post('/api/yelp/disconnect', {});
-    document.getElementById('yelp-status-text').textContent = 'Not connected — search for your business below';
-    document.getElementById('yelp-search-panel').style.display = 'block';
-    document.getElementById('yelp-connected-panel').style.display = 'none';
-    toast('Yelp disconnected', 'success');
   }
 
   async function postToGoogle(reviewId) {
@@ -1638,11 +1529,8 @@
     if (!confirm('Are you sure you want to permanently delete your account? ALL data will be lost and this cannot be undone.')) return;
     if (!confirm('This is your final confirmation. Delete account permanently?')) return;
     const { data, ok } = await API.delete('/api/auth/account');
-    if (ok && data.success) {
-      Auth.logout();
-    } else {
-      toast(data.error || 'Failed to delete account', 'error');
-    }
+    if (ok && data.success) { Auth.logout(); }
+    else { toast(data.error || 'Failed to delete account', 'error'); }
   }
 
   // ===== ADD REVIEW MODAL =====
@@ -1680,16 +1568,13 @@
     if (ok && data.success) {
       closeModal();
       toast('✓ Review added and analyzed!', 'success');
-      if (document.getElementById('content-reviews').classList.contains('active')) {
-        loadReviews();
-      }
+      if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
       loadOverview();
     } else {
       toast(data.error || 'Failed to add review', 'error');
     }
   }
 
-  // Click outside modal to close
   document.getElementById('add-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
@@ -1722,4 +1607,6 @@
   })();
 </script>
 </body>
+</html>
+```
 </html>
