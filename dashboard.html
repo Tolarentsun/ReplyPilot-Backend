@@ -1347,32 +1347,42 @@
 
   // ===== SUBSCRIPTION =====
   async function loadSubscriptionPlans() {
-    const { data } = await API.get('/api/subscriptions/plans');
-    const userPlan = currentUser.plan || 'free';
-    const cancelBtn = document.getElementById('cancel-sub-btn');
-    if (cancelBtn) cancelBtn.style.display = userPlan !== 'free' ? 'block' : 'none';
+    const planCardsEl = document.getElementById('plan-cards');
+    try {
+      const { data, ok } = await API.get('/api/subscriptions/plans');
+      if (!ok || !data || !data.plans) throw new Error('Bad response');
 
-    document.getElementById('plan-cards').innerHTML = data.plans.map(plan => `
-      <div class="plan-card ${plan.id === userPlan ? 'current' : ''}">
-        ${plan.id === userPlan ? '<span class="plan-current-badge">Current Plan</span>' : ''}
-        <div class="plan-name">${plan.name}</div>
-        <div class="plan-price">$${plan.price}</div>
-        <div class="plan-period">${plan.period}</div>
-        <div class="plan-features">
-          ${plan.features.map(f => {
-            if (f.startsWith('|DIVIDER|')) {
-              const label = f.replace('|DIVIDER|', '');
-              return `<div style="margin-top:4px;padding-top:12px;border-top:1.5px solid var(--mist);font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold)">${label}</div>`;
-            }
-            return `<div class="plan-feature">${f}</div>`;
-          }).join('')}
-        </div>
-        ${plan.id === userPlan
-          ? `<button class="btn-plan active-plan" disabled>Current Plan</button>`
-          : `<button class="btn-plan" onclick="upgradePlan('${plan.id}')">${plan.price === 0 ? 'Downgrade' : 'Upgrade to ' + plan.name}</button>`
-        }
-      </div>
-    `).join('');
+      const userPlan = currentUser.plan || 'free';
+      const cancelBtn = document.getElementById('cancel-sub-btn');
+      if (cancelBtn) cancelBtn.style.display = userPlan !== 'free' ? 'block' : 'none';
+
+      planCardsEl.innerHTML = data.plans.map(plan => {
+        const featuresHtml = plan.features.map(f => {
+          if (f.startsWith('|DIVIDER|')) {
+            const label = f.replace('|DIVIDER|', '');
+            return '<div style="margin-top:4px;padding-top:12px;border-top:1.5px solid var(--mist);font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold)">' + label + '</div>';
+          }
+          return '<div class="plan-feature">' + f + '</div>';
+        }).join('');
+
+        const btnHtml = plan.id === userPlan
+          ? '<button class="btn-plan active-plan" disabled>Current Plan</button>'
+          : '<button class="btn-plan" onclick="upgradePlan(\'' + plan.id + '\')">' + (plan.price === 0 ? 'Downgrade' : 'Upgrade to ' + plan.name) + '</button>';
+
+        const badgeHtml = plan.id === userPlan ? '<span class="plan-current-badge">Current Plan</span>' : '';
+
+        return '<div class="plan-card' + (plan.id === userPlan ? ' current' : '') + '">' +
+          badgeHtml +
+          '<div class="plan-name">' + plan.name + '</div>' +
+          '<div class="plan-price">$' + plan.price + '</div>' +
+          '<div class="plan-period">' + plan.period + '</div>' +
+          '<div class="plan-features">' + featuresHtml + '</div>' +
+          btnHtml +
+          '</div>';
+      }).join('');
+    } catch (e) {
+      planCardsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Failed to load plans. <button onclick="loadSubscriptionPlans()" style="background:none;border:none;color:var(--ink);font-weight:600;cursor:pointer;text-decoration:underline">Try again</button></div>';
+    }
   }
 
   async function upgradePlan(planId) {
