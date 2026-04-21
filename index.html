@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ReplyPilot — AI Review Intelligence for Local Businesses</title>
-  <link rel="icon" type="image/svg+xml" href="./favicon.svg"><rect width=%22100%22 height=%22100%22 rx=%2210%22 fill=%22%230A0A0F%22/><text y=%22.85em%22 font-size=%2260%22 font-weight=%22bold%22 fill=%22%23D4A853%22 font-family=%22serif%22>RP</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -13,871 +13,238 @@
       --cream: #FAF8F4;
       --gold: #D4A853;
       --gold-light: #F0D499;
-      --sage: #4A6741;
-      --coral: #E8624A;
       --mist: #E8E4DC;
+      --surface: #FFFFFF;
       --text: #2A2A35;
       --text-muted: #6B6878;
+      --border: #EDE9E1;
+      --positive: #16A34A;
+      --negative: #DC2626;
+      --neutral: #D97706;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--text);
-      overflow-x: hidden;
-    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
 
     /* NAV */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       padding: 20px 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(250, 248, 244, 0.92);
-      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(250,248,244,0.92); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--mist);
     }
-
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--ink);
-      text-decoration: none;
-      letter-spacing: -0.5px;
-    }
-
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--ink); text-decoration: none; }
     .nav-logo span { color: var(--gold); }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      transition: color 0.2s;
-    }
-
+    .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--gold); }
-
-    .nav-cta {
-      background: var(--ink) !important;
-      color: var(--cream) !important;
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-weight: 600 !important;
-      transition: background 0.2s !important;
-    }
-
+    .nav-cta { background: var(--ink) !important; color: var(--cream) !important; padding: 10px 24px; border-radius: 6px; font-weight: 600 !important; }
     .nav-cta:hover { background: var(--gold) !important; color: var(--ink) !important; }
 
     /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      padding-top: 80px;
-    }
-
-    .hero-left {
-      padding: 100px 60px 80px 60px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 28px;
-    }
-
-    .hero-eyebrow::before {
-      content: '';
-      width: 32px;
-      height: 1px;
-      background: var(--gold);
-    }
-
-    .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(48px, 5vw, 72px);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -2px;
-      color: var(--ink);
-      margin-bottom: 28px;
-    }
-
-    .hero-title em {
-      font-style: italic;
-      color: var(--gold);
-    }
-
-    .hero-sub {
-      font-size: 17px;
-      line-height: 1.7;
-      color: var(--text-muted);
-      max-width: 420px;
-      margin-bottom: 48px;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .btn-primary {
-      background: var(--ink);
-      color: var(--cream);
-      padding: 16px 36px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s;
-      letter-spacing: 0.02em;
-    }
-
-    .btn-primary:hover {
-      background: var(--gold);
-      color: var(--ink);
-      transform: translateY(-2px);
-    }
-
-    .btn-ghost {
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: color 0.2s;
-    }
-
+    .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; padding-top: 80px; }
+    .hero-left { padding: 100px 60px 80px 60px; display: flex; flex-direction: column; justify-content: center; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 28px; }
+    .hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--gold); }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(44px, 5vw, 68px); font-weight: 900; line-height: 1.05; letter-spacing: -2px; color: var(--ink); margin-bottom: 28px; }
+    .hero-title em { font-style: italic; color: var(--gold); }
+    .hero-sub { font-size: 17px; line-height: 1.7; color: var(--text-muted); max-width: 420px; margin-bottom: 48px; }
+    .hero-actions { display: flex; gap: 16px; align-items: center; }
+    .btn-primary { background: var(--ink); color: var(--cream); padding: 16px 36px; border-radius: 6px; font-size: 15px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.25s; }
+    .btn-primary:hover { background: var(--gold); color: var(--ink); transform: translateY(-2px); }
+    .btn-ghost { color: var(--text); font-size: 14px; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
     .btn-ghost:hover { color: var(--gold); }
+    .hero-stats { display: flex; gap: 48px; margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--mist); }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 800; color: var(--ink); }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; margin-top: 2px; }
 
-    .hero-stats {
-      display: flex;
-      gap: 48px;
-      margin-top: 64px;
-      padding-top: 48px;
-      border-top: 1px solid var(--mist);
-    }
-
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      margin-top: 2px;
-    }
-
-    /* HERO RIGHT - Dashboard Preview */
-    .hero-right {
-      background: var(--ink);
-      padding: 80px 60px 80px 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-right::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba(212,168,83,0.15) 0%, transparent 60%);
-    }
-
-    .dashboard-preview {
-      width: 100%;
-      max-width: 480px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .preview-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 16px;
-      backdrop-filter: blur(10px);
-    }
-
-    .preview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .preview-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .preview-badge {
-      font-size: 11px;
-      background: rgba(74,103,65,0.4);
-      color: #7FC67A;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .preview-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
-
-    .preview-stat {
-      text-align: center;
-    }
-
-    .preview-stat-val {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 800;
-      color: white;
-    }
-
-    .preview-stat-lbl {
-      font-size: 10px;
-      color: rgba(255,255,255,0.4);
-      font-weight: 500;
-      margin-top: 2px;
-    }
-
-    .preview-reviews {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .preview-review {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 10px;
-      padding: 14px;
-    }
-
-    .preview-review-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .preview-reviewer {
-      font-size: 13px;
-      font-weight: 600;
-      color: white;
-    }
-
+    /* HERO RIGHT */
+    .hero-right { background: var(--ink); padding: 80px 60px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .hero-right::before { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(212,168,83,0.15) 0%, transparent 60%); }
+    .dashboard-preview { width: 100%; max-width: 480px; position: relative; z-index: 1; }
+    .preview-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+    .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .preview-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; text-transform: uppercase; }
+    .preview-badge { font-size: 11px; background: rgba(74,103,65,0.4); color: #7FC67A; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+    .preview-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .preview-stat { text-align: center; }
+    .preview-stat-val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; color: white; }
+    .preview-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 500; margin-top: 2px; }
+    .preview-reviews { display: flex; flex-direction: column; gap: 12px; }
+    .preview-review { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; }
+    .preview-review-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .preview-reviewer { font-size: 13px; font-weight: 600; color: white; }
     .preview-stars { color: var(--gold); font-size: 12px; }
+    .preview-review-text { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    .preview-ai-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--gold); font-weight: 600; margin-top: 8px; }
 
-    .preview-review-text {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      line-height: 1.5;
-    }
+    /* SECTION */
+    .section { padding: 100px 60px; }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(34px, 4vw, 52px); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; color: var(--ink); margin-bottom: 20px; }
+    .section-sub { font-size: 16px; color: var(--text-muted); line-height: 1.7; max-width: 560px; }
 
-    .preview-ai-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      color: var(--gold);
-      font-weight: 600;
-      margin-top: 8px;
-    }
+    /* DEMO SECTION */
+    .demo-section { background: #F5F2EE; padding: 100px 60px; }
+    .demo-section .section-title { text-align: center; }
+    .demo-section .section-sub { text-align: center; margin: 0 auto 16px; }
+    .demo-banner { background: linear-gradient(135deg,#0A0A0F 0%,#1a1a2e 100%); border-radius: 14px; padding: 18px 28px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(212,168,83,0.25); max-width: 1100px; margin-left: auto; margin-right: auto; margin-bottom: 28px; }
+    .demo-banner-text { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 800; color: white; }
+    .demo-banner-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .demo-badge { padding: 5px 16px; background: var(--gold); color: var(--ink); border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; white-space: nowrap; }
+    .demo-wrap { max-width: 1100px; margin: 0 auto; }
+    .demo-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+    .demo-stat-card { background: white; border-radius: 12px; padding: 20px 22px; border: 1px solid var(--border); }
+    .demo-stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .demo-stat-icon { font-size: 20px; }
+    .demo-stat-change { font-size: 11px; font-weight: 600; color: var(--positive); }
+    .demo-stat-val { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 800; color: var(--ink); }
+    .demo-stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .demo-two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .demo-card { background: white; border-radius: 12px; padding: 24px; border: 1px solid var(--border); }
+    .demo-card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .demo-card-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
 
-    /* MARQUEE */
-    .marquee-section {
-      background: var(--ink);
-      padding: 20px 0;
-      overflow: hidden;
-    }
+    /* Bar chart */
+    .axis-y-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; padding-left: 30px; }
+    .chart-body { display: flex; gap: 0; }
+    .y-axis { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-right: 8px; height: 140px; padding-bottom: 22px; flex-shrink: 0; }
+    .y-tick { font-size: 10px; color: var(--text-muted); }
+    .chart-inner { flex: 1; position: relative; }
+    .gridlines { position: absolute; inset: 0 0 22px 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    .gridline-major { border-top: 1px solid var(--border); }
+    .gridline-minor { border-top: 1px dashed var(--mist); }
+    .bars-row { display: flex; align-items: flex-end; gap: 8px; height: 118px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .bar-col-stack { width: 100%; display: flex; flex-direction: column; justify-content: flex-end; height: 118px; gap: 2px; }
+    .bar-seg { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; }
+    .bar-seg-pos { background: var(--positive); }
+    .bar-seg-neg { background: var(--negative); }
+    .bar-month { font-size: 10px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+    .x-axis-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-align: center; margin-top: 4px; padding-left: 30px; }
+    .chart-legend { display: flex; gap: 18px; margin-top: 10px; }
+    .legend-item { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
-    .marquee-track {
-      display: flex;
-      gap: 60px;
-      animation: marquee 20s linear infinite;
-      white-space: nowrap;
-    }
+    /* Sentiment */
+    .sentiment-row-hp { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .sentiment-lbl-hp { font-size: 13px; font-weight: 600; width: 65px; flex-shrink: 0; }
+    .sentiment-bar-wrap-hp { flex: 1; height: 8px; background: var(--mist); border-radius: 4px; overflow: hidden; }
+    .sentiment-bar-hp { height: 100%; border-radius: 4px; }
+    .sentiment-count-hp { font-size: 13px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
+    .platform-breakdown { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .platform-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
 
-    .marquee-item {
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
+    /* Sample reviews */
+    .demo-review-card { background: white; border-radius: 12px; padding: 20px 22px; border: 1px solid var(--border); margin-bottom: 14px; }
+    .demo-review-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .demo-reviewer-info { display: flex; align-items: center; gap: 10px; }
+    .demo-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; color: var(--gold); font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 800; flex-shrink: 0; }
+    .demo-reviewer-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .demo-review-meta { font-size: 11px; color: var(--text-muted); }
+    .demo-chips { display: flex; align-items: center; gap: 8px; }
+    .demo-stars { color: var(--gold); font-size: 13px; }
+    .chip { padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .chip-pos { background: #D1FAE5; color: #065F46; }
+    .chip-neu { background: #FEF3C7; color: #92400E; }
+    .chip-neg { background: #FEE2E2; color: #991B1B; }
+    .demo-review-text { font-size: 13px; line-height: 1.65; color: var(--text); margin-bottom: 14px; }
+    .demo-response-box { background: #F0FDF4; border-left: 3px solid var(--positive); border-radius: 4px; padding: 12px 14px; font-size: 12px; color: #166534; line-height: 1.65; margin-bottom: 12px; }
+    .demo-response-label { font-size: 10px; font-weight: 700; color: var(--positive); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .demo-actions { display: flex; gap: 8px; }
+    .demo-btn { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: default; font-family: 'DM Sans', sans-serif; border: 1.5px solid transparent; }
+    .demo-btn-dark { background: var(--ink); color: white; }
+    .demo-btn-outline { background: none; border-color: var(--border); color: var(--text-muted); }
+    .demo-btn-green { background: none; border-color: var(--positive); color: var(--positive); }
 
-    .marquee-dot { color: var(--gold); }
-
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
+    /* PLATFORM LIMIT NOTE */
+    .limit-note { background: white; border: 1.5px solid #FDE68A; border-radius: 14px; padding: 32px 36px; max-width: 1100px; margin: 0 auto; }
+    .limit-note-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .limit-note-icon { font-size: 24px; }
+    .limit-note-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--ink); }
+    .limit-note-body { font-size: 14px; color: var(--text-muted); line-height: 1.75; }
+    .limit-note-body strong { color: var(--text); }
 
     /* HOW IT WORKS */
-    .section { padding: 120px 60px; }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(36px, 4vw, 56px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      color: var(--ink);
-      margin-bottom: 20px;
-    }
-
-    .section-sub {
-      font-size: 17px;
-      color: var(--text-muted);
-      line-height: 1.7;
-      max-width: 500px;
-    }
-
-    .how-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
-    }
-
-    .step {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-      opacity: 0;
-      transform: translateX(-20px);
-      transition: all 0.6s ease;
-    }
-
+    .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; max-width: 1100px; margin: 0 auto; }
+    .steps { display: flex; flex-direction: column; gap: 44px; }
+    .step { display: flex; gap: 24px; align-items: flex-start; opacity: 0; transform: translateX(-20px); transition: all 0.6s ease; }
     .step.visible { opacity: 1; transform: translateX(0); }
+    .step-num { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 900; color: var(--mist); line-height: 1; flex-shrink: 0; width: 56px; }
+    .step-content h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .step-content p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
 
-    .step-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 48px;
-      font-weight: 900;
-      color: var(--mist);
-      line-height: 1;
-      flex-shrink: 0;
-      width: 60px;
-    }
-
-    .step-content h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 10px;
-    }
-
-    .step-content p {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    /* DEMO PANEL */
-    .demo-panel {
-      background: var(--ink);
-      border-radius: 24px;
-      padding: 40px;
-      color: white;
-    }
-
-    .demo-review-in {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .demo-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 12px;
-    }
-
-    .demo-stars-row {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-
-    .star-filled { color: var(--gold); }
-    .star-empty { color: rgba(255,255,255,0.2); }
-
-    .demo-review-text {
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-      line-height: 1.6;
-      font-style: italic;
-    }
-
-    .demo-arrow {
-      text-align: center;
-      font-size: 24px;
-      margin: 16px 0;
-      color: var(--gold);
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(6px); }
-    }
-
-    .demo-response-out {
-      background: rgba(212,168,83,0.1);
-      border: 1px solid rgba(212,168,83,0.3);
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .demo-response-text {
-      font-size: 14px;
-      color: rgba(255,255,255,0.8);
-      line-height: 1.7;
-    }
-
-    .demo-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .demo-meta-item {
-      font-size: 11px;
-      color: rgba(255,255,255,0.4);
-    }
-
-    .demo-meta-val {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--gold);
-    }
+    /* HOW IT WORKS panel */
+    .how-panel { background: var(--ink); border-radius: 24px; padding: 36px; color: white; }
+    .how-panel-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+    .how-panel-review { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .how-panel-stars { color: var(--gold); margin-bottom: 8px; }
+    .how-panel-text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; font-style: italic; }
+    .how-panel-arrow { text-align: center; font-size: 22px; margin: 12px 0; color: var(--gold); animation: bounce 2s infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+    .how-panel-response { background: rgba(212,168,83,0.1); border: 1px solid rgba(212,168,83,0.3); border-radius: 10px; padding: 18px; }
+    .how-panel-response-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.7; }
+    .how-panel-meta { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .how-panel-meta-item { font-size: 10px; color: rgba(255,255,255,0.4); }
+    .how-panel-meta-val { font-size: 10px; font-weight: 700; color: var(--gold); }
 
     /* FEATURES */
-    .features-section {
-      background: var(--ink);
-      padding: 120px 60px;
-    }
-
+    .features-section { background: var(--ink); padding: 100px 60px; }
     .features-section .section-title { color: white; }
     .features-section .section-sub { color: rgba(255,255,255,0.5); }
     .features-section .section-label { color: var(--gold); }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-top: 80px;
-    }
-
-    .feature-tile {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      padding: 48px 40px;
-      transition: background 0.3s;
-    }
-
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-top: 70px; }
+    .feature-tile { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 44px 36px; transition: background 0.3s; }
     .feature-tile:hover { background: rgba(255,255,255,0.06); }
-
-    .feature-icon {
-      font-size: 32px;
-      margin-bottom: 24px;
-      display: block;
-    }
-
-    .feature-tile h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 12px;
-    }
-
-    .feature-tile p {
-      font-size: 14px;
-      color: rgba(255,255,255,0.45);
-      line-height: 1.7;
-    }
+    .feature-icon { font-size: 30px; margin-bottom: 20px; display: block; }
+    .feature-tile h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: white; margin-bottom: 10px; }
+    .feature-tile p { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.7; }
 
     /* PRICING */
-    .pricing-section { padding: 120px 60px; }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      max-width: 1000px;
-      margin: 80px auto 0;
-    }
-
-    .pricing-card {
-      border: 1px solid var(--mist);
-      border-radius: 16px;
-      padding: 40px 36px;
-      position: relative;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .pricing-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.1);
-    }
-
-    .pricing-card.featured {
-      background: var(--ink);
-      border-color: transparent;
-      color: white;
-    }
-
-    .pricing-tag {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--gold);
-      color: var(--ink);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      padding: 5px 16px;
-      border-radius: 20px;
-    }
-
-    .pricing-plan {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-
-    .pricing-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 52px;
-      font-weight: 900;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .pricing-period {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-    }
-
+    .pricing-section { padding: 100px 60px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; max-width: 1000px; margin: 70px auto 0; }
+    .pricing-card { border: 1px solid var(--mist); border-radius: 16px; padding: 40px 32px; position: relative; transition: transform 0.3s, box-shadow 0.3s; }
+    .pricing-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.1); }
+    .pricing-card.featured { background: var(--ink); border-color: transparent; color: white; }
+    .pricing-tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 5px 16px; border-radius: 20px; }
+    .pricing-plan { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .pricing-price { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+    .pricing-period { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
     .pricing-card.featured .pricing-period { color: rgba(255,255,255,0.5); }
-
-    .pricing-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 40px;
-    }
-
-    .pricing-features li {
-      font-size: 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      color: var(--text);
-    }
-
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
+    .pricing-features li { font-size: 14px; display: flex; align-items: flex-start; gap: 10px; color: var(--text); }
     .pricing-card.featured .pricing-features li { color: rgba(255,255,255,0.75); }
-
-    .pricing-features li::before {
-      content: '✓';
-      color: var(--gold);
-      font-weight: 700;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .pricing-btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.25s;
-      border: 2px solid var(--ink);
-      color: var(--ink);
-      background: transparent;
-      cursor: pointer;
-    }
-
+    .pricing-features li::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .pricing-btn { display: block; width: 100%; padding: 13px; border-radius: 8px; text-align: center; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.25s; border: 2px solid var(--ink); color: var(--ink); background: transparent; cursor: pointer; }
     .pricing-btn:hover { background: var(--ink); color: white; }
+    .pricing-card.featured .pricing-btn { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+    .pricing-card.featured .pricing-btn:hover { background: var(--gold-light); border-color: var(--gold-light); }
 
-    .pricing-card.featured .pricing-btn {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--ink);
-    }
-
-    .pricing-card.featured .pricing-btn:hover {
-      background: var(--gold-light);
-      border-color: var(--gold-light);
-    }
-
-    /* TESTIMONIALS */
-    .testimonials-section { padding: 100px 60px; background: var(--mist); }
-
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-top: 60px;
-    }
-
-    .testimonial-card {
-      background: white;
-      border-radius: 16px;
-      padding: 36px;
-    }
-
-    .testimonial-stars {
-      color: var(--gold);
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-
-    .testimonial-quote {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px;
-      line-height: 1.6;
-      color: var(--ink);
-      margin-bottom: 28px;
-      font-style: italic;
-    }
-
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .author-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gold);
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .author-name {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--ink);
-    }
-
-    .author-role {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    /* CTA SECTION */
-    .cta-section {
-      padding: 120px 60px;
-      text-align: center;
-      background: var(--ink);
-    }
-
-    .cta-section .section-title { color: white; font-size: 56px; }
-    .cta-section .section-sub { color: rgba(255,255,255,0.5); max-width: 500px; margin: 0 auto 48px; }
-
-    .cta-actions {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-    }
-
-    .btn-gold {
-      background: var(--gold);
-      color: var(--ink);
-      padding: 18px 40px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 700;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-
-    .btn-gold:hover {
-      background: var(--gold-light);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-white {
-      background: transparent;
-      color: white;
-      border: 2px solid rgba(255,255,255,0.3);
-      padding: 16px 36px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.25s;
-    }
-
+    /* CTA */
+    .cta-section { padding: 100px 60px; text-align: center; background: var(--ink); }
+    .cta-section .section-title { color: white; font-size: 52px; }
+    .cta-section .section-sub { color: rgba(255,255,255,0.5); max-width: 480px; margin: 0 auto 44px; }
+    .cta-actions { display: flex; gap: 20px; justify-content: center; }
+    .btn-gold { background: var(--gold); color: var(--ink); padding: 18px 40px; border-radius: 6px; font-size: 16px; font-weight: 700; text-decoration: none; transition: all 0.25s; }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-outline-white { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.3); padding: 16px 36px; border-radius: 6px; font-size: 16px; font-weight: 600; text-decoration: none; transition: all 0.25s; }
     .btn-outline-white:hover { border-color: white; }
 
     /* FOOTER */
-    footer {
-      background: #06060A;
-      color: rgba(255,255,255,0.5);
-      padding: 60px 60px 40px;
-    }
-
-    .footer-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding-bottom: 48px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 32px;
-    }
-
-    .footer-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      font-weight: 800;
-      color: white;
-      text-decoration: none;
-    }
-
+    footer { background: #06060A; color: rgba(255,255,255,0.5); padding: 56px 60px 36px; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 28px; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: white; text-decoration: none; }
     .footer-logo span { color: var(--gold); }
-
-    .footer-tagline {
-      font-size: 13px;
-      margin-top: 8px;
-      color: rgba(255,255,255,0.35);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 32px;
-    }
-
-    .footer-links a {
-      color: rgba(255,255,255,0.5);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-
+    .footer-tagline { font-size: 13px; margin-top: 6px; color: rgba(255,255,255,0.35); }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px; transition: color 0.2s; }
     .footer-links a:hover { color: var(--gold); }
-
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-    }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
 
     /* ANIMATIONS */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.7s ease;
-    }
-
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
 
     /* RESPONSIVE */
     @media (max-width: 1024px) {
@@ -888,394 +255,502 @@
       .how-grid { grid-template-columns: 1fr; gap: 48px; }
       .features-grid { grid-template-columns: 1fr 1fr; }
       .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
-      .testimonials-grid { grid-template-columns: 1fr; }
-      .section { padding: 80px 24px; }
-      .features-section, .cta-section { padding: 80px 24px; }
+      .section, .demo-section, .features-section, .cta-section, .pricing-section { padding: 70px 24px; }
       .nav-links { display: none; }
       .cta-actions { flex-direction: column; align-items: center; }
+      .demo-stats { grid-template-columns: 1fr 1fr; }
+      .demo-two-col { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="index.html" class="nav-logo">Reply<span>Pilot</span></a>
-    <ul class="nav-links">
-      <li><a href="#how">How It Works</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#pricing">Pricing</a></li>
-      <li><a href="login.html">Log In</a></li>
-      <li><a href="register.html" class="nav-cta">Start Free Trial</a></li>
-    </ul>
-  </nav>
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Reply<span>Pilot</span></a>
+  <ul class="nav-links">
+    <li><a href="#demo">Live Demo</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="login.html">Log In</a></li>
+    <li><a href="register.html" class="nav-cta">Start Free Trial</a></li>
+  </ul>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <span class="hero-eyebrow">AI-Powered Review Intelligence</span>
-      <h1 class="hero-title">Turn Reviews Into <em>Revenue</em></h1>
-      <p class="hero-sub">ReplyPilot analyzes your customer reviews, generates professional AI responses, and delivers actionable insights — all on autopilot.</p>
-      <div class="hero-actions">
-        <a href="register.html" class="btn-primary">Start 14-Day Free Trial</a>
-        <a href="#how" class="btn-ghost">See how it works →</a>
-      </div>
-      <div class="hero-stats">
-        <div>
-          <div class="stat-num">4.8×</div>
-          <div class="stat-label">Faster Responses</div>
-        </div>
-        <div>
-          <div class="stat-num">94%</div>
-          <div class="stat-label">Response Rate</div>
-        </div>
-        <div>
-          <div class="stat-num">+0.6★</div>
-          <div class="stat-label">Rating Improvement</div>
-        </div>
-      </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <span class="hero-eyebrow">AI-Powered Review Intelligence</span>
+    <h1 class="hero-title">Turn Reviews Into <em>Revenue</em></h1>
+    <p class="hero-sub">ReplyPilot analyzes your customer reviews, identifies what's working and what needs fixing, and generates professional AI responses — giving you a clear picture of your business reputation in one place.</p>
+    <div class="hero-actions">
+      <a href="register.html" class="btn-primary">Start Free Trial</a>
+      <a href="#demo" class="btn-ghost">See a live demo →</a>
     </div>
-    <div class="hero-right">
-      <div class="dashboard-preview">
-        <div class="preview-card">
-          <div class="preview-header">
-            <span class="preview-title">Business Overview</span>
-            <span class="preview-badge">● Live</span>
-          </div>
-          <div class="preview-stats">
-            <div class="preview-stat">
-              <div class="preview-stat-val">4.7</div>
-              <div class="preview-stat-lbl">Avg Rating</div>
-            </div>
-            <div class="preview-stat">
-              <div class="preview-stat-val">142</div>
-              <div class="preview-stat-lbl">Reviews</div>
-            </div>
-            <div class="preview-stat">
-              <div class="preview-stat-val">96%</div>
-              <div class="preview-stat-lbl">Responded</div>
-            </div>
-          </div>
-        </div>
-        <div class="preview-card">
-          <div class="preview-title" style="margin-bottom:16px">Recent Reviews</div>
-          <div class="preview-reviews">
-            <div class="preview-review">
-              <div class="preview-review-top">
-                <span class="preview-reviewer">Sarah M.</span>
-                <span class="preview-stars">★★★★★</span>
-              </div>
-              <div class="preview-review-text">"Absolutely phenomenal experience. The team went above and beyond..."</div>
-              <div class="preview-ai-tag">✨ AI Response Generated</div>
-            </div>
-            <div class="preview-review">
-              <div class="preview-review-top">
-                <span class="preview-reviewer">James C.</span>
-                <span class="preview-stars">★★☆☆☆</span>
-              </div>
-              <div class="preview-review-text">"Service was slower than expected and the staff seemed disinterested..."</div>
-              <div class="preview-ai-tag">⚡ Responding Now</div>
-            </div>
-          </div>
-        </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">4.3★</div>
+        <div class="stat-label">Sample Avg Rating</div>
       </div>
-    </div>
-  </section>
-
-  <!-- MARQUEE -->
-  <div class="marquee-section">
-    <div class="marquee-track">
-      <span class="marquee-item">Google Reviews <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Yelp Integration <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">AI Response Generation <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Sentiment Analysis <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Monthly Reports <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Competitor Benchmarking <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Real-Time Alerts <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Google Reviews <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Yelp Integration <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">AI Response Generation <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Sentiment Analysis <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Monthly Reports <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Competitor Benchmarking <span class="marquee-dot">✦</span></span>
-      <span class="marquee-item">Real-Time Alerts <span class="marquee-dot">✦</span></span>
+      <div>
+        <div class="stat-num">74%</div>
+        <div class="stat-label">Response Rate</div>
+      </div>
+      <div>
+        <div class="stat-num">143</div>
+        <div class="stat-label">Reviews Tracked</div>
+      </div>
     </div>
   </div>
+  <div class="hero-right">
+    <div class="dashboard-preview">
+      <div class="preview-card">
+        <div class="preview-header">
+          <span class="preview-title">The Coastal Kitchen</span>
+          <span class="preview-badge">● Live</span>
+        </div>
+        <div class="preview-stats">
+          <div class="preview-stat">
+            <div class="preview-stat-val">4.3</div>
+            <div class="preview-stat-lbl">Avg Rating</div>
+          </div>
+          <div class="preview-stat">
+            <div class="preview-stat-val">143</div>
+            <div class="preview-stat-lbl">Reviews</div>
+          </div>
+          <div class="preview-stat">
+            <div class="preview-stat-val">74%</div>
+            <div class="preview-stat-lbl">Responded</div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-title" style="margin-bottom:16px">Recent Reviews</div>
+        <div class="preview-reviews">
+          <div class="preview-review">
+            <div class="preview-review-top">
+              <span class="preview-reviewer">Sarah M.</span>
+              <span class="preview-stars">★★★★★</span>
+            </div>
+            <div class="preview-review-text">"Absolutely incredible dinner. The lobster bisque was the best on the coast..."</div>
+            <div class="preview-ai-tag">✨ AI Response Generated</div>
+          </div>
+          <div class="preview-review">
+            <div class="preview-review-top">
+              <span class="preview-reviewer">David T.</span>
+              <span class="preview-stars">★★★☆☆</span>
+            </div>
+            <div class="preview-review-text">"Food was good but we waited 35 min on Saturday without being told..."</div>
+            <div class="preview-ai-tag">⚡ Responding Now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- HOW IT WORKS -->
-  <section class="section" id="how">
-    <div class="how-grid">
+<!-- LIVE DEMO SECTION -->
+<section class="demo-section" id="demo">
+  <div class="demo-wrap">
+    <p class="section-label" style="text-align:center">Live Demo</p>
+    <h2 class="section-title fade-up">See exactly what you get — before you sign up</h2>
+    <p class="section-sub fade-up">This is a real working preview of the ReplyPilot dashboard using sample data from a fictional restaurant. Your dashboard will look exactly like this with your own reviews.</p>
+
+    <div style="height:32px"></div>
+
+    <!-- Demo banner -->
+    <div class="demo-banner">
       <div>
-        <p class="section-label fade-up">How It Works</p>
-        <h2 class="section-title fade-up">From raw reviews to <em style="font-style:italic; color:var(--gold)">smart action</em> in minutes</h2>
-        <p class="section-sub fade-up">ReplyPilot connects to your review platforms and does the heavy lifting — analyzing, responding, and reporting so you don't have to.</p>
-        <div class="steps" style="margin-top:60px">
-          <div class="step">
-            <span class="step-num">01</span>
-            <div class="step-content">
-              <h3>Connect Your Business</h3>
-              <p>Link your Google Business Profile, Yelp, or paste reviews manually. Setup takes under 5 minutes.</p>
-            </div>
-          </div>
-          <div class="step">
-            <span class="step-num">02</span>
-            <div class="step-content">
-              <h3>AI Analyzes Every Review</h3>
-              <p>Our AI reads sentiment, extracts themes, scores each review, and identifies urgent issues that need attention.</p>
-            </div>
-          </div>
-          <div class="step">
-            <span class="step-num">03</span>
-            <div class="step-content">
-              <h3>Generate Perfect Responses</h3>
-              <p>One click generates a professional, personalized response. Edit or send directly — your choice.</p>
-            </div>
-          </div>
-          <div class="step">
-            <span class="step-num">04</span>
-            <div class="step-content">
-              <h3>Track & Improve Monthly</h3>
-              <p>Monthly reports surface trends, compare to competitors, and show your reputation improving over time.</p>
-            </div>
-          </div>
-        </div>
+        <div class="demo-banner-text">Sample Business: The Coastal Kitchen</div>
+        <div class="demo-banner-sub">143 reviews across Google, Yelp & Facebook — last 6 months of data</div>
       </div>
-      <div class="fade-up">
-        <div class="demo-panel">
-          <div class="demo-label">Sample Review</div>
-          <div class="demo-review-in">
-            <div class="demo-stars-row">
-              <span class="star-filled">★</span>
-              <span class="star-filled">★</span>
-              <span class="star-empty">★</span>
-              <span class="star-empty">★</span>
-              <span class="star-empty">★</span>
-            </div>
-            <div class="demo-review-text">"The wait was over 45 minutes and when I finally got help, the staff seemed completely uninterested in my issue. Very disappointed for the price."</div>
+      <span class="demo-badge">DEMO DATA</span>
+    </div>
+
+    <!-- Stats -->
+    <div class="demo-stats fade-up">
+      <div class="demo-stat-card">
+        <div class="demo-stat-top"><span class="demo-stat-icon">📝</span><span class="demo-stat-change">+12 this month</span></div>
+        <div class="demo-stat-val">143</div>
+        <div class="demo-stat-lbl">Total Reviews</div>
+      </div>
+      <div class="demo-stat-card">
+        <div class="demo-stat-top"><span class="demo-stat-icon">⭐</span><span class="demo-stat-change">▲ Above avg</span></div>
+        <div class="demo-stat-val">4.3</div>
+        <div class="demo-stat-lbl">Average Rating</div>
+      </div>
+      <div class="demo-stat-card">
+        <div class="demo-stat-top"><span class="demo-stat-icon">💬</span><span class="demo-stat-change">▲ Good</span></div>
+        <div class="demo-stat-val">74%</div>
+        <div class="demo-stat-lbl">Response Rate</div>
+      </div>
+      <div class="demo-stat-card">
+        <div class="demo-stat-top"><span class="demo-stat-icon">😊</span><span class="demo-stat-change">78% of total</span></div>
+        <div class="demo-stat-val">112</div>
+        <div class="demo-stat-lbl">Positive Reviews</div>
+      </div>
+    </div>
+
+    <!-- Chart + Sentiment -->
+    <div class="demo-two-col fade-up">
+      <div class="demo-card">
+        <div class="demo-card-title">Review Volume &amp; Sentiment</div>
+        <div class="demo-card-sub">Monthly positive vs negative — last 6 months</div>
+
+        <div class="axis-y-label">Reviews</div>
+        <div class="chart-body">
+          <div class="y-axis">
+            <span class="y-tick">25</span>
+            <span class="y-tick">20</span>
+            <span class="y-tick">15</span>
+            <span class="y-tick">10</span>
+            <span class="y-tick">5</span>
+            <span class="y-tick">0</span>
           </div>
-          <div class="demo-arrow">↓</div>
-          <div class="demo-label">AI-Generated Response</div>
-          <div class="demo-response-out">
-            <div class="demo-review-text" style="color:rgba(255,255,255,0.4); font-size:10px; margin-bottom:8px; font-style:normal">Sentiment: Negative • Score: 0.18 • Keywords: wait, price, disappointed</div>
-            <div class="demo-response-text">"Thank you for taking the time to share your experience. We sincerely apologize for the wait time and that our team didn't meet your expectations. This is not the standard we hold ourselves to, and we'd genuinely like to make this right. Please reach out to us directly — we value your business and want to turn this experience around."</div>
-            <div class="demo-meta">
-              <div>
-                <span class="demo-meta-item">Generated in </span>
-                <span class="demo-meta-val">1.2s</span>
+          <div class="chart-inner">
+            <div class="gridlines">
+              <div class="gridline-minor"></div>
+              <div class="gridline-minor"></div>
+              <div class="gridline-minor"></div>
+              <div class="gridline-minor"></div>
+              <div class="gridline-minor"></div>
+              <div class="gridline-major"></div>
+            </div>
+            <div class="bars-row">
+              <div class="bar-col">
+                <div class="bar-col-stack"><div class="bar-seg bar-seg-pos" style="height:56%"></div><div class="bar-seg bar-seg-neg" style="height:8%"></div></div>
+                <span class="bar-month">Nov/24</span>
               </div>
-              <div>
-                <span class="demo-meta-item">Tone: </span>
-                <span class="demo-meta-val">Professional</span>
+              <div class="bar-col">
+                <div class="bar-col-stack"><div class="bar-seg bar-seg-pos" style="height:48%"></div><div class="bar-seg bar-seg-neg" style="height:8%"></div></div>
+                <span class="bar-month">Dec/24</span>
               </div>
-              <div>
-                <span class="demo-meta-item">Words: </span>
-                <span class="demo-meta-val">72</span>
+              <div class="bar-col">
+                <div class="bar-col-stack"><div class="bar-seg bar-seg-pos" style="height:60%"></div><div class="bar-seg bar-seg-neg" style="height:12%"></div></div>
+                <span class="bar-month">Jan/25</span>
+              </div>
+              <div class="bar-col">
+                <div class="bar-col-stack"><div class="bar-seg bar-seg-pos" style="height:72%"></div><div class="bar-seg bar-seg-neg" style="height:8%"></div></div>
+                <span class="bar-month">Feb/25</span>
+              </div>
+              <div class="bar-col">
+                <div class="bar-col-stack"><div class="bar-seg bar-seg-pos" style="height:84%"></div><div class="bar-seg bar-seg-neg" style="height:8%"></div></div>
+                <span class="bar-month">Mar/25</span>
+              </div>
+              <div class="bar-col">
+                <div class="bar-col-stack"><div class="bar-seg bar-seg-pos" style="height:96%"></div><div class="bar-seg bar-seg-neg" style="height:4%"></div></div>
+                <span class="bar-month">Apr/25</span>
               </div>
             </div>
           </div>
         </div>
+        <div class="x-axis-label">Month</div>
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:var(--positive)"></span>Positive</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--negative)"></span>Negative</span>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <!-- FEATURES -->
-  <section class="features-section" id="features">
-    <div style="max-width:1200px; margin:0 auto;">
-      <p class="section-label">Features</p>
-      <h2 class="section-title">Everything you need to<br>dominate your reputation</h2>
-      <div class="features-grid">
-        <div class="feature-tile fade-up">
-          <span class="feature-icon">🧠</span>
-          <h3>Sentiment Intelligence</h3>
-          <p>Deep NLP analysis scores every review, detects emotion, and flags urgent negative feedback instantly.</p>
-        </div>
-        <div class="feature-tile fade-up">
-          <span class="feature-icon">✍️</span>
-          <h3>AI Response Writer</h3>
-          <p>Generate human-quality, brand-consistent responses in seconds. Choose tone: professional, friendly, or apologetic.</p>
-        </div>
-        <div class="feature-tile fade-up">
-          <span class="feature-icon">📈</span>
-          <h3>Trend Analytics</h3>
-          <p>Visualize your rating trajectory, sentiment shift, and peak review periods across months.</p>
-        </div>
-        <div class="feature-tile fade-up">
-          <span class="feature-icon">🏆</span>
-          <h3>Theme Extraction</h3>
-          <p>Automatically identify what customers love and hate — so you can double down on strengths and fix weak spots.</p>
-        </div>
-        <div class="feature-tile fade-up">
-          <span class="feature-icon">📋</span>
-          <h3>Monthly Reports</h3>
-          <p>Beautiful PDF reports delivered to your inbox summarizing your reputation health, wins, and recommended actions.</p>
-        </div>
-        <div class="feature-tile fade-up">
-          <span class="feature-icon">🌐</span>
-          <h3>Multi-Platform</h3>
-          <p>Google, Yelp, Facebook, TripAdvisor — manage reviews from all platforms in one unified dashboard.</p>
+      <div class="demo-card">
+        <div class="demo-card-title">Sentiment Breakdown</div>
+        <div style="height:12px"></div>
+        <div class="sentiment-row-hp"><span class="sentiment-lbl-hp">Positive</span><div class="sentiment-bar-wrap-hp"><div class="sentiment-bar-hp" style="width:78%;background:var(--positive)"></div></div><span class="sentiment-count-hp">112</span></div>
+        <div class="sentiment-row-hp"><span class="sentiment-lbl-hp">Neutral</span><div class="sentiment-bar-wrap-hp"><div class="sentiment-bar-hp" style="width:13%;background:var(--neutral)"></div></div><span class="sentiment-count-hp">19</span></div>
+        <div class="sentiment-row-hp"><span class="sentiment-lbl-hp">Negative</span><div class="sentiment-bar-wrap-hp"><div class="sentiment-bar-hp" style="width:9%;background:var(--negative)"></div></div><span class="sentiment-count-hp">12</span></div>
+
+        <div class="platform-breakdown">
+          <div style="font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text)">Platform Breakdown</div>
+          <div class="platform-row"><span>🔍 Google</span><span style="font-weight:700">89 reviews · 4.4★</span></div>
+          <div class="platform-row"><span>⭐ Yelp</span><span style="font-weight:700">41 reviews · 4.1★</span></div>
+          <div class="platform-row"><span>👍 Facebook</span><span style="font-weight:700">13 reviews · 4.5★</span></div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- TESTIMONIALS -->
-  <section class="testimonials-section">
-    <div style="max-width:1100px; margin:0 auto;">
-      <p class="section-label">Customer Stories</p>
-      <h2 class="section-title">Trusted by local businesses</h2>
-      <div class="testimonials-grid">
-        <div class="testimonial-card fade-up">
-          <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-quote">"ReplyPilot changed how we manage our online reputation. We went from a 3.8 to a 4.6 average in just 4 months."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">A</div>
-            <div>
-              <div class="author-name">Amanda R.</div>
-              <div class="author-role">Owner, Riverside Café</div>
+    <!-- Sample reviews -->
+    <div class="fade-up">
+      <div class="demo-card">
+        <div class="demo-card-title" style="margin-bottom:20px">Sample Reviews with AI Responses</div>
+
+        <div class="demo-review-card">
+          <div class="demo-review-top">
+            <div class="demo-reviewer-info">
+              <div class="demo-avatar">S</div>
+              <div>
+                <div class="demo-reviewer-name">Sarah M.</div>
+                <div class="demo-review-meta">2025-04-15 · Google</div>
+              </div>
+            </div>
+            <div class="demo-chips">
+              <span class="demo-stars">★★★★★</span>
+              <span class="chip chip-pos">Positive</span>
             </div>
           </div>
-        </div>
-        <div class="testimonial-card fade-up">
-          <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-quote">"I used to spend 3 hours a week responding to reviews. Now it takes me 20 minutes and the responses are better than what I'd write myself."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">M</div>
-            <div>
-              <div class="author-name">Marcus T.</div>
-              <div class="author-role">Manager, AutoFix Pro</div>
-            </div>
+          <p class="demo-review-text">"Absolutely incredible dinner last Friday. The lobster bisque was the best I've had anywhere on the coast, and our server James was attentive without being overbearing. The whole team seems genuinely happy to be there which makes such a difference. Will definitely be back!"</p>
+          <div class="demo-response-box">
+            <div class="demo-response-label">AI Generated Response ✓ Sent</div>
+            Thank you so much for this wonderful review, Sarah! We're thrilled the lobster bisque hit the mark — our chef will be especially pleased to hear that. James is a fantastic member of our team and we'll make sure he sees your kind words. We look forward to welcoming you back to The Coastal Kitchen soon!
+          </div>
+          <div class="demo-actions">
+            <span class="demo-btn demo-btn-outline">📋 Copy Response</span>
+            <span style="font-size:12px;color:var(--positive);font-weight:600;display:flex;align-items:center">✓ Responded</span>
           </div>
         </div>
-        <div class="testimonial-card fade-up">
-          <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-quote">"The monthly insights report showed us that customers were consistently mentioning wait times. We fixed it. Our ratings jumped."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">P</div>
-            <div>
-              <div class="author-name">Patricia L.</div>
-              <div class="author-role">Director, MedWell Clinic</div>
+
+        <div class="demo-review-card">
+          <div class="demo-review-top">
+            <div class="demo-reviewer-info">
+              <div class="demo-avatar">D</div>
+              <div>
+                <div class="demo-reviewer-name">David T.</div>
+                <div class="demo-review-meta">2025-04-10 · Yelp</div>
+              </div>
             </div>
+            <div class="demo-chips">
+              <span class="demo-stars">★★★☆☆</span>
+              <span class="chip chip-neu">Neutral</span>
+            </div>
+          </div>
+          <p class="demo-review-text">"Food was genuinely good — the fish tacos were fresh and well seasoned. But we waited 35 minutes on a Saturday without being told it would be that long, and parking nearby was a nightmare. Would come back on a quieter night."</p>
+          <div class="demo-response-box">
+            <div class="demo-response-label">AI Generated Response</div>
+            Thank you for the honest feedback, David. We're glad the fish tacos delivered — they're one of our favourites too. You're right about the Saturday wait time and we apologise for not communicating that better. We're working on a queue notification system. For parking, Street C two blocks north usually has space on weekends. We'd love to show you a smoother experience on your next visit!
+          </div>
+          <div class="demo-actions">
+            <span class="demo-btn demo-btn-outline">📋 Copy Response</span>
+            <span class="demo-btn demo-btn-green">✓ Mark as Sent</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Platform limitation note -->
+    <div class="limit-note fade-up" style="margin-top:24px">
+      <div class="limit-note-header">
+        <span class="limit-note-icon">🔧</span>
+        <div class="limit-note-title">A note on automatic review collection</div>
+      </div>
+      <p class="limit-note-body">
+        We are actively working on building a seamless interface that automatically collects your reviews the moment they are posted — no copy-pasting required. <strong>Google Business Profile</strong> currently allows us to sync reviews and post responses directly on your behalf. However, <strong>Yelp, Facebook, and TripAdvisor</strong> impose strict API restrictions that limit or prevent automated access to review data. Until those platforms open up broader access, reviews from those sources can be added manually in seconds using our "Add Review" tool — ReplyPilot will still analyze them and generate a response you can copy and paste back. We will update this as platform access improves.
+      </p>
+    </div>
+
+    <div style="text-align:center;margin-top:40px">
+      <a href="register.html" class="btn-primary" style="font-size:15px;padding:16px 40px">Start Your Free Trial</a>
+      <p style="margin-top:14px;font-size:13px;color:var(--text-muted)">No credit card required · Your own data in minutes</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background:white">
+  <div class="how-grid">
+    <div>
+      <p class="section-label fade-up">How It Works</p>
+      <h2 class="section-title fade-up">From raw reviews to <em style="font-style:italic;color:var(--gold)">smart action</em></h2>
+      <p class="section-sub fade-up">Add your reviews — manually or via Google — and ReplyPilot handles the analysis, responses, and insights.</p>
+      <div class="steps" style="margin-top:56px">
+        <div class="step">
+          <span class="step-num">01</span>
+          <div class="step-content">
+            <h3>Connect or Add Reviews</h3>
+            <p>Link your Google Business Profile for automatic syncing, or paste reviews manually from Yelp, Facebook, or TripAdvisor. Setup takes under 5 minutes.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">02</span>
+          <div class="step-content">
+            <h3>AI Analyzes Every Review</h3>
+            <p>Sentiment is scored, themes are extracted, and problem areas are flagged — so you see what customers are actually saying, not just what rating they gave.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">03</span>
+          <div class="step-content">
+            <h3>Generate & Send Responses</h3>
+            <p>One click generates a professional, personalized reply. Post directly to Google or copy and paste to any platform.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">04</span>
+          <div class="step-content">
+            <h3>Track Your Reputation</h3>
+            <p>Monthly trend charts and AI insight reports show how your ratings are moving, what customers keep mentioning, and where to focus next.</p>
           </div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="pricing-section" id="pricing">
-    <div style="max-width:1100px; margin:0 auto; text-align:center">
-      <p class="section-label">Pricing</p>
-      <h2 class="section-title">Simple, transparent pricing</h2>
-      <p class="section-sub" style="margin:0 auto">Start free, upgrade when you're ready. No long-term contracts. Cancel anytime.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card fade-up">
-          <p class="pricing-plan">Starter</p>
-          <div class="pricing-price">$0</div>
-          <p class="pricing-period">Free forever</p>
-          <ul class="pricing-features">
-            <li>Up to 25 reviews/month</li>
-            <li>Basic sentiment analysis</li>
-            <li>5 AI responses/month</li>
-            <li>Email support</li>
-          </ul>
-          <a href="register.html" class="pricing-btn">Get Started Free</a>
+    <div class="fade-up">
+      <div class="how-panel">
+        <div class="how-panel-label">Sample Review — 2 Stars</div>
+        <div class="how-panel-review">
+          <div class="how-panel-stars">★★☆☆☆</div>
+          <div class="how-panel-text">"The wait was over 45 minutes and when I finally got help, the staff seemed completely uninterested. Very disappointed for the price."</div>
         </div>
-        <div class="pricing-card featured fade-up">
-          <span class="pricing-tag">Most Popular</span>
-          <p class="pricing-plan">Professional</p>
-          <div class="pricing-price">$49</div>
-          <p class="pricing-period">per month</p>
-          <ul class="pricing-features">
-            <li>Unlimited reviews</li>
-            <li>Advanced AI analysis</li>
-            <li>Unlimited AI responses</li>
-            <li>Monthly insight reports</li>
-            <li>Priority support</li>
-            <li>Competitor benchmarking</li>
-          </ul>
-          <a href="register.html" class="pricing-btn" id="pro-btn">Start Free Trial</a>
-        </div>
-        <div class="pricing-card fade-up">
-          <p class="pricing-plan">Business</p>
-          <div class="pricing-price">$149</div>
-          <p class="pricing-period">per month</p>
-          <ul class="pricing-features">
-            <li>Everything in Pro</li>
-            <li>Multi-location support</li>
-            <li>White-label reports</li>
-            <li>API access</li>
-            <li>Custom templates</li>
-            <li>Dedicated account manager</li>
-          </ul>
-          <a href="register.html" class="pricing-btn">Start Free Trial</a>
+        <div class="how-panel-arrow">↓</div>
+        <div class="how-panel-label">AI-Generated Response</div>
+        <div class="how-panel-response">
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:8px">Sentiment: Negative · Score: 0.18 · Keywords: wait, price, disappointed</div>
+          <div class="how-panel-response-text">"Thank you for taking the time to share your experience. We sincerely apologize for the wait and that our team didn't meet your expectations — this is not the standard we hold ourselves to. We'd genuinely like to make this right. Please reach out to us directly."</div>
+          <div class="how-panel-meta">
+            <div><span class="how-panel-meta-item">Generated in </span><span class="how-panel-meta-val">1.2s</span></div>
+            <div><span class="how-panel-meta-item">Tone: </span><span class="how-panel-meta-val">Professional</span></div>
+            <div><span class="how-panel-meta-item">Words: </span><span class="how-panel-meta-val">58</span></div>
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CTA -->
-  <section class="cta-section">
-    <p class="section-label" style="color:var(--gold)">Get Started Today</p>
-    <h2 class="section-title">Ready to take control<br>of your reputation?</h2>
-    <p class="section-sub">Join hundreds of local businesses using ReplyPilot to respond faster, improve ratings, and understand their customers better.</p>
-    <div class="cta-actions">
-      <a href="register.html" class="btn-gold">Start Free 14-Day Trial</a>
-      <a href="login.html" class="btn-outline-white">Sign In</a>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-top">
-      <div>
-        <a href="index.html" class="footer-logo">Reply<span>Pilot</span></a>
-        <p class="footer-tagline">AI-powered review intelligence for local businesses</p>
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div style="max-width:1100px;margin:0 auto">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need to<br>understand your reputation</h2>
+    <div class="features-grid">
+      <div class="feature-tile fade-up">
+        <span class="feature-icon">🧠</span>
+        <h3>Sentiment Analysis</h3>
+        <p>Every review is automatically scored for sentiment and tone. Positive, neutral, and negative reviews are grouped so you can see what's going well and what isn't.</p>
       </div>
-      <div class="footer-links">
-        <a href="#how">How It Works</a>
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="login.html">Login</a>
-        <a href="register.html">Register</a>
+      <div class="feature-tile fade-up">
+        <span class="feature-icon">✍️</span>
+        <h3>AI Response Writer</h3>
+        <p>Generate professional, on-brand responses in seconds. Choose from professional, friendly, apologetic, or enthusiastic tone — and edit before sending.</p>
+      </div>
+      <div class="feature-tile fade-up">
+        <span class="feature-icon">📈</span>
+        <h3>Trend Analytics</h3>
+        <p>See how your review volume and sentiment changes month to month. Spot patterns — good and bad — before they become a bigger problem.</p>
+      </div>
+      <div class="feature-tile fade-up">
+        <span class="feature-icon">🏆</span>
+        <h3>Theme Extraction</h3>
+        <p>ReplyPilot pulls out the words and phrases customers repeat most — so you know exactly what they love and what keeps coming up as a complaint.</p>
+      </div>
+      <div class="feature-tile fade-up">
+        <span class="feature-icon">🔍</span>
+        <h3>Google Integration</h3>
+        <p>Connect your Google Business Profile to automatically sync reviews and post responses directly — no copy-pasting required for your most important platform.</p>
+      </div>
+      <div class="feature-tile fade-up">
+        <span class="feature-icon">🌐</span>
+        <h3>Multi-Platform</h3>
+        <p>Google syncs automatically. Yelp, Facebook, and TripAdvisor reviews can be added manually — ReplyPilot analyzes and responds to all of them the same way.</p>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2025 ReplyPilot. All rights reserved.</span>
-      <span id="status-indicator">Checking system...</span>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div style="max-width:1100px;margin:0 auto;text-align:center">
+    <p class="section-label">Pricing</p>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p class="section-sub" style="margin:0 auto">Start free, upgrade when you're ready. No long-term contracts. Cancel anytime.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card fade-up">
+        <p class="pricing-plan">Starter</p>
+        <div class="pricing-price">$0</div>
+        <p class="pricing-period">Free forever</p>
+        <ul class="pricing-features">
+          <li>Up to 25 reviews</li>
+          <li>Sentiment analysis</li>
+          <li>5 AI responses/month</li>
+          <li>Basic dashboard</li>
+          <li>Email support</li>
+        </ul>
+        <a href="register.html" class="pricing-btn">Get Started Free</a>
+      </div>
+      <div class="pricing-card featured fade-up">
+        <span class="pricing-tag">Most Popular</span>
+        <p class="pricing-plan">Professional</p>
+        <div class="pricing-price">$49</div>
+        <p class="pricing-period">per month</p>
+        <ul class="pricing-features">
+          <li>Unlimited reviews</li>
+          <li>Unlimited AI responses</li>
+          <li>Google auto-sync & posting</li>
+          <li>Full trend analytics</li>
+          <li>AI insight reports</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="register.html" class="pricing-btn">Start Free Trial</a>
+      </div>
+      <div class="pricing-card fade-up">
+        <p class="pricing-plan">Business</p>
+        <div class="pricing-price">$149</div>
+        <p class="pricing-period">per month</p>
+        <ul class="pricing-features">
+          <li>Everything in Pro</li>
+          <li>Multi-location support</li>
+          <li>Custom AI response templates</li>
+          <li>API access</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="register.html" class="pricing-btn">Start Free Trial</a>
+      </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script src="config.js"></script>
-  <script>
-    // Scroll animations
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-label" style="color:var(--gold)">Get Started Today</p>
+  <h2 class="section-title">Ready to take control<br>of your reputation?</h2>
+  <p class="section-sub">Add your first review and ReplyPilot starts working immediately — no setup, no waiting.</p>
+  <div class="cta-actions">
+    <a href="register.html" class="btn-gold">Start Free Trial</a>
+    <a href="login.html" class="btn-outline-white">Sign In</a>
+  </div>
+</section>
 
-    document.querySelectorAll('.fade-up, .step').forEach(el => observer.observe(el));
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <a href="index.html" class="footer-logo">Reply<span>Pilot</span></a>
+      <p class="footer-tagline">AI-powered review intelligence for local businesses</p>
+    </div>
+    <div class="footer-links">
+      <a href="#demo">Demo</a>
+      <a href="#how">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 ReplyPilot. All rights reserved.</span>
+    <span id="status-indicator">Checking system...</span>
+  </div>
+</footer>
 
-    // Status check
-    async function checkStatus() {
-      try {
-        const { data } = await API.get('/health');
-        document.getElementById('status-indicator').innerHTML = '● System Online';
-        document.getElementById('status-indicator').style.color = '#7FC67A';
-      } catch {
-        document.getElementById('status-indicator').textContent = '⚠ Offline';
-      }
+<script src="config.js"></script>
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.fade-up, .step').forEach(el => observer.observe(el));
+
+  async function checkStatus() {
+    try {
+      await API.get('/health');
+      document.getElementById('status-indicator').innerHTML = '● System Online';
+      document.getElementById('status-indicator').style.color = '#7FC67A';
+    } catch {
+      document.getElementById('status-indicator').textContent = '⚠ Offline';
     }
+  }
 
-    // Redirect to dashboard if logged in
-    if (Auth.isLoggedIn()) {
-      document.querySelector('.nav-cta').href = 'dashboard.html';
-      document.querySelector('.nav-cta').textContent = 'Dashboard →';
-    }
+  if (Auth.isLoggedIn()) {
+    document.querySelector('.nav-cta').href = 'dashboard.html';
+    document.querySelector('.nav-cta').textContent = 'Dashboard →';
+  }
 
-    document.addEventListener('DOMContentLoaded', checkStatus);
-  </script>
+  document.addEventListener('DOMContentLoaded', checkStatus);
+</script>
 </body>
 </html>
