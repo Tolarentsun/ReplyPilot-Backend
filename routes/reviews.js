@@ -110,6 +110,14 @@ router.post('/', authenticate, async (req, res) => {
     const { reviewer_name, rating, review_text, platform, review_date } = req.body;
     if (!reviewer_name || !rating || !review_text) return res.status(400).json({ error: 'reviewer_name, rating, and review_text are required' });
 
+    // Enforce free plan review limit
+    if (req.user.plan === 'free') {
+      const countRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [req.user.id]);
+      if ((countRow?.total || 0) >= 25) {
+        return res.status(403).json({ error: 'Free plan limit reached (25 reviews). Upgrade to Pro for unlimited reviews.', upgrade_required: true });
+      }
+    }
+
     const { sentiment, sentiment_score, keywords } = analyzeSentiment(review_text, rating);
     const id = generateId();
 
@@ -138,6 +146,25 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
   try {
     const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
     if (!review) return res.status(404).json({ error: 'Review not found' });
+
+    // Enforce free plan AI response limit (5 per month)
+    if (req.user.plan === 'free') {
+      const monthStart = new Date();
+      monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+      const usedRow = await db.asyncGet(
+        'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
+        [req.user.id, monthStart.toISOString()]
+      );
+      if ((usedRow?.total || 0) >= 5) {
+        return res.status(403).json({ error: 'Free plan limit reached (5 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      }
+    }
+
+    // Log this generation
+    await db.asyncRun(
+      'INSERT INTO ai_generations (id, user_id, review_id, model) VALUES (?, ?, ?, ?)',
+      [generateId(), req.user.id, review.id, 'claude-sonnet-4-6']
+    );
 
     const { tone = 'professional' } = req.body;
     const businessName = req.user.business_name || 'our business';

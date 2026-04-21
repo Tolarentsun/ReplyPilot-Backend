@@ -7,9 +7,9 @@ router.get('/plans', (req, res) => {
   res.json({
     success: true,
     plans: [
-      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 25 reviews/month', 'Basic sentiment analysis', 'AI response generation (5/month)', 'Email support'], limits: { reviews: 25, ai_responses: 5 } },
-      { id: 'pro', name: 'Professional', price: 49, period: 'month', popular: true, features: ['Unlimited reviews', 'Advanced AI sentiment analysis', 'Unlimited AI responses', 'Competitor benchmarking', 'Monthly insight reports', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } },
-      { id: 'business', name: 'Business', price: 149, period: 'month', features: ['Everything in Professional', 'Multi-location support', 'White-label reports', 'API access', 'Custom response templates', 'Dedicated account manager'], limits: { reviews: -1, ai_responses: -1 } }
+      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 25 reviews', 'Sentiment analysis', 'AI responses (5/month)', 'Basic dashboard', 'Email support'], limits: { reviews: 25, ai_responses: 5 } },
+      { id: 'pro', name: 'Professional', price: 49, period: 'month', popular: true, features: ['Unlimited reviews', 'Unlimited AI responses', 'Google auto-sync & posting', 'Full trend analytics', 'AI insight reports', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } },
+      { id: 'business', name: 'Business', price: 149, period: 'month', features: ['Everything in Professional', 'Multi-location support', 'Custom response templates', 'API access', 'Dedicated account manager'], limits: { reviews: -1, ai_responses: -1 } }
     ]
   });
 });
@@ -49,7 +49,7 @@ router.post('/checkout', authenticate, async (req, res) => {
       await db.asyncRun('UPDATE users SET stripe_customer_id = ? WHERE id = ?', [customerId, req.user.id]);
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'https://tolarentsun.github.io/ReplyPilot-Backend';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://reply-pilot.net';
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
@@ -98,9 +98,18 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
 router.post('/cancel', authenticate, async (req, res) => {
   try {
-    await db.asyncRun(`UPDATE users SET plan = 'free', subscription_status = 'inactive', stripe_subscription_id = NULL WHERE id = ?`, [req.user.id]);
-    res.json({ success: true, message: 'Subscription cancelled' });
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (stripeKey && !stripeKey.includes('...') && req.user.stripe_subscription_id) {
+      const stripe = require('stripe')(stripeKey);
+      // Cancel at period end so user keeps access until billing cycle ends
+      await stripe.subscriptions.update(req.user.stripe_subscription_id, {
+        cancel_at_period_end: true
+      });
+    }
+    await db.asyncRun(`UPDATE users SET subscription_status = 'cancelling' WHERE id = ?`, [req.user.id]);
+    res.json({ success: true, message: 'Subscription cancelled. You will retain access until the end of your billing period.' });
   } catch (err) {
+    console.error('Cancel error:', err);
     res.status(500).json({ error: 'Failed to cancel subscription' });
   }
 });
@@ -119,7 +128,7 @@ router.post('/portal', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'No billing account found. Please subscribe first.' });
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'https://tolarentsun.github.io/ReplyPilot-Backend';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://reply-pilot.net';
     const session = await stripe.billingPortal.sessions.create({
       customer: user.stripe_customer_id,
       return_url: `${frontendUrl}/dashboard.html`,

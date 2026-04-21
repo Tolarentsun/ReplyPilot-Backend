@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_BASE: 'https://replypilot-backend-production.up.railway.app',
+  API_BASE: window.location.origin,
   APP_NAME: 'ReplyPilot',
   VERSION: '2.0.0'
 };
