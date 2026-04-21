@@ -87,6 +87,8 @@ async function initSchema() {
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yelp_business_id TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yelp_business_name TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS ai_persona TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TEXT');
     } catch(e) {}
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {

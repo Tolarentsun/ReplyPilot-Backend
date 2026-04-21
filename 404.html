@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — ReplyPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#0A0A0F; --cream:#FAF8F4; --gold:#D4A853; --text-muted:#6B6878; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--cream); min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px; text-align:center; }
+    .logo { font-family:'Playfair Display',serif; font-size:24px; font-weight:800; color:var(--ink); text-decoration:none; margin-bottom:60px; display:block; }
+    .logo span { color:var(--gold); }
+    .num { font-family:'Playfair Display',serif; font-size:120px; font-weight:900; color:var(--ink); line-height:1; letter-spacing:-4px; margin-bottom:8px; }
+    .num span { color:var(--gold); }
+    h1 { font-family:'Playfair Display',serif; font-size:32px; font-weight:800; color:var(--ink); margin-bottom:16px; }
+    p { font-size:16px; color:var(--text-muted); max-width:400px; line-height:1.7; margin-bottom:40px; }
+    .actions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .btn-primary { background:var(--ink); color:white; padding:14px 32px; border-radius:6px; font-size:15px; font-weight:600; text-decoration:none; transition:all 0.2s; }
+    .btn-primary:hover { background:var(--gold); color:var(--ink); }
+    .btn-ghost { color:var(--ink); font-size:14px; font-weight:500; text-decoration:none; display:flex; align-items:center; gap:6px; transition:color 0.2s; }
+    .btn-ghost:hover { color:var(--gold); }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="logo">Reply<span>Pilot</span></a>
+  <div class="num">4<span>0</span>4</div>
+  <h1>This page doesn't exist.</h1>
+  <p>The link you followed may be broken, or the page may have been removed. Let's get you back on track.</p>
+  <div class="actions">
+    <a href="index.html" class="btn-primary">Go Home</a>
+    <a href="dashboard.html" class="btn-ghost">Dashboard →</a>
+  </div>
+</body>
+</html>

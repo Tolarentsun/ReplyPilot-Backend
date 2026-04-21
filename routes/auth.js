@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const { seedDemoReviews } = require('../db/seedData');
+const { sendEmail, welcomeEmail, passwordResetEmail } = require('./email');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'replypilot-secret-change-in-production';
 
@@ -33,6 +35,8 @@ router.post('/register', async (req, res) => {
 
     const user = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, created_at FROM users WHERE id = ?', [id]);
     const token = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
+
+    sendEmail({ to: email, subject: 'Welcome to ReplyPilot', html: welcomeEmail(name) }).catch(() => {});
 
     res.json({ success: true, token, user });
   } catch (err) {
@@ -81,7 +85,6 @@ router.put('/profile', authenticate, async (req, res) => {
   }
 });
 
-// Change password
 router.post('/change-password', authenticate, async (req, res) => {
   try {
     const { current_password, new_password } = req.body;
@@ -99,7 +102,53 @@ router.post('/change-password', authenticate, async (req, res) => {
   }
 });
 
-// Delete account
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const user = await db.asyncGet('SELECT id, name, email FROM users WHERE email = ?', [email.toLowerCase()]);
+
+    // Always respond success to prevent email enumeration
+    if (!user) return res.json({ success: true });
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+    await db.asyncRun('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [token, expires, user.id]);
+
+    await sendEmail({ to: user.email, subject: 'Reset your ReplyPilot password', html: passwordResetEmail(user.name, token) });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Failed to send reset email' });
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) return res.status(400).json({ error: 'Token and password are required' });
+    if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
+
+    const user = await db.asyncGet(
+      'SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > ?',
+      [token, new Date().toISOString()]
+    );
+
+    if (!user) return res.status(400).json({ error: 'This reset link has expired or is invalid. Please request a new one.' });
+
+    const hash = await bcrypt.hash(password, 12);
+    await db.asyncRun('UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?', [hash, user.id]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
 router.delete('/account', authenticate, async (req, res) => {
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY;

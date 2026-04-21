@@ -29,6 +29,11 @@ app.use(express.static(path.join(__dirname), { index: 'index.html' }));
 app.get('/dashboard', (req, res) => { res.set('Cache-Control', 'no-store'); res.sendFile(path.join(__dirname, 'dashboard.html')); });
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
+app.get('/forgot-password', (req, res) => res.sendFile(path.join(__dirname, 'forgot-password.html')));
+app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'reset-password.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
+app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'contact.html')));
 
 try { require('dotenv').config(); } catch(e) {}
 
@@ -91,6 +96,9 @@ app.get('/api', (req, res) => {
 });
 
 app.use((req, res) => {
+  if (req.accepts('html') && !req.path.startsWith('/api/')) {
+    return res.status(404).sendFile(path.join(__dirname, '404.html'));
+  }
   res.status(404).json({ error: 'Route not found' });
 });
 

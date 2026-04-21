@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — ReplyPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#0A0A0F; --cream:#FAF8F4; --gold:#D4A853; --mist:#E8E4DC; --text:#2A2A35; --text-muted:#6B6878; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); }
+    nav { padding:20px 60px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--mist); background:var(--cream); }
+    .logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:800; color:var(--ink); text-decoration:none; }
+    .logo span { color:var(--gold); }
+    .nav-links { display:flex; gap:24px; }
+    .nav-links a { font-size:14px; color:var(--text-muted); text-decoration:none; font-weight:500; }
+    .nav-links a:hover { color:var(--gold); }
+    .container { max-width:760px; margin:0 auto; padding:80px 40px 120px; }
+    .label { font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+    h1 { font-family:'Playfair Display',serif; font-size:48px; font-weight:800; color:var(--ink); margin-bottom:12px; line-height:1.1; }
+    .updated { font-size:14px; color:var(--text-muted); margin-bottom:60px; }
+    h2 { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--ink); margin:48px 0 16px; }
+    p { font-size:15px; line-height:1.8; color:var(--text-muted); margin-bottom:16px; }
+    ul { padding-left:24px; margin-bottom:16px; }
+    ul li { font-size:15px; line-height:1.8; color:var(--text-muted); margin-bottom:6px; }
+    a { color:var(--ink); font-weight:600; }
+    a:hover { color:var(--gold); }
+    footer { text-align:center; padding:40px; font-size:13px; color:var(--text-muted); border-top:1px solid var(--mist); }
+    @media (max-width:768px) { nav { padding:16px 24px; } .container { padding:48px 24px 80px; } h1 { font-size:34px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">Reply<span>Pilot</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="terms.html">Terms</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <p class="label">Legal</p>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: April 21, 2025</p>
+
+    <p>ReplyPilot ("we", "our", or "us") operates the ReplyPilot service at reply-pilot.net. This Privacy Policy explains what information we collect, how we use it, and your rights around it. By using ReplyPilot, you agree to this policy.</p>
+
+    <h2>What We Collect</h2>
+    <p><strong>Account information:</strong> When you register, we collect your name, email address, business name, business type, and a hashed (encrypted) version of your password.</p>
+    <p><strong>Review data:</strong> Reviews you add manually or sync from Google Business Profile — including reviewer name, rating, review text, and date. This data belongs to you and is only used to power the ReplyPilot dashboard.</p>
+    <p><strong>Google account data:</strong> If you connect Google Business Profile, we store an OAuth access token and refresh token to sync reviews and (on the Business plan) post responses on your behalf. We access only the minimum required scopes.</p>
+    <p><strong>Subscription data:</strong> If you subscribe, Stripe processes your payment. We store a Stripe customer ID and subscription ID but never your full card details.</p>
+    <p><strong>Usage data:</strong> We log server-side errors and aggregate usage metrics (e.g., number of AI responses generated per month) to enforce plan limits and improve the product. We do not use third-party analytics trackers.</p>
+
+    <h2>How We Use Your Data</h2>
+    <ul>
+      <li>To operate and deliver the ReplyPilot service</li>
+      <li>To generate AI responses to your reviews using the Anthropic Claude API</li>
+      <li>To enforce plan limits (free: 25 reviews, 5 AI responses/month)</li>
+      <li>To send transactional emails (welcome, password reset, subscription confirmation)</li>
+      <li>To sync and post to Google Business Profile when you authorise it</li>
+      <li>To process payments via Stripe</li>
+    </ul>
+    <p>We do not sell your data. We do not use your review content to train AI models. We do not send marketing emails unless you explicitly opt in.</p>
+
+    <h2>Third-Party Services</h2>
+    <p>We use the following third-party services to operate ReplyPilot:</p>
+    <ul>
+      <li><strong>Anthropic</strong> — AI response generation. Review text is sent to Anthropic's API to generate responses. Anthropic's data use policy applies.</li>
+      <li><strong>Google</strong> — OAuth authentication and Google Business Profile API for review sync and response posting.</li>
+      <li><strong>Stripe</strong> — Subscription billing and payment processing.</li>
+      <li><strong>Railway</strong> — Cloud hosting and PostgreSQL database.</li>
+      <li><strong>Resend</strong> — Transactional email delivery.</li>
+    </ul>
+
+    <h2>Data Retention</h2>
+    <p>We retain your data for as long as your account is active. When you delete your account, all your reviews, profile data, and associated records are permanently deleted from our database within 24 hours. Google OAuth tokens are also revoked on deletion.</p>
+
+    <h2>Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul>
+      <li>Access the data we hold about you (email us at <a href="mailto:support@reply-pilot.net">support@reply-pilot.net</a>)</li>
+      <li>Delete your account and all associated data at any time from the Settings tab in your dashboard</li>
+      <li>Disconnect your Google account at any time from the Platforms tab in your dashboard</li>
+      <li>Export your review data (contact us and we'll provide a CSV)</li>
+    </ul>
+
+    <h2>Security</h2>
+    <p>Passwords are hashed using bcrypt. All data is transmitted over HTTPS. Database access is restricted to our application server. OAuth tokens are stored encrypted at rest. We follow industry-standard security practices and review them regularly.</p>
+
+    <h2>Children</h2>
+    <p>ReplyPilot is not intended for users under 16 years of age. We do not knowingly collect data from children.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this policy as the product evolves. We'll notify registered users by email of any material changes. The "Last updated" date at the top of this page reflects the most recent revision.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy? Email us at <a href="mailto:support@reply-pilot.net">support@reply-pilot.net</a>. We aim to respond within 2 business days.</p>
+  </div>
+
+  <footer>
+    <a href="index.html">ReplyPilot</a> &nbsp;·&nbsp; <a href="terms.html">Terms of Service</a> &nbsp;·&nbsp; <a href="contact.html">Contact</a>
+    <br><br>© 2025 ReplyPilot. All rights reserved.
+  </footer>
+</body>
+</html>

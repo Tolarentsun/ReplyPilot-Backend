@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
+const { sendEmail, subscriptionEmail } = require('./email');
 
 router.get('/plans', (req, res) => {
   res.json({
@@ -86,6 +87,8 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     const { user_id, plan_id } = session.metadata;
     await db.asyncRun(`UPDATE users SET plan = ?, stripe_subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? WHERE id = ?`,
       [plan_id, session.subscription, new Date(Date.now() + 30*24*60*60*1000).toISOString(), user_id]);
+    const user = await db.asyncGet('SELECT name, email FROM users WHERE id = ?', [user_id]);
+    if (user) sendEmail({ to: user.email, subject: `Your ReplyPilot ${plan_id === 'business' ? 'Business' : 'Professional'} subscription is confirmed`, html: subscriptionEmail(user.name, plan_id) }).catch(() => {});
   }
 
   if (event.type === 'customer.subscription.deleted') {

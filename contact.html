@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — ReplyPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#0A0A0F; --cream:#FAF8F4; --gold:#D4A853; --mist:#E8E4DC; --text:#2A2A35; --text-muted:#6B6878; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); }
+    nav { padding:20px 60px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--mist); background:var(--cream); }
+    .logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:800; color:var(--ink); text-decoration:none; }
+    .logo span { color:var(--gold); }
+    .nav-links { display:flex; gap:24px; }
+    .nav-links a { font-size:14px; color:var(--text-muted); text-decoration:none; font-weight:500; }
+    .nav-links a:hover { color:var(--gold); }
+    .hero { max-width:760px; margin:0 auto; padding:80px 40px 0; }
+    .label { font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+    h1 { font-family:'Playfair Display',serif; font-size:52px; font-weight:800; color:var(--ink); margin-bottom:16px; line-height:1.1; }
+    .sub { font-size:17px; color:var(--text-muted); line-height:1.7; max-width:520px; margin-bottom:64px; }
+    .cards { max-width:760px; margin:0 auto; padding:0 40px 120px; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .card { background:white; border:1px solid var(--mist); border-radius:16px; padding:36px; }
+    .card-icon { font-size:32px; margin-bottom:20px; }
+    .card h2 { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--ink); margin-bottom:10px; }
+    .card p { font-size:14px; color:var(--text-muted); line-height:1.7; margin-bottom:20px; }
+    .card a.btn { display:inline-block; background:var(--ink); color:white; padding:12px 24px; border-radius:6px; font-size:14px; font-weight:600; text-decoration:none; transition:all 0.2s; }
+    .card a.btn:hover { background:var(--gold); color:var(--ink); }
+    .card a.link { font-size:14px; font-weight:600; color:var(--ink); text-decoration:none; }
+    .card a.link:hover { color:var(--gold); }
+    footer { text-align:center; padding:40px; font-size:13px; color:var(--text-muted); border-top:1px solid var(--mist); }
+    footer a { color:var(--text-muted); text-decoration:none; }
+    footer a:hover { color:var(--gold); }
+    @media (max-width:768px) { nav { padding:16px 24px; } .hero { padding:48px 24px 0; } .cards { padding:0 24px 80px; grid-template-columns:1fr; } h1 { font-size:36px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">Reply<span>Pilot</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <p class="label">Support</p>
+    <h1>We're here to help.</h1>
+    <p class="sub">Have a question, found a bug, or need help with your account? Reach out — we typically respond within one business day.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">✉️</div>
+      <h2>Email Support</h2>
+      <p>For account issues, billing questions, or anything else — email us directly. We aim to respond within 1 business day.</p>
+      <a href="mailto:support@reply-pilot.net" class="btn">support@reply-pilot.net</a>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h2>Billing &amp; Subscriptions</h2>
+      <p>Manage your subscription, update payment details, or cancel from your dashboard. Or email us and we'll sort it out.</p>
+      <a href="dashboard.html" class="link">Go to Dashboard →</a>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h2>Account Access</h2>
+      <p>Locked out of your account? Use the password reset flow to regain access instantly.</p>
+      <a href="forgot-password.html" class="link">Reset Password →</a>
+    </div>
+    <div class="card">
+      <div class="card-icon">📖</div>
+      <h2>Legal &amp; Privacy</h2>
+      <p>Read our Privacy Policy and Terms of Service to understand how we handle your data.</p>
+      <a href="privacy.html" class="link" style="margin-right:16px">Privacy →</a>
+      <a href="terms.html" class="link">Terms →</a>
+    </div>
+  </div>
+
+  <footer>
+    <a href="index.html">ReplyPilot</a> &nbsp;·&nbsp; <a href="privacy.html">Privacy</a> &nbsp;·&nbsp; <a href="terms.html">Terms</a>
+    <br><br>© 2025 ReplyPilot. All rights reserved.
+  </footer>
+</body>
+</html>
