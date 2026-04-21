@@ -12,13 +12,17 @@ process.on('unhandledRejection', (reason) => {
 // Trust Railway's proxy
 app.set('trust proxy', 1);
 
-// Health check FIRST
+// Health check FIRST (before static files so Railway health check always responds)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', version: '2.0.0', timestamp: new Date().toISOString() });
 });
-app.get('/', (req, res) => {
-  res.json({ message: 'ReplyPilot API v2.0', status: 'running' });
-});
+
+// Serve HTML pages
+const path = require('path');
+app.use(express.static(path.join(__dirname), { index: 'index.html' }));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
 
 try { require('dotenv').config(); } catch(e) {}
 
