@@ -11,21 +11,24 @@ router.post('/generate', authenticate, async (req, res) => {
     const businessName = req.user.business_name || 'your business';
 
     // Gather data
-    const reviews = db.prepare('SELECT * FROM reviews WHERE user_id = ? ORDER BY review_date DESC LIMIT 50').all(userId);
+    const reviews = await db.asyncAll(
+      'SELECT * FROM reviews WHERE user_id = $1 ORDER BY review_date DESC LIMIT 50',
+      [userId]
+    );
     
-    if (reviews.length === 0) {
+    if (!reviews || reviews.length === 0) {
       return res.json({ success: true, insights: getDefaultInsights() });
     }
 
-    const analytics = db.prepare(`
+    const analytics = await db.asyncGet(`
       SELECT 
         COUNT(*) as total,
         AVG(rating) as avg_rating,
         SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive,
         SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative,
         SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral
-      FROM reviews WHERE user_id = ?
-    `).get(userId);
+      FROM reviews WHERE user_id = $1
+    `, [userId]);
 
     const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
     
@@ -95,8 +98,10 @@ Respond with ONLY the JSON, no other text.`;
 });
 
 function generateTemplateInsights(analytics, reviews, businessName) {
-  const avgRating = analytics.avg_rating || 0;
-  const positiveRate = analytics.total > 0 ? (analytics.positive / analytics.total) * 100 : 0;
+  const avgRating = parseFloat(analytics.avg_rating) || 0;
+  const total = parseInt(analytics.total) || 0;
+  const positive = parseInt(analytics.positive) || 0;
+  const positiveRate = total > 0 ? (positive / total) * 100 : 0;
   
   let health = 'Needs Attention';
   let score = 50;
@@ -108,7 +113,7 @@ function generateTemplateInsights(analytics, reviews, businessName) {
   return {
     overall_health: health,
     health_score: score,
-    executive_summary: `${businessName} has an average rating of ${avgRating.toFixed(1)}/5 based on ${analytics.total} reviews. ${positiveRate.toFixed(0)}% of customers report positive experiences. Focus on addressing negative feedback patterns to improve overall satisfaction.`,
+    executive_summary: `${businessName} has an average rating of ${avgRating.toFixed(1)}/5 based on ${total} reviews. ${positiveRate.toFixed(0)}% of customers report positive experiences. Focus on addressing negative feedback patterns to improve overall satisfaction.`,
     strengths: ['Customers consistently mention quality of service', 'Strong repeat customer base indicated', 'Professional and courteous staff feedback'],
     improvement_areas: ['Response time to customer feedback', 'Consistency across all touchpoints', 'Follow-up communication with dissatisfied customers'],
     action_items: [
