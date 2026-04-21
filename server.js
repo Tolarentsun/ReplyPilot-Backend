@@ -96,3 +96,38 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 ReplyPilot API running on port ${PORT}`);
 });
+
+// Daily Google review sync — runs at 3am UTC every day
+try {
+  const cron = require('node-cron');
+  const db = require('./db/database');
+  const { syncGoogleReviews, refreshTokenIfNeeded } = require('./routes/google');
+
+  cron.schedule('0 3 * * *', async () => {
+    console.log('[Cron] Starting daily Google review sync...');
+    try {
+      const users = await db.asyncAll(
+        'SELECT * FROM users WHERE google_connected = true AND google_access_token IS NOT NULL',
+        []
+      );
+      console.log(`[Cron] Syncing ${users.length} connected account(s)`);
+
+      for (const user of users) {
+        try {
+          const token = await refreshTokenIfNeeded(user);
+          const count = await syncGoogleReviews(user.id, token, user.google_location_id);
+          if (count > 0) console.log(`[Cron] ${user.email}: synced ${count} new review(s)`);
+        } catch (e) {
+          console.error(`[Cron] Failed for ${user.email}:`, e.message);
+        }
+      }
+      console.log('[Cron] Daily sync complete');
+    } catch (e) {
+      console.error('[Cron] Sync job error:', e.message);
+    }
+  });
+
+  console.log('✅ Daily Google sync scheduled (3am UTC)');
+} catch (e) {
+  console.error('Cron setup failed:', e.message);
+}
