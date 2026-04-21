@@ -1359,7 +1359,13 @@
         <div class="plan-price">$${plan.price}</div>
         <div class="plan-period">${plan.period}</div>
         <div class="plan-features">
-          ${plan.features.map(f => `<div class="plan-feature">${f}</div>`).join('')}
+          ${plan.features.map(f => {
+            if (f.startsWith('|DIVIDER|')) {
+              const label = f.replace('|DIVIDER|', '');
+              return `<div style="margin-top:4px;padding-top:12px;border-top:1.5px solid var(--mist);font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold)">${label}</div>`;
+            }
+            return `<div class="plan-feature">${f}</div>`;
+          }).join('')}
         </div>
         ${plan.id === userPlan
           ? `<button class="btn-plan active-plan" disabled>Current Plan</button>`
@@ -1659,19 +1665,29 @@
     const platform = document.getElementById('modal-platform').value;
     const review_date = document.getElementById('modal-date').value;
 
-    if (!reviewer_name || !review_text || !selectedRating) {
-      toast('Please fill in all fields and select a rating', 'error');
-      return;
-    }
+    if (!reviewer_name) { toast('Please enter the reviewer\'s name', 'error'); return; }
+    if (!selectedRating) { toast('Please select a star rating', 'error'); return; }
+    if (!review_text) { toast('Please paste the review text', 'error'); return; }
 
-    const { data, ok } = await API.post('/api/reviews', { reviewer_name, rating: selectedRating, review_text, platform, review_date });
-    if (ok && data.success) {
-      closeModal();
-      toast('✓ Review added and analyzed!', 'success');
-      if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
-      loadOverview();
-    } else {
-      toast(data.error || 'Failed to add review', 'error');
+    const btn = document.querySelector('#add-modal .btn-generate');
+    if (btn) { btn.textContent = '⏳ Analyzing...'; btn.disabled = true; }
+
+    try {
+      const { data, ok } = await API.post('/api/reviews', { reviewer_name, rating: selectedRating, review_text, platform, review_date });
+      if (ok && data.success) {
+        closeModal();
+        toast('✓ Review added and analyzed!', 'success');
+        if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
+        loadOverview();
+      } else if (data?.upgrade_required) {
+        showUpgradeModal(data.error);
+      } else {
+        toast(data?.error || 'Failed to add review', 'error');
+      }
+    } catch (e) {
+      toast('Could not reach the server. Check your connection and try again.', 'error');
+    } finally {
+      if (btn) { btn.textContent = 'Add & Analyze'; btn.disabled = false; }
     }
   }
 
