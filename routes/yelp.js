@@ -44,6 +44,8 @@ router.post('/sync/:businessId', authenticate, async (req, res) => {
     const { businessId } = req.params;
     const { business_name } = req.body;
 
+    console.log('Syncing Yelp business ID:', businessId);
+
     // Save yelp business ID to user
     await db.asyncRun(
       'UPDATE users SET yelp_business_id = ?, yelp_business_name = ? WHERE id = ?',
@@ -51,16 +53,27 @@ router.post('/sync/:businessId', authenticate, async (req, res) => {
     );
 
     // Get reviews from Yelp
-    const response = await axios.get(`https://api.yelp.com/v3/businesses/${businessId}/reviews`, {
-      headers: { Authorization: `Bearer ${YELP_API_KEY}` },
-      params: { limit: 20, sort_by: 'yelp_sort' }
-    });
+    let reviews = [];
+    try {
+      const response = await axios.get(`https://api.yelp.com/v3/businesses/${businessId}/reviews`, {
+        headers: { Authorization: `Bearer ${YELP_API_KEY}` },
+        params: { limit: 20, sort_by: 'yelp_sort' }
+      });
+      reviews = response.data.reviews || [];
+    } catch (yelpErr) {
+      console.error('Yelp API error:', yelpErr.response?.data || yelpErr.message);
+      // Business was saved, just couldn't get reviews
+      return res.json({
+        success: true,
+        synced: 0,
+        message: 'Business connected! Yelp free API has limited review access.',
+        note: 'Yelp free API provides up to 3 reviews. All responses must be posted manually on Yelp.'
+      });
+    }
 
-    const reviews = response.data.reviews || [];
     let count = 0;
 
     for (const yr of reviews) {
-      // Check if already imported
       const existing = await db.asyncGet(
         'SELECT id FROM reviews WHERE yelp_review_id = ? AND user_id = ?',
         [yr.id, req.user.id]
@@ -88,7 +101,7 @@ router.post('/sync/:businessId', authenticate, async (req, res) => {
       synced: count,
       message: count > 0
         ? `Synced ${count} new reviews from Yelp`
-        : 'No new reviews to sync (Yelp free API only provides 3 reviews per business)',
+        : 'Business connected! No new reviews to sync (Yelp free API only provides 3 reviews per business)',
       note: 'Yelp free API provides up to 3 reviews. All responses must be posted manually on Yelp.'
     });
   } catch (err) {
