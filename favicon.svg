@@ -1,4 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="12" fill="#0A0A0F"/>
-  <text y="72" x="10" font-size="58" font-weight="900" fill="#D4A853" font-family="Georgia,serif">RP</text>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B4080"/>
+      <stop offset="100%" stop-color="#0D2040"/>
+    </linearGradient>
+    <linearGradient id="needle" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0C96A"/>
+      <stop offset="100%" stop-color="#C8922A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100" height="100" rx="20" fill="url(#bg)"/>
+
+  <!-- Subtle ring -->
+  <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Compass needle — gold upper half (NE direction = send/reply) -->
+  <polygon points="50,18 44,52 50,46 56,52" fill="url(#needle)"/>
+  <!-- Compass needle — dimmed lower half -->
+  <polygon points="50,82 56,48 50,54 44,48" fill="rgba(212,168,83,0.22)"/>
+
+  <!-- Center jewel -->
+  <circle cx="50" cy="50" r="5" fill="white" opacity="0.95"/>
+  <circle cx="50" cy="50" r="2.5" fill="#D4A853"/>
 </svg>
