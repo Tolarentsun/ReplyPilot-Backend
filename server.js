@@ -19,8 +19,14 @@ app.get('/health', (req, res) => {
 
 // Serve HTML pages
 const path = require('path');
+
+// Serve JS/HTML with no-cache so browsers always get the latest version
+app.get('/config.js', (req, res) => { res.set('Cache-Control', 'no-store'); res.sendFile(path.join(__dirname, 'config.js')); });
+app.get('/dashboard.html', (req, res) => { res.set('Cache-Control', 'no-store'); res.sendFile(path.join(__dirname, 'dashboard.html')); });
+app.get('/index.html', (req, res) => { res.set('Cache-Control', 'no-store'); res.sendFile(path.join(__dirname, 'index.html')); });
+
 app.use(express.static(path.join(__dirname), { index: 'index.html' }));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
+app.get('/dashboard', (req, res) => { res.set('Cache-Control', 'no-store'); res.sendFile(path.join(__dirname, 'dashboard.html')); });
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
 
