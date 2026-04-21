@@ -6,8 +6,8 @@ const axios = require('axios');
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://replypilot-backend-production.up.railway.app/api/google/callback';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://tolarentsun.github.io/ReplyPilot-Backend';
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://reply-pilot.net/api/google/callback';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://reply-pilot.net';
 
 // Step 1: Redirect user to Google OAuth
 router.get('/connect', authenticate, (req, res) => {
@@ -122,11 +122,11 @@ router.post('/respond/:reviewId', authenticate, async (req, res) => {
 
     const token = await refreshTokenIfNeeded(user);
 
-    // Post reply to Google Business Profile API
+    // Post reply to Google Business Profile API (current reviews API)
     await axios.put(
-      `https://mybusiness.googleapis.com/v4/${review.google_review_id}/reply`,
+      `https://mybusinessreviews.googleapis.com/v1/${review.google_review_id}/reply`,
       { comment: response_text },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
 
     // Mark as responded in DB
@@ -240,7 +240,7 @@ async function syncGoogleReviews(userId, token, locationId) {
 
   try {
     const reviewsRes = await axios.get(
-      `https://mybusiness.googleapis.com/v4/${locationId}/reviews`,
+      `https://mybusinessreviews.googleapis.com/v1/${locationId}/reviews?pageSize=50`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
