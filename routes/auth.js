@@ -69,12 +69,12 @@ router.get('/me', authenticate, (req, res) => {
 
 router.put('/profile', authenticate, async (req, res) => {
   try {
-    const { name, business_name, business_type } = req.body;
+    const { name, business_name, business_type, ai_persona } = req.body;
     await db.asyncRun(
-      `UPDATE users SET name = ?, business_name = ?, business_type = ? WHERE id = ?`,
-      [name || req.user.name, business_name || null, business_type || null, req.user.id]
+      `UPDATE users SET name = ?, business_name = ?, business_type = ?, ai_persona = ? WHERE id = ?`,
+      [name || req.user.name, business_name || null, business_type || null, ai_persona !== undefined ? ai_persona : req.user.ai_persona, req.user.id]
     );
-    const updated = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type FROM users WHERE id = ?', [req.user.id]);
+    const updated = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, ai_persona FROM users WHERE id = ?', [req.user.id]);
     res.json({ success: true, user: updated });
   } catch (err) {
     res.status(500).json({ error: 'Profile update failed' });

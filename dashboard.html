@@ -643,6 +643,7 @@
           <option value="lowest">Lowest Rating</option>
           <option value="highest">Highest Rating</option>
         </select>
+        <button id="bulk-generate-btn" onclick="bulkGenerateResponses()" style="display:none;align-items:center;gap:6px;padding:10px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">⚡ Generate All</button>
       </div>
       <div class="reviews-list" id="reviews-list">
         <div class="loading-spinner"><div class="spinner"></div>Loading reviews...</div>
@@ -763,6 +764,16 @@
             <input id="settings-confirm-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
           </div>
           <button class="btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <!-- Custom AI Persona (Business plan only) -->
+        <div class="chart-card" id="persona-section" style="display:none">
+          <div class="chart-title" style="margin-bottom:6px">Custom AI Persona <span style="font-size:11px;padding:3px 10px;background:var(--ink);color:var(--gold);border-radius:20px;font-weight:700;letter-spacing:0.05em;vertical-align:middle">BUSINESS</span></div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Define your brand voice so every AI response sounds like <em>your business</em> — not a generic template. This context is injected into every AI response you generate.</p>
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px">Brand Voice & Guidelines</label>
+          <textarea id="settings-persona" placeholder="e.g. We are a family-owned Italian restaurant. Always be warm and personal. Sign off with 'Warm regards, The Bella Vita Team'. Never offer refunds in responses — invite the customer back instead. Mention our owner Marco by name when thanking staff." style="width:100%;min-height:130px;padding:12px;border:1.5px solid var(--mist);border-radius:8px;font-family:DM Sans,sans-serif;font-size:13px;line-height:1.6;resize:vertical;color:var(--text);outline:none"></textarea>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:16px">Tips: include your sign-off, things to avoid, staff names to mention, and your overall tone.</p>
+          <button class="btn-primary" onclick="saveSettings()">Save Persona</button>
         </div>
 
         <!-- Danger Zone -->
@@ -893,6 +904,19 @@
   </div><!-- /content -->
 </div><!-- /main -->
 
+
+<!-- UPGRADE MODAL -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal" style="max-width:420px;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">🚀</div>
+    <h2 class="modal-title">Upgrade Your Plan</h2>
+    <p class="modal-sub" id="upgrade-modal-msg" style="margin-bottom:28px">Upgrade to access this feature.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button class="btn-primary" onclick="showTab('subscription');closeUpgradeModal()" style="width:100%">View Plans & Pricing</button>
+      <button style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif;padding:8px" onclick="closeUpgradeModal()">Maybe later</button>
+    </div>
+  </div>
+</div>
 
 <!-- ADD REVIEW MODAL -->
 <div class="modal-overlay" id="add-modal">
@@ -1112,6 +1136,10 @@
     const rating = document.getElementById('filter-rating').value;
     const sort = document.getElementById('filter-sort').value;
 
+    // Show bulk generate button for Pro/Business users
+    const bulkBtn = document.getElementById('bulk-generate-btn');
+    if (bulkBtn) bulkBtn.style.display = (currentUser.plan === 'pro' || currentUser.plan === 'business') ? 'inline-flex' : 'none';
+
     document.getElementById('reviews-list').innerHTML = '<div class="loading-spinner"><div class="spinner"></div>Loading...</div>';
 
     try {
@@ -1161,15 +1189,18 @@
         </div>` : '';
 
       const isGoogle = r.platform === 'google' && r.google_review_id;
+      const canAutoPost = isGoogle && currentUser.plan === 'business';
       const platformNotice = !isGoogle && r.ai_response ? `
         <div style="margin-top:10px;padding:8px 12px;background:#FEF9EC;border-radius:6px;font-size:12px;color:#92400E">
-          ⚠️ ${r.platform.charAt(0).toUpperCase()+r.platform.slice(1)} does not support automated posting.
-          Copy this response and paste it manually${r.platform !== 'google' ? ` — or <strong>connect Google</strong> for full automation` : ''}.
-        </div>` : '';
+          ⚠️ ${r.platform.charAt(0).toUpperCase()+r.platform.slice(1)} does not support automated posting. Copy this response and paste it manually.
+        </div>` : (isGoogle && r.ai_response && currentUser.plan !== 'business' ? `
+        <div style="margin-top:10px;padding:8px 12px;background:#EFF6FF;border-radius:6px;font-size:12px;color:#1D4ED8">
+          🔍 <strong>Business plan:</strong> Auto-post this response directly to Google in one click.
+        </div>` : '');
 
       const actionBtns = r.ai_response
         ? `<button class="btn-sm btn-copy" onclick="copyResponse('${r.id}')">📋 Copy Response</button>
-           ${isGoogle && r.response_status !== 'responded' ? `<button class="btn-sm btn-generate" style="background:#1a73e8" onclick="postToGoogle('${r.id}')">🔍 Post to Google</button>` : ''}
+           ${canAutoPost && r.response_status !== 'responded' ? `<button class="btn-sm btn-generate" style="background:#1a73e8;color:white" onclick="postToGoogle('${r.id}')">🔍 Post to Google</button>` : ''}
            ${r.response_status !== 'responded' ? `<button class="btn-sm btn-responded" onclick="markResponded('${r.id}')">✓ Mark as Sent</button>` : '<span style="font-size:13px;color:var(--positive);font-weight:600">✓ Responded</span>'}
            <button class="btn-sm" style="background:none;border:1.5px solid var(--mist);color:var(--text-muted)" onclick="generateResponse('${r.id}')">↺ Regenerate</button>`
         : `<button class="btn-sm btn-generate" onclick="generateResponse('${r.id}')">✨ Generate AI Response</button>`;
@@ -1204,18 +1235,22 @@
     if (btn) { btn.textContent = '⏳ Generating...'; btn.disabled = true; btn.className = 'btn-sm btn-generating'; }
 
     try {
-      const { data, ok } = await API.post(`/api/reviews/${reviewId}/generate-response`, { tone: 'professional' });
+      const tone = localStorage.getItem('rp_tone') || 'professional';
+      const { data, ok } = await API.post(`/api/reviews/${reviewId}/generate-response`, { tone });
       if (ok && data.success) {
         const rev = allReviews.find(r => r.id === reviewId);
         if (rev) { rev.ai_response = data.response; rev.response_status = 'generated'; }
         renderReviews(allReviews);
         toast('✨ AI response generated!', 'success');
+      } else if (data?.upgrade_required) {
+        showUpgradeModal(data.error);
+        if (btn) { btn.textContent = '✨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
       } else {
-        toast('Failed to generate response', 'error');
+        toast(data?.error || 'Failed to generate response', 'error');
         if (btn) { btn.textContent = '✨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
       }
     } catch (e) {
-      toast('Network error', 'error');
+      toast('Could not reach the server. Check your connection.', 'error');
       if (btn) { btn.textContent = '✨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
     }
   }
@@ -1380,12 +1415,22 @@
   let selectedTone = localStorage.getItem('rp_tone') || 'professional';
 
   function loadSettings() {
-    loadGoogleStatus();
     document.getElementById('settings-name').value = currentUser.name || '';
     document.getElementById('settings-biz').value = currentUser.business_name || '';
     document.getElementById('settings-email').value = currentUser.email || '';
     document.getElementById('settings-type').value = currentUser.business_type || '';
     setTone(selectedTone, false);
+
+    // Show AI persona section for Business plan only
+    const personaSection = document.getElementById('persona-section');
+    if (personaSection) {
+      if (currentUser.plan === 'business') {
+        personaSection.style.display = 'block';
+        document.getElementById('settings-persona').value = currentUser.ai_persona || '';
+      } else {
+        personaSection.style.display = 'none';
+      }
+    }
   }
 
   function setTone(tone, save = true) {
@@ -1412,17 +1457,23 @@
   }
 
   async function saveSettings() {
-    const name = document.getElementById('settings-name').value;
-    const business_name = document.getElementById('settings-biz').value;
-    const business_type = document.getElementById('settings-type').value;
-    const { data, ok } = await API.put('/api/auth/profile', { name, business_name, business_type });
-    if (ok && data.success) {
-      currentUser = { ...currentUser, ...data.user };
-      Auth.save(Auth.getToken(), currentUser);
-      updateSidebar();
-      toast('✓ Settings saved!', 'success');
-    } else {
-      toast('Failed to save settings', 'error');
+    try {
+      const name = document.getElementById('settings-name').value;
+      const business_name = document.getElementById('settings-biz').value;
+      const business_type = document.getElementById('settings-type').value;
+      const personaEl = document.getElementById('settings-persona');
+      const ai_persona = personaEl ? personaEl.value.trim() || null : undefined;
+      const { data, ok } = await API.put('/api/auth/profile', { name, business_name, business_type, ai_persona });
+      if (ok && data.success) {
+        currentUser = { ...currentUser, ...data.user };
+        Auth.save(Auth.getToken(), currentUser);
+        updateSidebar();
+        toast('✓ Settings saved!', 'success');
+      } else {
+        toast(data?.error || 'Failed to save settings', 'error');
+      }
+    } catch (e) {
+      toast('Could not reach the server.', 'error');
     }
   }
 
@@ -1458,35 +1509,49 @@
   }
 
   async function connectGoogle() {
-    const { data, ok } = await API.get('/api/google/connect');
-    if (ok && data.auth_url) {
-      window.location.href = data.auth_url;
-    } else {
-      toast(data.error || 'Google connection not configured', 'error');
+    try {
+      const { data, ok } = await API.get('/api/google/connect');
+      if (ok && data.auth_url) {
+        window.location.href = data.auth_url;
+      } else {
+        toast(data?.error || 'Google OAuth is not configured yet. Contact support.', 'error');
+      }
+    } catch (e) {
+      toast('Could not reach the server. Check your connection and try again.', 'error');
     }
   }
 
   async function syncGoogleReviews() {
-    toast('Syncing reviews from Google...', '');
-    const { data, ok } = await API.post('/api/google/sync', {});
-    if (ok && data.success) {
-      toast(`✓ ${data.message}`, 'success');
-      loadOverview();
-      if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
-    } else {
-      toast(data.error || 'Sync failed', 'error');
+    try {
+      toast('Syncing reviews from Google...', '');
+      const { data, ok } = await API.post('/api/google/sync', {});
+      if (ok && data.success) {
+        toast(`✓ ${data.message}`, 'success');
+        loadOverview();
+        if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
+      } else {
+        toast(data?.error || 'Sync failed', 'error');
+      }
+    } catch (e) {
+      toast('Sync failed — could not reach the server.', 'error');
     }
   }
 
   async function disconnectGoogle() {
-    if (!confirm('Disconnect Google Business Profile?')) return;
-    const { ok } = await API.post('/api/google/disconnect', {});
-    if (ok) {
-      document.getElementById('google-status-text').textContent = 'Not connected';
-      document.getElementById('google-connect-btn').textContent = 'Connect Google';
-      document.getElementById('google-connect-btn').style.background = 'var(--ink)';
-      document.getElementById('google-connected-panel').style.display = 'none';
-      toast('Google disconnected', 'success');
+    if (!confirm('Disconnect Google Business Profile? Existing reviews will stay in your dashboard.')) return;
+    try {
+      const { ok, data } = await API.post('/api/google/disconnect', {});
+      if (ok) {
+        document.getElementById('google-status-text').textContent = 'Not connected';
+        document.getElementById('google-connect-btn').textContent = 'Connect Google';
+        document.getElementById('google-connect-btn').style.background = 'var(--ink)';
+        document.getElementById('google-connected-panel').style.display = 'none';
+        toast('Google disconnected', 'success');
+      } else {
+        toast(data?.error || 'Failed to disconnect', 'error');
+      }
+    } catch (e) {
+      toast('Could not reach the server.', 'error');
     }
   }
 
@@ -1494,7 +1559,7 @@
     const params = new URLSearchParams(window.location.search);
     if (params.get('google_connected')) {
       toast('✓ Google Business Profile connected!', 'success');
-      showTab('settings');
+      showTab('platforms');
       history.replaceState({}, '', window.location.pathname);
     }
     if (params.get('google_error')) {
@@ -1510,14 +1575,41 @@
   async function postToGoogle(reviewId) {
     const rev = allReviews.find(r => r.id === reviewId);
     if (!rev || !rev.ai_response) { toast('Generate a response first', 'error'); return; }
-    if (!confirm('Post this response directly to Google?')) return;
-    const { data, ok } = await API.post(`/api/google/respond/${reviewId}`, { response_text: rev.ai_response });
-    if (ok && data.success) {
-      rev.response_status = 'responded';
-      renderReviews(allReviews);
-      toast('✓ Response posted to Google!', 'success');
-    } else {
-      toast(data.error || 'Failed to post to Google', 'error');
+    if (!confirm('Post this AI response directly to your Google Business Profile? It will be publicly visible.')) return;
+    try {
+      const { data, ok } = await API.post(`/api/google/respond/${reviewId}`, { response_text: rev.ai_response });
+      if (ok && data.success) {
+        rev.response_status = 'responded';
+        renderReviews(allReviews);
+        toast('✓ Response posted to Google!', 'success');
+      } else {
+        toast(data?.error || 'Failed to post to Google', 'error');
+      }
+    } catch (e) {
+      toast('Could not reach the server. Try again.', 'error');
+    }
+  }
+
+  async function bulkGenerateResponses() {
+    if (!confirm(`Generate AI responses for all reviews that don't have one yet? This may take a minute.`)) return;
+    const btn = document.getElementById('bulk-generate-btn');
+    if (btn) { btn.textContent = '⏳ Generating...'; btn.disabled = true; }
+    try {
+      const tone = localStorage.getItem('rp_tone') || 'professional';
+      const { data, ok } = await API.post('/api/reviews/bulk-generate', { tone });
+      if (ok && data.success) {
+        toast(`✓ ${data.message}`, 'success');
+        await loadReviews();
+        loadOverview();
+      } else if (data?.upgrade_required) {
+        showUpgradeModal('Bulk AI response generation requires a Pro or Business plan.');
+      } else {
+        toast(data?.error || 'Bulk generation failed', 'error');
+      }
+    } catch (e) {
+      toast('Could not reach the server.', 'error');
+    } finally {
+      if (btn) { btn.textContent = '⚡ Generate All Responses'; btn.disabled = false; }
     }
   }
 
@@ -1594,6 +1686,20 @@
     t.className = `toast ${type} show`;
     setTimeout(() => t.classList.remove('show'), 3500);
   }
+
+  // ===== UPGRADE MODAL =====
+  function showUpgradeModal(msg) {
+    document.getElementById('upgrade-modal-msg').textContent = msg || 'Upgrade your plan to access this feature.';
+    document.getElementById('upgrade-modal').classList.add('open');
+  }
+
+  function closeUpgradeModal() {
+    document.getElementById('upgrade-modal').classList.remove('open');
+  }
+
+  document.getElementById('upgrade-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeUpgradeModal();
+  });
 
   // ===== UTILS =====
   function escHtml(text) {

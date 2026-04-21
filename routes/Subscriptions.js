@@ -7,9 +7,9 @@ router.get('/plans', (req, res) => {
   res.json({
     success: true,
     plans: [
-      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 25 reviews', 'Sentiment analysis', 'AI responses (5/month)', 'Basic dashboard', 'Email support'], limits: { reviews: 25, ai_responses: 5 } },
-      { id: 'pro', name: 'Professional', price: 49, period: 'month', popular: true, features: ['Unlimited reviews', 'Unlimited AI responses', 'Google auto-sync & posting', 'Full trend analytics', 'AI insight reports', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } },
-      { id: 'business', name: 'Business', price: 149, period: 'month', features: ['Everything in Professional', 'Multi-location support', 'Custom response templates', 'API access', 'Dedicated account manager'], limits: { reviews: -1, ai_responses: -1 } }
+      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 25 reviews', 'Sentiment analysis', 'AI responses (5/month)', 'Basic analytics dashboard', 'Email support'], limits: { reviews: 25, ai_responses: 5 } },
+      { id: 'pro', name: 'Professional', price: 49, period: 'month', popular: true, features: ['Unlimited reviews', 'Unlimited AI responses', 'Google auto-sync every 24hrs', '⚡ Bulk generate all responses', 'Full trend analytics', 'AI insight reports', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } },
+      { id: 'business', name: 'Business', price: 149, period: 'month', features: ['Everything in Professional', '🔍 Auto-post responses to Google', '🎨 Custom AI persona & brand voice', 'Multi-location Google support', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } }
     ]
   });
 });

@@ -167,8 +167,10 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
     );
 
     const { tone = 'professional' } = req.body;
-    const businessName = req.user.business_name || 'our business';
-    const response = await generateAIResponse(review, businessName, tone, req.user.id);
+    const userRecord = await db.asyncGet('SELECT business_name, ai_persona FROM users WHERE id = ?', [req.user.id]);
+    const businessName = userRecord?.business_name || req.user.business_name || 'our business';
+    const persona = userRecord?.ai_persona || null;
+    const response = await generateAIResponse(review, businessName, tone, persona);
 
     await db.asyncRun(`UPDATE reviews SET ai_response = ?, response_status = 'generated' WHERE id = ?`, [response, review.id]);
 
@@ -189,6 +191,52 @@ router.put('/:id/respond', authenticate, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update review' });
+  }
+});
+
+// Bulk generate AI responses (Pro/Business only)
+router.post('/bulk-generate', authenticate, async (req, res) => {
+  try {
+    if (req.user.plan === 'free') {
+      return res.status(403).json({ error: 'Bulk AI response generation requires a Pro or Business plan.', upgrade_required: true });
+    }
+
+    const { tone = 'professional' } = req.body;
+    const userRecord = await db.asyncGet('SELECT business_name, ai_persona FROM users WHERE id = ?', [req.user.id]);
+    const businessName = userRecord?.business_name || req.user.business_name || 'our business';
+    const persona = userRecord?.ai_persona || null;
+
+    const pending = await db.asyncAll(
+      `SELECT * FROM reviews WHERE user_id = ? AND (ai_response IS NULL OR ai_response = '')`,
+      [req.user.id]
+    );
+
+    if (!pending.length) {
+      return res.json({ success: true, generated: 0, message: 'All reviews already have responses' });
+    }
+
+    let generated = 0;
+    for (const review of pending.slice(0, 20)) {
+      try {
+        const response = await generateAIResponse(review, businessName, tone, persona);
+        await db.asyncRun(
+          `UPDATE reviews SET ai_response = ?, response_status = 'generated' WHERE id = ?`,
+          [response, review.id]
+        );
+        await db.asyncRun(
+          'INSERT INTO ai_generations (id, user_id, review_id, model) VALUES (?, ?, ?, ?)',
+          [generateId(), req.user.id, review.id, 'claude-sonnet-4-6']
+        );
+        generated++;
+      } catch (e) {
+        console.error('Bulk generate error for review', review.id, e.message);
+      }
+    }
+
+    res.json({ success: true, generated, message: `Generated responses for ${generated} of ${pending.length} pending reviews` });
+  } catch (err) {
+    console.error('Bulk generate error:', err);
+    res.status(500).json({ error: 'Bulk generation failed: ' + err.message });
   }
 });
 
@@ -228,13 +276,14 @@ function analyzeSentiment(text, rating) {
   return { sentiment, sentiment_score: sentimentScore, keywords };
 }
 
-async function generateAIResponse(review, businessName, tone, userId) {
+async function generateAIResponse(review, businessName, tone, persona) {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_API_KEY) return generateTemplateResponse(review, businessName);
 
   const toneMap = { professional: 'professional and courteous', friendly: 'warm and friendly', apologetic: 'empathetic and understanding', enthusiastic: 'enthusiastic and grateful' };
+  const personaContext = persona ? `\n\nBrand voice guidelines: ${persona}` : '';
 
-  const prompt = `You are a customer response specialist for ${businessName}. Write a ${toneMap[tone]||'professional'} response to this ${review.rating}-star review: "${review.review_text}". Keep it 80-150 words, address specific points, and sign off naturally. Respond with ONLY the response text.`;
+  const prompt = `You are a customer response specialist for ${businessName}. Write a ${toneMap[tone]||'professional'} response to this ${review.rating}-star review: "${review.review_text}". Keep it 80-150 words, address specific points, and sign off naturally.${personaContext} Respond with ONLY the response text.`;
 
   const response = await axios.post('https://api.anthropic.com/v1/messages', {
     model: 'claude-sonnet-4-6',
