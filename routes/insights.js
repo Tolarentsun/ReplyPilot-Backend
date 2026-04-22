@@ -139,4 +139,103 @@ function getDefaultInsights() {
   };
 }
 
+// Monthly insights report — Business plan only
+router.post('/monthly', authenticate, async (req, res) => {
+  try {
+    if (req.user.plan !== 'business') {
+      return res.status(403).json({ error: 'Monthly reports are a Business plan feature.', upgrade_required: true });
+    }
+
+    const userId = req.user.id;
+    const businessName = req.user.business_name || 'your business';
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    const monthLabel = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    const reviews = await db.asyncAll(
+      `SELECT * FROM reviews WHERE user_id = ? AND review_date >= ? AND review_date <= ? ORDER BY review_date DESC`,
+      [userId, monthStart, monthEnd]
+    );
+
+    const stats = await db.asyncGet(`
+      SELECT
+        COUNT(*) as total,
+        AVG(rating) as avg_rating,
+        SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive,
+        SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative,
+        SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral,
+        SUM(CASE WHEN response_status = 'responded' THEN 1 ELSE 0 END) as responded
+      FROM reviews WHERE user_id = ? AND review_date >= ? AND review_date <= ?
+    `, [userId, monthStart, monthEnd]);
+
+    const total = parseInt(stats?.total) || 0;
+
+    if (total === 0) {
+      return res.json({
+        success: true,
+        month: monthLabel,
+        stats: { total: 0, avg_rating: 0, positive: 0, negative: 0, neutral: 0, responded: 0, response_rate: 0 },
+        praise: [],
+        issues: [],
+        summary: `No reviews were recorded for ${businessName} in ${monthLabel}.`
+      });
+    }
+
+    const monthStats = {
+      total,
+      avg_rating: Math.round((parseFloat(stats.avg_rating) || 0) * 10) / 10,
+      positive: parseInt(stats.positive) || 0,
+      negative: parseInt(stats.negative) || 0,
+      neutral: parseInt(stats.neutral) || 0,
+      responded: parseInt(stats.responded) || 0,
+      response_rate: total > 0 ? Math.round(((parseInt(stats.responded) || 0) / total) * 100) : 0
+    };
+
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+    if (!ANTHROPIC_API_KEY) {
+      return res.json({ success: true, month: monthLabel, stats: monthStats, praise: ['Quality of service', 'Staff friendliness'], issues: ['Wait times', 'Inconsistency'], summary: `${businessName} received ${total} reviews in ${monthLabel} with an average rating of ${monthStats.avg_rating}/5.` });
+    }
+
+    const reviewText = reviews.map(r => `[${r.rating}★] "${r.review_text.substring(0, 150)}"`).join('\n');
+
+    const prompt = `You are a business analyst. Analyze these ${monthLabel} reviews for ${businessName}.
+
+Reviews this month:
+${reviewText}
+
+Stats: ${total} reviews, ${monthStats.avg_rating}/5 avg rating, ${monthStats.positive} positive, ${monthStats.negative} negative.
+
+Return ONLY a JSON object with this exact structure:
+{
+  "summary": "2-3 sentence executive summary of this month",
+  "praise": ["specific thing customers praised", "specific thing customers praised", "specific thing customers praised"],
+  "issues": ["specific issue customers raised", "specific issue customers raised", "specific issue customers raised"],
+  "top_keyword": "the single most mentioned topic this month",
+  "recommendation": "one specific actionable thing to do next month based on the feedback"
+}`;
+
+    const response = await axios.post('https://api.anthropic.com/v1/messages', {
+      model: 'claude-sonnet-4-6',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: prompt }]
+    }, {
+      headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' }
+    });
+
+    const aiText = response.data.content[0]?.text;
+    let aiData;
+    try {
+      aiData = JSON.parse(aiText.replace(/```json\n?|\n?```/g, '').trim());
+    } catch (e) {
+      aiData = { summary: `${businessName} received ${total} reviews in ${monthLabel}.`, praise: [], issues: [], top_keyword: '', recommendation: '' };
+    }
+
+    res.json({ success: true, month: monthLabel, stats: monthStats, ...aiData });
+  } catch (err) {
+    console.error('Monthly insights error:', err);
+    res.status(500).json({ error: 'Failed to generate monthly report' });
+  }
+});
+
 module.exports = router;

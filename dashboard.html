@@ -542,6 +542,9 @@
   <button class="nav-item" onclick="showTab('insights')" id="tab-insights">
     <span class="nav-icon">🧠</span> AI Insights
   </button>
+  <button class="nav-item" onclick="showTab('monthly')" id="tab-monthly">
+    <span class="nav-icon">📅</span> Monthly Report <span style="font-size:9px;background:var(--gold);color:white;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700">BIZ</span>
+  </button>
   <button class="nav-item" onclick="showTab('platforms')" id="tab-platforms">
     <span class="nav-icon">🔗</span> Platforms
   </button>
@@ -658,6 +661,81 @@
             🧠 Generate AI Insights Report
           </button>
           <p style="margin-top:16px; font-size:14px; color:var(--text-muted)">Analyzes all your reviews and provides strategic recommendations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MONTHLY REPORT TAB ===== -->
+    <div class="tab-content" id="content-monthly">
+      <div id="monthly-gate" style="display:none;text-align:center;padding:80px 40px">
+        <div style="font-size:48px;margin-bottom:16px">📅</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:12px">Monthly Reports</h2>
+        <p style="font-size:15px;color:var(--text-muted);max-width:400px;margin:0 auto 28px;line-height:1.7">Get a full breakdown of every month — what customers loved, what needs work, and your key stats. Business plan only.</p>
+        <button class="btn-primary" onclick="showTab('subscription')">Upgrade to Business →</button>
+      </div>
+      <div id="monthly-content" style="display:none;max-width:860px;display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--ink)" id="monthly-title">Monthly Report</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px">AI-powered analysis of this month's reviews</p>
+          </div>
+          <button class="btn-primary" onclick="generateMonthlyReport()" id="monthly-btn" style="padding:12px 28px">Generate This Month's Report</button>
+        </div>
+
+        <div id="monthly-report" style="display:none">
+          <!-- Stats row -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin-bottom:24px">
+            <div class="chart-card" style="text-align:center;padding:20px 16px">
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-total">—</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Reviews This Month</div>
+            </div>
+            <div class="chart-card" style="text-align:center;padding:20px 16px">
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-rating">—</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Avg Rating</div>
+            </div>
+            <div class="chart-card" style="text-align:center;padding:20px 16px">
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--positive)" id="m-positive">—</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Positive Reviews</div>
+            </div>
+            <div class="chart-card" style="text-align:center;padding:20px 16px">
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--negative)" id="m-negative">—</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Negative Reviews</div>
+            </div>
+            <div class="chart-card" style="text-align:center;padding:20px 16px">
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-response-rate">—</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Response Rate</div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="chart-card" style="margin-bottom:24px">
+            <div class="chart-title" style="margin-bottom:10px">Executive Summary</div>
+            <p style="font-size:14px;color:var(--text-muted);line-height:1.75" id="m-summary">—</p>
+          </div>
+
+          <!-- Praise + Issues -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+            <div class="chart-card">
+              <div class="chart-title" style="margin-bottom:16px;color:var(--positive)">👍 What Customers Praised</div>
+              <ul id="m-praise" style="list-style:none;display:flex;flex-direction:column;gap:10px"></ul>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title" style="margin-bottom:16px;color:var(--negative)">⚠️ Common Issues Raised</div>
+              <ul id="m-issues" style="list-style:none;display:flex;flex-direction:column;gap:10px"></ul>
+            </div>
+          </div>
+
+          <!-- Top topic + Recommendation -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div class="chart-card" style="background:var(--ink);color:white">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Top Topic This Month</div>
+              <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800" id="m-keyword">—</div>
+            </div>
+            <div class="chart-card" style="border:1.5px solid var(--gold)">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Recommendation for Next Month</div>
+              <p style="font-size:14px;color:var(--text);line-height:1.65" id="m-recommendation">—</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -996,10 +1074,11 @@
     document.getElementById('content-' + tab).classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
 
-    const titles = { overview: 'Dashboard Overview', reviews: 'Review Manager', insights: 'AI Insights', platforms: 'Platform Connections', subscription: 'Subscription', settings: 'Settings' };
+    const titles = { overview: 'Dashboard Overview', reviews: 'Review Manager', insights: 'AI Insights', monthly: 'Monthly Report', platforms: 'Platform Connections', subscription: 'Subscription', settings: 'Settings' };
     document.getElementById('topbar-title').textContent = titles[tab] || tab;
 
     if (tab === 'reviews') loadReviews();
+    if (tab === 'monthly') initMonthlyTab();
     if (tab === 'subscription') loadSubscriptionPlans();
     if (tab === 'settings') loadSettings();
     if (tab === 'platforms') loadGoogleStatus();
@@ -1281,6 +1360,53 @@
     if (rev && rev.ai_response) {
       navigator.clipboard.writeText(rev.ai_response);
       toast('📋 Response copied to clipboard!', 'success');
+    }
+  }
+
+  // ===== MONTHLY REPORT =====
+  function initMonthlyTab() {
+    const isBusiness = currentUser.plan === 'business';
+    document.getElementById('monthly-gate').style.display = isBusiness ? 'none' : 'block';
+    document.getElementById('monthly-content').style.display = isBusiness ? 'flex' : 'none';
+    const now = new Date();
+    document.getElementById('monthly-title').textContent = now.toLocaleString('default', { month: 'long', year: 'numeric' }) + ' Report';
+  }
+
+  async function generateMonthlyReport() {
+    const btn = document.getElementById('monthly-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    document.getElementById('monthly-report').style.display = 'none';
+    try {
+      const { data, ok } = await API.post('/api/insights/monthly', {});
+      if (!ok) { toast(data.error || 'Failed to generate report', 'error'); return; }
+
+      const s = data.stats;
+      document.getElementById('m-total').textContent = s.total;
+      document.getElementById('m-rating').textContent = s.avg_rating + '★';
+      document.getElementById('m-positive').textContent = s.positive;
+      document.getElementById('m-negative').textContent = s.negative;
+      document.getElementById('m-response-rate').textContent = s.response_rate + '%';
+      document.getElementById('m-summary').textContent = data.summary || '—';
+      document.getElementById('m-keyword').textContent = data.top_keyword || '—';
+      document.getElementById('m-recommendation').textContent = data.recommendation || '—';
+
+      const praiseEl = document.getElementById('m-praise');
+      praiseEl.innerHTML = (data.praise || []).map(p =>
+        `<li style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--positive);font-size:16px;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.5">${escHtml(p)}</span></li>`
+      ).join('') || '<li style="font-size:14px;color:var(--text-muted)">No specific praise identified this month.</li>';
+
+      const issuesEl = document.getElementById('m-issues');
+      issuesEl.innerHTML = (data.issues || []).map(i =>
+        `<li style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--negative);font-size:16px;flex-shrink:0">!</span><span style="font-size:14px;color:var(--text);line-height:1.5">${escHtml(i)}</span></li>`
+      ).join('') || '<li style="font-size:14px;color:var(--text-muted)">No recurring issues identified this month.</li>';
+
+      document.getElementById('monthly-report').style.display = 'block';
+    } catch (e) {
+      toast('Could not reach the server.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Generate This Month's Report";
     }
   }
 
