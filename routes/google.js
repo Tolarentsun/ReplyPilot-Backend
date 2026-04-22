@@ -248,9 +248,12 @@ async function syncGoogleReviews(userId, token, locationId) {
     let count = 0;
 
     for (const gr of reviews) {
+      // Use gr.name (full resource path) so we can POST replies via the API
+      const reviewResourceName = gr.name || gr.reviewId;
+
       // Check if already imported
       const existing = await db.asyncGet('SELECT id FROM reviews WHERE google_review_id = ? AND user_id = ?',
-        [gr.reviewId, userId]);
+        [reviewResourceName, userId]);
       if (existing) continue;
 
       const rating = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 }[gr.starRating] || 3;
@@ -263,7 +266,7 @@ async function syncGoogleReviews(userId, token, locationId) {
       await db.asyncRun(
         `INSERT INTO reviews (id, user_id, platform, reviewer_name, rating, review_text, review_date, sentiment, sentiment_score, keywords, source, google_review_id, response_status) VALUES (?, ?, 'google', ?, ?, ?, ?, ?, ?, ?, 'google_sync', ?, ?)`,
         [generateId(), userId, reviewerName, rating, reviewText, reviewDate, sentiment, sentiment_score,
-         JSON.stringify(keywords), gr.reviewId, gr.reviewReply ? 'responded' : 'pending']
+         JSON.stringify(keywords), reviewResourceName, gr.reviewReply ? 'responded' : 'pending']
       );
       count++;
     }
