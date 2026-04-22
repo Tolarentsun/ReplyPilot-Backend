@@ -1198,12 +1198,16 @@
           🔍 <strong>Business plan:</strong> Auto-post this response directly to Google in one click.
         </div>` : '');
 
+      const deleteBtnHtml = `<button class="btn-sm" style="background:none;border:1.5px solid #FECACA;color:#EF4444" onclick="deleteReview('${r.id}')">🗑 Delete</button>`;
+
       const actionBtns = r.ai_response
         ? `<button class="btn-sm btn-copy" onclick="copyResponse('${r.id}')">📋 Copy Response</button>
            ${canAutoPost && r.response_status !== 'responded' ? `<button class="btn-sm btn-generate" style="background:#1a73e8;color:white" onclick="postToGoogle('${r.id}')">🔍 Post to Google</button>` : ''}
            ${r.response_status !== 'responded' ? `<button class="btn-sm btn-responded" onclick="markResponded('${r.id}')">✓ Mark as Sent</button>` : '<span style="font-size:13px;color:var(--positive);font-weight:600">✓ Responded</span>'}
-           <button class="btn-sm" style="background:none;border:1.5px solid var(--mist);color:var(--text-muted)" onclick="generateResponse('${r.id}')">↺ Regenerate</button>`
-        : `<button class="btn-sm btn-generate" onclick="generateResponse('${r.id}')">✨ Generate AI Response</button>`;
+           <button class="btn-sm" style="background:none;border:1.5px solid var(--mist);color:var(--text-muted)" onclick="generateResponse('${r.id}')">↺ Regenerate</button>
+           ${deleteBtnHtml}`
+        : `<button class="btn-sm btn-generate" onclick="generateResponse('${r.id}')">✨ Generate AI Response</button>
+           ${deleteBtnHtml}`;
 
       return `
         <div class="review-card" id="card-${r.id}">
@@ -1638,6 +1642,18 @@
       loadOverview();
     } else {
       toast(data.error || 'Failed to delete reviews', 'error');
+    }
+  }
+
+  async function deleteReview(id) {
+    if (!confirm('Delete this review? This cannot be undone.')) return;
+    const { data, ok } = await API.delete(`/api/reviews/${id}`);
+    if (ok && data.success) {
+      allReviews = allReviews.filter(r => r.id !== id);
+      document.getElementById(`card-${id}`)?.remove();
+      toast('✓ Review deleted', 'success');
+    } else {
+      toast(data.error || 'Failed to delete review', 'error');
     }
   }
 
