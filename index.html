@@ -280,6 +280,7 @@
     <li><a href="#demo">Live Demo</a></li>
     <li><a href="#how">How It Works</a></li>
     <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
     <li><a href="login.html">Log In</a></li>
     <li><a href="register.html" class="nav-cta">Start Free Trial</a></li>
   </ul>
@@ -804,6 +805,86 @@
   </div>
 </section>
 
+<!-- FAQ -->
+<section style="padding:100px 60px;max-width:800px;margin:0 auto" id="faq">
+  <p class="section-label" style="text-align:center">FAQ</p>
+  <h2 class="section-title fade-up" style="text-align:center;margin-bottom:16px">Common questions</h2>
+  <p class="section-sub fade-up" style="text-align:center;margin:0 auto 56px">Everything you need to know before getting started.</p>
+
+  <div class="faq-list fade-up">
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What kind of businesses is ReplyPilot for?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">ReplyPilot is built for any local business that receives online reviews — restaurants, hotels, auto shops, retail stores, salons, clinics, and more. If customers are leaving reviews about your business, ReplyPilot can help you respond faster and smarter.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How does the AI response generation work?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">ReplyPilot uses Claude, Anthropic's AI, to read each review and write a professional, context-aware response. It considers the star rating, the reviewer's specific comments, and your business name. Business plan users can also add brand voice guidelines so every response sounds like your team wrote it.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Does it post replies directly to Google?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Yes — on the Business plan, you can post responses directly to your Google Business Profile in one click after connecting your Google account. On the Starter and Professional plans, you generate the response in ReplyPilot and paste it into Google yourself.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Is my Google account data safe?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Yes. ReplyPilot only requests read and reply access to your Google Business reviews — it cannot access other parts of your Google account. You can disconnect your Google account at any time from the Platforms tab in your dashboard, and we will immediately remove your stored credentials.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What's included in the free Starter plan?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">The free plan lets you add up to 25 reviews, run sentiment analysis on all of them, and generate up to 5 AI responses per month. It's a great way to try ReplyPilot with no commitment and no credit card required.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Can I cancel my subscription at any time?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Yes — you can cancel anytime from the Subscription tab in your dashboard. Your plan stays active until the end of the billing period. We also offer a full refund within 7 days of your first subscription payment if you're not satisfied.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What if I have more than one business location?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Managing multiple Google locations is a Business plan feature. After connecting your Google account, you can select which location to sync reviews from. Support for switching between locations is built into the Platforms tab of your dashboard.</div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .faq-list { display:flex; flex-direction:column; gap:0; border:1px solid var(--mist); border-radius:12px; overflow:hidden; }
+  .faq-item { border-bottom:1px solid var(--mist); }
+  .faq-item:last-child { border-bottom:none; }
+  .faq-q { width:100%; background:white; border:none; padding:22px 28px; display:flex; justify-content:space-between; align-items:center; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; text-align:left; gap:16px; transition:background 0.2s; }
+  .faq-q:hover { background:var(--cream); }
+  .faq-q.open { background:var(--cream); color:var(--gold); }
+  .faq-icon { font-size:20px; font-weight:300; flex-shrink:0; transition:transform 0.25s; color:var(--gold); }
+  .faq-q.open .faq-icon { transform:rotate(45deg); }
+  .faq-a { display:none; padding:0 28px 22px; font-size:14px; color:var(--text-muted); line-height:1.75; background:var(--cream); }
+  .faq-a.open { display:block; }
+</style>
+
 <!-- CTA -->
 <section class="cta-section">
   <p class="section-label" style="color:var(--gold)">Get Started Today</p>
@@ -844,6 +925,13 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
   document.querySelectorAll('.fade-up, .step').forEach(el => observer.observe(el));
+
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    document.querySelectorAll('.faq-q.open').forEach(b => { b.classList.remove('open'); b.nextElementSibling.classList.remove('open'); });
+    if (!isOpen) { btn.classList.add('open'); answer.classList.add('open'); }
+  }
 
   async function checkStatus() {
     try {
