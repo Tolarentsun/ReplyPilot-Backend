@@ -250,7 +250,9 @@
 
   <script src="config.js"></script>
   <script>
-    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+    const _planParam = new URLSearchParams(window.location.search).get('plan');
+    const _checkoutDest = _planParam ? `dashboard.html?checkout=${_planParam}` : 'dashboard.html';
+    if (Auth.isLoggedIn()) window.location.href = _checkoutDest;
 
     async function register() {
       const name = document.getElementById('name').value.trim();
@@ -273,7 +275,7 @@
         if (ok && data.success) {
           Auth.save(data.token, data.user);
           showMsg('✓ Account created! Setting up your dashboard...', 'success');
-          setTimeout(() => window.location.href = 'dashboard.html', 1200);
+          setTimeout(() => window.location.href = _checkoutDest, 1200);
         } else {
           showMsg('❌ ' + (data.error || 'Registration failed.'), 'error');
           btn.disabled = false;

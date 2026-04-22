@@ -1397,7 +1397,6 @@
   }
 
   async function upgradePlan(planId) {
-    if (!confirm(`Switch to the ${planId} plan?`)) return;
     const { data, ok } = await API.post('/api/subscriptions/checkout', { plan_id: planId });
     if (ok && data.success) {
       if (data.checkout_url) {
@@ -1596,6 +1595,11 @@
     if (params.get('upgraded')) {
       toast('✓ Subscription upgraded successfully!', 'success');
       history.replaceState({}, '', window.location.pathname);
+    }
+    if (params.get('checkout')) {
+      const plan = params.get('checkout');
+      history.replaceState({}, '', window.location.pathname);
+      upgradePlan(plan);
     }
   }
 
