@@ -66,8 +66,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/me', authenticate, (req, res) => {
-  const { password_hash, ...safeUser } = req.user;
+router.get('/me', authenticate, async (req, res) => {
+  const fresh = await db.asyncGet('SELECT * FROM users WHERE id = ?', [req.user.id]);
+  if (!fresh) return res.status(404).json({ error: 'User not found' });
+  const { password_hash, reset_token, reset_token_expires, ...safeUser } = fresh;
   res.json({ success: true, user: safeUser });
 });
 

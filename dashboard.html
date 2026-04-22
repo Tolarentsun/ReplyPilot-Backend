@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — ReplyPilot</title>
@@ -1719,8 +1727,14 @@
       history.replaceState({}, '', window.location.pathname);
     }
     if (params.get('upgraded')) {
-      toast('✓ Subscription upgraded successfully!', 'success');
       history.replaceState({}, '', window.location.pathname);
+      const { data, ok } = await API.get('/api/auth/me');
+      if (ok && data.user) {
+        currentUser = data.user;
+        Auth.save(Auth.getToken(), currentUser);
+        updateSidebar();
+      }
+      toast('✓ Subscription upgraded successfully!', 'success');
     }
     if (params.get('checkout')) {
       const plan = params.get('checkout');
