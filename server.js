@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -91,6 +91,11 @@ try {
   console.log('✅ Yelp routes loaded');
 } catch(e) { console.error('❌ Yelp routes failed:', e.message); }
 
+try {
+  app.use('/api/facebook', require('./routes/facebook'));
+  console.log('✅ Facebook routes loaded');
+} catch(e) { console.error('❌ Facebook routes failed:', e.message); }
+
 app.get('/api', (req, res) => {
   res.json({ message: 'ReplyPilot API v2.0' });
 });
@@ -145,3 +150,4 @@ try {
 } catch (e) {
   console.error('Cron setup failed:', e.message);
 }
+
