@@ -662,6 +662,7 @@
           <option value="highest">Highest Rating</option>
         </select>
         <button id="bulk-generate-btn" onclick="bulkGenerateResponses()" style="display:none;align-items:center;gap:6px;padding:10px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">⚡ Generate All</button>
+        <button onclick="exportCSV()" style="padding:10px 16px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--text);white-space:nowrap">⬇ Export CSV</button>
       </div>
       <div class="reviews-list" id="reviews-list">
         <div class="loading-spinner"><div class="spinner"></div>Loading reviews...</div>
@@ -872,6 +873,39 @@
             </select>
           </div>
           <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+
+        <!-- Notifications -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:6px">Email Notifications</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Get notified when new reviews come in so you can respond quickly</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;border:1.5px solid var(--mist);border-radius:10px">
+            <div>
+              <div style="font-weight:600;font-size:14px">New review alerts</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Email me when new reviews are synced from any connected platform</div>
+            </div>
+            <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0">
+              <input type="checkbox" id="notify-toggle" onchange="saveNotifyPref()" style="opacity:0;width:0;height:0">
+              <span onclick="document.getElementById('notify-toggle').click()" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:.2s" id="notify-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Review Request Link -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:6px">Review Request Link</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Share this link with customers to ask for a review. Paste your Google review URL below and we'll generate a clean shareable link.</p>
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Your Google Review URL</label>
+          <input id="review-request-url" type="url" placeholder="https://g.page/r/your-business/review" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif;margin-bottom:12px">
+          <button class="btn-primary" onclick="saveReviewRequestUrl()" style="margin-bottom:16px">Save Link</button>
+          <div id="review-request-preview" style="display:none;padding:14px;background:#F0F4FF;border-radius:10px;border:1.5px solid #C7D7F5">
+            <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px">Your shareable link:</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <code id="review-link-display" style="font-size:12px;background:white;padding:6px 10px;border-radius:6px;border:1px solid #C7D7F5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
+              <button onclick="copyReviewLink()" style="padding:7px 14px;background:var(--ink);color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">Copy</button>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Send this link via text, email, or receipt — customers click it and land directly on your Google review page.</div>
+          </div>
         </div>
 
         <!-- Preferences -->
@@ -1742,6 +1776,21 @@
     document.getElementById('settings-type').value = currentUser.business_type || '';
     setTone(selectedTone, false);
 
+    // Notification toggle
+    const toggle = document.getElementById('notify-toggle');
+    const slider = document.getElementById('notify-slider');
+    if (toggle && slider) {
+      toggle.checked = !!currentUser.notify_new_reviews;
+      slider.style.background = toggle.checked ? 'var(--ink)' : '#ccc';
+    }
+
+    // Review request link
+    const urlInput = document.getElementById('review-request-url');
+    if (urlInput && currentUser.review_request_url) {
+      urlInput.value = currentUser.review_request_url;
+      showReviewLinkPreview(currentUser.id);
+    }
+
     // Show AI persona section for Business plan only
     const personaSection = document.getElementById('persona-section');
     if (personaSection) {
@@ -1752,6 +1801,68 @@
         personaSection.style.display = 'none';
       }
     }
+  }
+
+  async function saveNotifyPref() {
+    const checked = document.getElementById('notify-toggle').checked;
+    document.getElementById('notify-slider').style.background = checked ? 'var(--ink)' : '#ccc';
+    const { data, ok } = await API.put('/api/auth/profile', { notify_new_reviews: checked });
+    if (ok) {
+      currentUser.notify_new_reviews = checked;
+      Auth.save(Auth.getToken(), currentUser);
+      toast(checked ? '✓ Review alerts enabled' : 'Review alerts disabled', 'success');
+    }
+  }
+
+  async function saveReviewRequestUrl() {
+    const url = document.getElementById('review-request-url').value.trim();
+    if (!url) { toast('Please enter your Google review URL', 'error'); return; }
+    const { data, ok } = await API.put('/api/auth/profile', { review_request_url: url });
+    if (ok && data.success) {
+      currentUser.review_request_url = url;
+      Auth.save(Auth.getToken(), currentUser);
+      showReviewLinkPreview(currentUser.id);
+      toast('✓ Review link saved!', 'success');
+    }
+  }
+
+  function showReviewLinkPreview(userId) {
+    const preview = document.getElementById('review-request-preview');
+    const display = document.getElementById('review-link-display');
+    if (preview && display) {
+      display.textContent = window.location.origin + '/r/' + userId;
+      preview.style.display = 'block';
+    }
+  }
+
+  function copyReviewLink() {
+    const link = document.getElementById('review-link-display').textContent;
+    navigator.clipboard.writeText(link);
+    toast('📋 Review link copied!', 'success');
+  }
+
+  function exportCSV() {
+    if (!allReviews || !allReviews.length) { toast('No reviews to export', 'error'); return; }
+    const headers = ['Date','Reviewer','Platform','Rating','Sentiment','Review','AI Response','Status'];
+    const rows = allReviews.map(r => [
+      r.review_date,
+      r.reviewer_name,
+      r.platform,
+      r.rating,
+      r.sentiment,
+      '"' + (r.review_text || '').replace(/"/g, '""') + '"',
+      '"' + (r.ai_response || '').replace(/"/g, '""') + '"',
+      r.response_status
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'replypilot-reviews-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('✓ Reviews exported!', 'success');
   }
 
   function setTone(tone, save = true) {
