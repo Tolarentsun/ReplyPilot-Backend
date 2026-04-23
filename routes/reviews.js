@@ -53,7 +53,8 @@ router.get('/analytics', authenticate, async (req, res) => {
         SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive_count,
         SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral_count,
         SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative_count,
-        SUM(CASE WHEN response_status = 'responded' THEN 1 ELSE 0 END) as responded_count
+        SUM(CASE WHEN response_status = 'responded' THEN 1 ELSE 0 END) as responded_count,
+        SUM(CASE WHEN response_status != 'responded' THEN 1 ELSE 0 END) as pending_count
       FROM reviews WHERE user_id = ?`, [uid]);
 
     const ratingDist = await db.asyncAll(
