@@ -6,8 +6,15 @@ const axios = require('axios');
 
 const YELP_API_KEY = process.env.YELP_API_KEY;
 
+function requireProOrBusiness(req, res, next) {
+  if (!['pro', 'business'].includes(req.user.plan)) {
+    return res.status(403).json({ error: 'Yelp auto-sync requires a Pro or Business plan.', upgrade_required: true });
+  }
+  next();
+}
+
 // Search for a business on Yelp
-router.get('/search', authenticate, async (req, res) => {
+router.get('/search', authenticate, requireProOrBusiness, async (req, res) => {
   try {
     if (!YELP_API_KEY) return res.status(500).json({ error: 'Yelp API not configured' });
 
@@ -36,77 +43,47 @@ router.get('/search', authenticate, async (req, res) => {
   }
 });
 
-// Get reviews for a business and sync to dashboard
-router.post('/sync/:businessId', authenticate, async (req, res) => {
+// Connect a business and do initial sync
+router.post('/connect/:businessId', authenticate, requireProOrBusiness, async (req, res) => {
   try {
     if (!YELP_API_KEY) return res.status(500).json({ error: 'Yelp API not configured' });
 
     const { businessId } = req.params;
     const { business_name } = req.body;
 
-    console.log('Syncing Yelp business ID:', businessId);
-
-    // Save yelp business ID to user
     await db.asyncRun(
       'UPDATE users SET yelp_business_id = ?, yelp_business_name = ? WHERE id = ?',
       [businessId, business_name || businessId, req.user.id]
     );
 
-    // Get reviews from Yelp
-    let reviews = [];
-    try {
-      const response = await axios.get(`https://api.yelp.com/v3/businesses/${businessId}/reviews`, {
-        headers: { Authorization: `Bearer ${YELP_API_KEY}` },
-        params: { limit: 20, sort_by: 'yelp_sort' }
-      });
-      reviews = response.data.reviews || [];
-    } catch (yelpErr) {
-      console.error('Yelp API error:', yelpErr.response?.data || yelpErr.message);
-      // Business was saved, just couldn't get reviews
-      return res.json({
-        success: true,
-        synced: 0,
-        message: 'Business connected! Yelp free API has limited review access.',
-        note: 'Yelp free API provides up to 3 reviews. All responses must be posted manually on Yelp.'
-      });
-    }
-
-    let count = 0;
-
-    for (const yr of reviews) {
-      const existing = await db.asyncGet(
-        'SELECT id FROM reviews WHERE yelp_review_id = ? AND user_id = ?',
-        [yr.id, req.user.id]
-      );
-      if (existing) continue;
-
-      const rating = yr.rating || 3;
-      const reviewText = yr.text || '(No comment provided)';
-      const reviewDate = yr.time_created ? yr.time_created.split(' ')[0] : new Date().toISOString().split('T')[0];
-      const reviewerName = yr.user?.name || 'Yelp Reviewer';
-
-      const { sentiment, sentiment_score, keywords } = analyzeSentiment(reviewText, rating);
-
-      await db.asyncRun(
-        `INSERT INTO reviews (id, user_id, platform, reviewer_name, rating, review_text, review_date, sentiment, sentiment_score, keywords, source, yelp_review_id, response_status)
-         VALUES (?, ?, 'yelp', ?, ?, ?, ?, ?, ?, ?, 'yelp_sync', ?, 'pending')`,
-        [generateId(), req.user.id, reviewerName, rating, reviewText, reviewDate,
-         sentiment, sentiment_score, JSON.stringify(keywords), yr.id]
-      );
-      count++;
-    }
+    const count = await syncYelpReviews(req.user.id, businessId);
 
     res.json({
       success: true,
       synced: count,
-      message: count > 0
-        ? `Synced ${count} new reviews from Yelp`
-        : 'Business connected! No new reviews to sync (Yelp free API only provides 3 reviews per business)',
-      note: 'Yelp free API provides up to 3 reviews. All responses must be posted manually on Yelp.'
+      message: count > 0 ? `Connected and synced ${count} reviews from Yelp` : 'Business connected! No reviews found yet.'
     });
   } catch (err) {
-    console.error('Yelp sync error:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to sync Yelp reviews: ' + err.message });
+    console.error('Yelp connect error:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Failed to connect Yelp: ' + err.message });
+  }
+});
+
+// Manual re-sync
+router.post('/sync', authenticate, requireProOrBusiness, async (req, res) => {
+  try {
+    const user = await db.asyncGet('SELECT yelp_business_id FROM users WHERE id = ?', [req.user.id]);
+    if (!user?.yelp_business_id) return res.status(400).json({ error: 'No Yelp business connected' });
+
+    const count = await syncYelpReviews(req.user.id, user.yelp_business_id);
+    res.json({
+      success: true,
+      synced: count,
+      message: count > 0 ? `Synced ${count} new review(s) from Yelp` : 'No new reviews since last sync'
+    });
+  } catch (err) {
+    console.error('Yelp sync error:', err.message);
+    res.status(500).json({ error: 'Failed to sync: ' + err.message });
   }
 });
 
@@ -133,6 +110,56 @@ router.post('/disconnect', authenticate, async (req, res) => {
   res.json({ success: true });
 });
 
+// Makes up to 3 API calls (offsets 0, 3, 6) to get up to 9 reviews
+async function syncYelpReviews(userId, businessId) {
+  if (!YELP_API_KEY || !businessId) return 0;
+
+  const offsets = [0, 3, 6];
+  const allReviews = [];
+
+  for (const offset of offsets) {
+    try {
+      const response = await axios.get(`https://api.yelp.com/v3/businesses/${businessId}/reviews`, {
+        headers: { Authorization: `Bearer ${YELP_API_KEY}` },
+        params: { limit: 3, offset, sort_by: 'yelp_sort' }
+      });
+      const batch = response.data.reviews || [];
+      allReviews.push(...batch);
+      // If Yelp returned fewer than 3, there are no more to fetch
+      if (batch.length < 3) break;
+    } catch (err) {
+      // If offset pagination fails (Yelp may block it on free tier), stop here
+      if (offset === 0) console.error('Yelp reviews fetch error:', err.response?.data || err.message);
+      break;
+    }
+  }
+
+  let count = 0;
+  for (const yr of allReviews) {
+    const existing = await db.asyncGet(
+      'SELECT id FROM reviews WHERE yelp_review_id = ? AND user_id = ?',
+      [yr.id, userId]
+    );
+    if (existing) continue;
+
+    const rating = yr.rating || 3;
+    const reviewText = yr.text || '(No comment provided)';
+    const reviewDate = yr.time_created ? yr.time_created.split(' ')[0] : new Date().toISOString().split('T')[0];
+    const reviewerName = yr.user?.name || 'Yelp Reviewer';
+    const { sentiment, sentiment_score, keywords } = analyzeSentiment(reviewText, rating);
+
+    await db.asyncRun(
+      `INSERT INTO reviews (id, user_id, platform, reviewer_name, rating, review_text, review_date, sentiment, sentiment_score, keywords, source, yelp_review_id, response_status)
+       VALUES (?, ?, 'yelp', ?, ?, ?, ?, ?, ?, ?, 'yelp_sync', ?, 'pending')`,
+      [generateId(), userId, reviewerName, rating, reviewText, reviewDate,
+       sentiment, sentiment_score, JSON.stringify(keywords), yr.id]
+    );
+    count++;
+  }
+
+  return count;
+}
+
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
@@ -151,3 +178,4 @@ function analyzeSentiment(text, rating) {
 }
 
 module.exports = router;
+module.exports.syncYelpReviews = syncYelpReviews;
