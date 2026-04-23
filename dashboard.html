@@ -1038,92 +1038,73 @@
 
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:6px">Platform Connections</div>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Connect your review platforms to enable automatic syncing and posting</p>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Add reviews manually from any platform — automation is coming soon</p>
 
           <!-- Google -->
-          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">🔍</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Google Business Profile</div>
-                  <div style="font-size:12px;color:var(--text-muted)" id="google-status-text">Not connected</div>
-                </div>
-              </div>
-              <div id="google-btn-area">
-                <button onclick="connectGoogle()" id="google-connect-btn" style="padding:10px 20px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Connect Google</button>
-              </div>
-            </div>
-            <div id="google-connected-panel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
-              <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <button onclick="syncGoogleReviews()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Sync Reviews Now</button>
-                <button onclick="disconnectGoogle()" style="padding:9px 18px;background:white;border:1.5px solid #FCA5A5;color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
-              </div>
-            </div>
-            <div style="margin-top:12px;padding:10px 14px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1D4ED8">
-              ✅ <strong>Fully automatic:</strong> Once connected, new Google reviews are pulled into your dashboard every 24 hours — no action needed. You can also sync manually at any time using the button above.
-            </div>
-          </div>
-
-          <!-- Yelp -->
-          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.7">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div style="display:flex;align-items:center;gap:14px">
-                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
-                <div>
-                  <div style="font-weight:700;font-size:15px">Yelp</div>
-                  <div style="font-size:12px;color:var(--text-muted)">Coming soon</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
                 </div>
               </div>
               <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
             </div>
-            <div style="margin-top:14px;font-size:13px;color:var(--text-muted);line-height:1.6">
-              Yelp review sync is in development. We're working on partner API access — check back soon.
-            </div>
             <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
-              💡 In the meantime, you can add Yelp reviews manually using the <strong>Add Review</strong> button in the Reviews tab — then use AI to generate a response and post it on Yelp yourself.
+              💡 Add Google reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste directly to Google.
             </div>
           </div>
 
           <!-- Facebook -->
-          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">👍</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Facebook Reviews</div>
-                  <div style="font-size:12px;color:var(--text-muted)" id="facebook-status-text">Not connected</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
                 </div>
               </div>
-              <div id="facebook-btn-area">
-                <button onclick="connectFacebook()" id="facebook-connect-btn" style="padding:10px 20px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Connect Facebook</button>
-              </div>
+              <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
             </div>
-            <div id="facebook-connected-panel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
-              <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <button onclick="syncFacebookReviews()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Sync Reviews Now</button>
-                <button onclick="disconnectFacebook()" style="padding:9px 18px;background:white;border:1.5px solid #FCA5A5;color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
-              </div>
+            <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
+              💡 Add Facebook reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste to your Facebook Page.
             </div>
-            <div style="margin-top:12px;padding:10px 14px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1D4ED8">
-              ℹ️ <strong>Note:</strong> Facebook's API does not support posting replies automatically. AI responses are generated for you to copy and post manually on your Facebook Page.
+          </div>
+
+          <!-- Yelp -->
+          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
+                <div>
+                  <div style="font-weight:700;font-size:15px">Yelp</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
+                </div>
+              </div>
+              <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
+            </div>
+            <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
+              💡 Add Yelp reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste to Yelp.
             </div>
           </div>
 
           <!-- TripAdvisor -->
-          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px">
+          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">✈️</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">TripAdvisor</div>
-                  <div style="font-size:12px;color:var(--text-muted)">Analysis only — no public API for posting</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Manual only</div>
                 </div>
               </div>
-              <span style="padding:6px 14px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">Not Available</span>
+              <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">MANUAL</span>
             </div>
-            <div style="margin-top:12px;padding:10px 14px;background:#F9FAFB;border-radius:8px;font-size:12px;color:#6B7280">
-              ℹ️ <strong>TripAdvisor does not provide a public API</strong> for review management. Add TripAdvisor reviews manually to get AI-generated responses you can copy and paste.
+            <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
+              💡 Add TripAdvisor reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste.
             </div>
           </div>
         </div>
@@ -1227,7 +1208,7 @@
     if (tab === 'monthly') initMonthlyTab();
     // subscription tab is static — no load needed
     if (tab === 'settings') loadSettings();
-    if (tab === 'platforms') { loadGoogleStatus(); loadYelpStatus(); loadFacebookStatus(); }
+    // platform cards are static — no API calls needed
     if (tab === 'insights') { loadRecommendations(); }
   }
 
