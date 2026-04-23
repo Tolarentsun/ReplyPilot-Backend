@@ -75,12 +75,20 @@ router.get('/me', authenticate, async (req, res) => {
 
 router.put('/profile', authenticate, async (req, res) => {
   try {
-    const { name, business_name, business_type, ai_persona } = req.body;
+    const { name, business_name, business_type, ai_persona, notify_new_reviews, review_request_url } = req.body;
     await db.asyncRun(
-      `UPDATE users SET name = ?, business_name = ?, business_type = ?, ai_persona = ? WHERE id = ?`,
-      [name || req.user.name, business_name || null, business_type || null, ai_persona !== undefined ? ai_persona : req.user.ai_persona, req.user.id]
+      `UPDATE users SET name = ?, business_name = ?, business_type = ?, ai_persona = ?, notify_new_reviews = ?, review_request_url = ? WHERE id = ?`,
+      [
+        name || req.user.name,
+        business_name !== undefined ? (business_name || null) : req.user.business_name,
+        business_type !== undefined ? (business_type || null) : req.user.business_type,
+        ai_persona !== undefined ? ai_persona : req.user.ai_persona,
+        notify_new_reviews !== undefined ? notify_new_reviews : req.user.notify_new_reviews,
+        review_request_url !== undefined ? (review_request_url || null) : req.user.review_request_url,
+        req.user.id
+      ]
     );
-    const updated = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, ai_persona FROM users WHERE id = ?', [req.user.id]);
+    const updated = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, ai_persona, notify_new_reviews, review_request_url FROM users WHERE id = ?', [req.user.id]);
     res.json({ success: true, user: updated });
   } catch (err) {
     res.status(500).json({ error: 'Profile update failed' });
