@@ -181,6 +181,48 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
   }
 });
 
+// Generate 3 response options for user to choose from
+router.post('/:id/generate-options', authenticate, async (req, res) => {
+  try {
+    const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+    if (!review) return res.status(404).json({ error: 'Review not found' });
+
+    if (req.user.plan === 'free') {
+      const monthStart = new Date();
+      monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+      const usedRow = await db.asyncGet(
+        'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
+        [req.user.id, monthStart.toISOString()]
+      );
+      if ((usedRow?.total || 0) >= 5) {
+        return res.status(403).json({ error: 'Free plan limit reached (5 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      }
+    }
+
+    const { tone = 'professional' } = req.body;
+    const userRecord = await db.asyncGet('SELECT business_name, ai_persona FROM users WHERE id = ?', [req.user.id]);
+    const businessName = userRecord?.business_name || req.user.business_name || 'our business';
+    const persona = userRecord?.ai_persona || null;
+
+    const [opt1, opt2, opt3] = await Promise.all([
+      generateAIResponse(review, businessName, tone, persona, 'concise'),
+      generateAIResponse(review, businessName, tone, persona, 'detailed'),
+      generateAIResponse(review, businessName, tone, persona, 'personal')
+    ]);
+
+    // Count as 1 generation event
+    await db.asyncRun(
+      'INSERT INTO ai_generations (id, user_id, review_id, model) VALUES (?, ?, ?, ?)',
+      [generateId(), req.user.id, review.id, 'claude-sonnet-4-6']
+    );
+
+    res.json({ success: true, options: [opt1, opt2, opt3].filter(Boolean) });
+  } catch (err) {
+    console.error('Generate options error:', err);
+    res.status(500).json({ error: 'Failed to generate options: ' + err.message });
+  }
+});
+
 // Mark as responded
 router.put('/:id/respond', authenticate, async (req, res) => {
   try {
@@ -276,18 +318,24 @@ function analyzeSentiment(text, rating) {
   return { sentiment, sentiment_score: sentimentScore, keywords };
 }
 
-async function generateAIResponse(review, businessName, tone, persona) {
+async function generateAIResponse(review, businessName, tone, persona, style = 'balanced') {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_API_KEY) return generateTemplateResponse(review, businessName);
 
   const toneMap = { professional: 'professional and courteous', friendly: 'warm and friendly', apologetic: 'empathetic and understanding', enthusiastic: 'enthusiastic and grateful' };
+  const styleGuide = {
+    concise: 'Keep it brief and punchy — 50-70 words max.',
+    detailed: 'Be thorough and address each point the reviewer raised — 120-160 words.',
+    personal: 'Be conversational and personal, as if speaking directly to them — 80-110 words.',
+    balanced: 'Keep it 80-150 words, address specific points, and sign off naturally.'
+  };
   const personaContext = persona ? `\n\nBrand voice guidelines: ${persona}` : '';
 
-  const prompt = `You are a customer response specialist for ${businessName}. Write a ${toneMap[tone]||'professional'} response to this ${review.rating}-star review: "${review.review_text}". Keep it 80-150 words, address specific points, and sign off naturally.${personaContext} Respond with ONLY the response text.`;
+  const prompt = `You are a customer response specialist for ${businessName}. Write a ${toneMap[tone]||'professional'} response to this ${review.rating}-star review: "${review.review_text}". ${styleGuide[style]||styleGuide.balanced}${personaContext} Respond with ONLY the response text.`;
 
   const response = await axios.post('https://api.anthropic.com/v1/messages', {
     model: 'claude-sonnet-4-6',
-    max_tokens: 300,
+    max_tokens: 350,
     messages: [{ role: 'user', content: prompt }]
   }, { headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' } });
 
