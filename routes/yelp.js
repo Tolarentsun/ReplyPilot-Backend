@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const axios = require('axios');
+const { sendEmail, newReviewEmail } = require('./email');
 
 const YELP_API_KEY = process.env.YELP_API_KEY;
 
@@ -76,6 +77,9 @@ router.post('/sync', authenticate, requireProOrBusiness, async (req, res) => {
     if (!user?.yelp_business_id) return res.status(400).json({ error: 'No Yelp business connected' });
 
     const count = await syncYelpReviews(req.user.id, user.yelp_business_id);
+    if (count > 0 && req.user.notify_new_reviews) {
+      sendEmail({ to: req.user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail(req.user.name, count, 'yelp') }).catch(() => {});
+    }
     res.json({
       success: true,
       synced: count,
