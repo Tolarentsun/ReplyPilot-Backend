@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+﻿const { Pool } = require('pg');
 
 let pool = null;
 
@@ -87,6 +87,11 @@ async function initSchema() {
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yelp_business_id TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yelp_business_name TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS ai_persona TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS facebook_connected BOOLEAN DEFAULT false');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS facebook_access_token TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS facebook_page_id TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS facebook_page_name TEXT');
+      await client.query('ALTER TABLE reviews ADD COLUMN IF NOT EXISTS facebook_review_id TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TEXT');
     } catch(e) {}
@@ -225,3 +230,4 @@ const db = {
 };
 
 module.exports = db;
+
