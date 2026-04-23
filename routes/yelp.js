@@ -117,6 +117,7 @@ router.post('/disconnect', authenticate, async (req, res) => {
 // Makes up to 3 API calls (offsets 0, 3, 6) to get up to 9 reviews
 async function syncYelpReviews(userId, businessId) {
   if (!YELP_API_KEY || !businessId) return 0;
+  console.log(`[Yelp] Syncing reviews for business ID: ${businessId}`);
 
   const offsets = [0, 3, 6];
   const allReviews = [];
