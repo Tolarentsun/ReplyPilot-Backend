@@ -94,6 +94,8 @@ async function initSchema() {
       await client.query('ALTER TABLE reviews ADD COLUMN IF NOT EXISTS facebook_review_id TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS notify_new_reviews BOOLEAN DEFAULT false');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS review_request_url TEXT');
     } catch(e) {}
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {
