@@ -29,7 +29,7 @@ function welcomeEmail(name) {
     <p style="font-size:15px;color:#6B6878;line-height:1.7;margin-bottom:24px">Your ReplyPilot account is ready. Start by adding your first review — the AI will analyze it, score the sentiment, and generate a professional response in seconds.</p>
     <a href="${BASE_URL}/dashboard.html" style="display:inline-block;background:#0A0A0F;color:white;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:15px;margin-bottom:32px">Go to Dashboard →</a>
     <hr style="border:none;border-top:1px solid #E8E4DC;margin-bottom:24px">
-    <p style="font-size:13px;color:#6B6878;line-height:1.6">You're on the free Starter plan — up to 25 reviews and 5 AI responses per month. Upgrade anytime from your dashboard. Questions? Reply to this email.</p>
+    <p style="font-size:13px;color:#6B6878;line-height:1.6">You're on the free Starter plan — up to 50 reviews and 20 AI responses per month. Upgrade anytime from your dashboard. Questions? Reply to this email.</p>
     <p style="font-size:12px;color:#9CA3AF;margin-top:24px">© 2025 ReplyPilot · <a href="${BASE_URL}/privacy.html" style="color:#9CA3AF">Privacy</a> · <a href="${BASE_URL}/terms.html" style="color:#9CA3AF">Terms</a></p>
   </div>`;
 }
