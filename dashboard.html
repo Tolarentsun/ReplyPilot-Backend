@@ -831,22 +831,48 @@
     </div>
 
     <div class="tab-content" id="content-subscription">
-      <div class="chart-card" style="margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div class="chart-title">Your Current Plan</div>
-          <p style="margin-top:8px; font-size:14px; color:var(--text-muted)">Manage your subscription and billing</p>
+      <div style="max-width:680px;margin:0 auto;padding:20px 0">
+
+        <!-- Current plan banner -->
+        <div class="chart-card" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <div class="chart-title">Your Plan: Free</div>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:6px">50 reviews · 20 AI responses/month · All core features included</p>
+          </div>
+          <span style="padding:6px 16px;background:#D1FAE5;color:#065F46;border-radius:20px;font-size:12px;font-weight:700">ACTIVE</span>
         </div>
-        <div style="display:flex; gap:12px;">
-          <button onclick="openBillingPortal()" style="padding:10px 20px; background:white; border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:DM Sans,sans-serif; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--ink)'" onmouseout="this.style.borderColor='var(--border)'">
-            💳 Manage Billing
-          </button>
-          <button onclick="cancelSubscription()" id="cancel-sub-btn" style="padding:10px 20px; background:white; border:1.5px solid #FCA5A5; color:var(--negative); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:DM Sans,sans-serif; display:none;">
-            Cancel Subscription
-          </button>
+
+        <!-- Coming soon card -->
+        <div style="border:1.5px solid var(--gold);border-radius:14px;padding:40px;text-align:center;background:linear-gradient(135deg,#FFFBF0 0%,#FFF8E7 100%)">
+          <div style="font-size:42px;margin-bottom:16px">🚀</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:10px">Pro & Business plans coming soon</h2>
+          <p style="font-size:14px;color:var(--text-muted);max-width:460px;margin:0 auto 28px;line-height:1.7">We're putting the finishing touches on our paid plans — including Google & Facebook auto-sync, unlimited reviews, bulk AI responses, and monthly reports. You'll be notified as soon as they launch.</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px;margin:0 auto 32px;text-align:left">
+            <div style="background:white;border-radius:10px;padding:18px;border:1.5px solid var(--border)">
+              <div style="font-weight:700;font-size:15px;margin-bottom:10px">Pro <span style="font-size:12px;color:var(--text-muted);font-weight:400">— coming soon</span></div>
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
+                ✓ Unlimited reviews<br>
+                ✓ Unlimited AI responses<br>
+                ✓ Google auto-sync<br>
+                ✓ Bulk AI generation<br>
+                ✓ Priority support
+              </div>
+            </div>
+            <div style="background:white;border-radius:10px;padding:18px;border:1.5px solid var(--border)">
+              <div style="font-weight:700;font-size:15px;margin-bottom:10px">Business <span style="font-size:12px;color:var(--text-muted);font-weight:400">— coming soon</span></div>
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
+                ✓ Everything in Pro<br>
+                ✓ Facebook auto-sync<br>
+                ✓ Auto-post to Google<br>
+                ✓ Monthly AI reports<br>
+                ✓ Multiple locations
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:12px;color:var(--text-muted)">Questions? Contact us at <a href="mailto:RPCS@reply-pilot.net" style="color:var(--ink);font-weight:600">RPCS@reply-pilot.net</a></p>
         </div>
-      </div>
-      <div class="plan-cards" id="plan-cards">
-        <div class="loading-spinner" style="grid-column:1/-1"><div class="spinner"></div></div>
       </div>
     </div>
 
@@ -1113,11 +1139,12 @@
 <div class="modal-overlay" id="upgrade-modal">
   <div class="modal" style="max-width:420px;text-align:center">
     <div style="font-size:48px;margin-bottom:16px">🚀</div>
-    <h2 class="modal-title">Upgrade Your Plan</h2>
-    <p class="modal-sub" id="upgrade-modal-msg" style="margin-bottom:28px">Upgrade to access this feature.</p>
+    <h2 class="modal-title">Coming Soon</h2>
+    <p class="modal-sub" id="upgrade-modal-msg" style="margin-bottom:8px">This feature is part of our Pro & Business plans, which are launching soon.</p>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:28px">Have questions? Reach us at <a href="mailto:RPCS@reply-pilot.net" style="color:var(--ink);font-weight:600">RPCS@reply-pilot.net</a></p>
     <div style="display:flex;flex-direction:column;gap:12px">
-      <button class="btn-primary" onclick="showTab('subscription');closeUpgradeModal()" style="width:100%">View Plans & Pricing</button>
-      <button style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif;padding:8px" onclick="closeUpgradeModal()">Maybe later</button>
+      <button class="btn-primary" onclick="showTab('subscription');closeUpgradeModal()" style="width:100%">See What's Coming</button>
+      <button style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif;padding:8px" onclick="closeUpgradeModal()">Got it</button>
     </div>
   </div>
 </div>
@@ -1198,7 +1225,7 @@
 
     if (tab === 'reviews') loadReviews();
     if (tab === 'monthly') initMonthlyTab();
-    if (tab === 'subscription') loadSubscriptionPlans();
+    // subscription tab is static — no load needed
     if (tab === 'settings') loadSettings();
     if (tab === 'platforms') { loadGoogleStatus(); loadYelpStatus(); loadFacebookStatus(); }
     if (tab === 'insights') { loadRecommendations(); }
