@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const axios = require('axios');
+const { sendEmail, newReviewEmail } = require('./email');
 
 const FB_APP_ID = process.env.FACEBOOK_APP_ID;
 const FB_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
@@ -112,6 +113,9 @@ router.post('/sync', authenticate, async (req, res) => {
     }
 
     const count = await syncFacebookReviews(user.id, user.facebook_access_token, user.facebook_page_id);
+    if (count > 0 && user.notify_new_reviews) {
+      sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail(user.name, count, 'facebook') }).catch(() => {});
+    }
     res.json({
       success: true,
       synced: count,
