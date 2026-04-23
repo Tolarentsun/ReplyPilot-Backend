@@ -87,11 +87,6 @@ try {
 } catch(e) { console.error('❌ Google routes failed:', e.message); }
 
 try {
-  app.use('/api/yelp', require('./routes/yelp'));
-  console.log('✅ Yelp routes loaded');
-} catch(e) { console.error('❌ Yelp routes failed:', e.message); }
-
-try {
   app.use('/api/facebook', require('./routes/facebook'));
   console.log('✅ Facebook routes loaded');
 } catch(e) { console.error('❌ Facebook routes failed:', e.message); }
@@ -171,42 +166,4 @@ try {
   console.error('Cron setup failed:', e.message);
 }
 
-// Daily Yelp review sync — runs at 3:30am UTC every day (Pro + Business users)
-try {
-  const cron = require('node-cron');
-  const db = require('./db/database');
-  const { syncYelpReviews } = require('./routes/yelp');
-  const { sendEmail: sendEmail2, newReviewEmail: newReviewEmail2 } = require('./routes/email');
-
-  cron.schedule('30 3 * * *', async () => {
-    console.log('[Cron] Starting daily Yelp review sync...');
-    try {
-      const users = await db.asyncAll(
-        "SELECT * FROM users WHERE yelp_business_id IS NOT NULL AND plan IN ('pro', 'business')",
-        []
-      );
-      console.log(`[Cron] Syncing Yelp for ${users.length} account(s)`);
-      for (const user of users) {
-        try {
-          const count = await syncYelpReviews(user.id, user.yelp_business_id);
-          if (count > 0) {
-            console.log(`[Cron] Yelp ${user.email}: synced ${count} new review(s)`);
-            if (user.notify_new_reviews) {
-              sendEmail2({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail2(user.name, count, 'yelp') }).catch(() => {});
-            }
-          }
-        } catch (e) {
-          console.error(`[Cron] Yelp failed for ${user.email}:`, e.message);
-        }
-      }
-      console.log('[Cron] Daily Yelp sync complete');
-    } catch (e) {
-      console.error('[Cron] Yelp sync job error:', e.message);
-    }
-  });
-
-  console.log('✅ Daily Yelp sync scheduled (3:30am UTC)');
-} catch (e) {
-  console.error('Yelp cron setup failed:', e.message);
-}
 
