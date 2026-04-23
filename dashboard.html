@@ -1047,7 +1047,7 @@
             <div id="yelp-search-panel" style="display:none;margin-top:16px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
                 <div style="font-size:13px;color:var(--text-muted)">Search for your business to connect it:</div>
-                <button onclick="document.getElementById('yelp-search-panel').style.display='none';document.getElementById('yelp-results').innerHTML=''" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer;line-height:1;padding:0 2px" title="Close">✕</button>
+                <button onclick="hideYelpSearch()" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer;line-height:1;padding:0 2px" title="Close">✕</button>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <input id="yelp-search-term" type="text" placeholder="Business name" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
@@ -1967,6 +1967,16 @@
     if (ri) ri.innerHTML = '';
     document.getElementById('yelp-search-term').value = '';
     document.getElementById('yelp-search-location').value = '';
+    document.getElementById('yelp-btn-area').innerHTML = '';
+  }
+
+  function hideYelpSearch() {
+    document.getElementById('yelp-search-panel').style.display = 'none';
+    document.getElementById('yelp-results').innerHTML = '';
+    const btnArea = document.getElementById('yelp-btn-area');
+    if (btnArea && !document.getElementById('yelp-connected-panel').style.display.includes('block')) {
+      btnArea.innerHTML = '<button onclick="showYelpSearch()" style="padding:7px 16px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">+ Connect</button>';
+    }
   }
 
   async function searchYelp() {
