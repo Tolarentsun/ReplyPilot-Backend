@@ -61,4 +61,19 @@ function subscriptionEmail(name, plan) {
   </div>`;
 }
 
-module.exports = { sendEmail, welcomeEmail, passwordResetEmail, subscriptionEmail };
+function newReviewEmail(name, count, platform) {
+  const platformLabel = platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : 'your platforms';
+  const plural = count === 1 ? 'review' : 'reviews';
+  return `
+  <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#FAF8F4;padding:40px 32px;border-radius:12px">
+    <div style="font-family:Georgia,serif;font-size:26px;font-weight:800;color:#0A0A0F;margin-bottom:24px">Reply<span style="color:#E8922A">Pilot</span></div>
+    <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:800;color:#0A0A0F;margin-bottom:12px">You have ${count} new ${plural} 🔔</h1>
+    <p style="font-size:15px;color:#6B6878;line-height:1.7;margin-bottom:8px">Hi ${name}, <strong>${count} new ${plural}</strong> just came in from ${platformLabel}. Head to your dashboard to view and respond before they get missed.</p>
+    <a href="${BASE_URL}/dashboard.html" style="display:inline-block;background:#0A0A0F;color:white;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:15px;margin:24px 0 32px">View Reviews →</a>
+    <hr style="border:none;border-top:1px solid #E8E4DC;margin-bottom:24px">
+    <p style="font-size:13px;color:#6B6878">Responding quickly to reviews — especially negative ones — builds trust and improves your search ranking. ReplyPilot's AI can generate a response in seconds.</p>
+    <p style="font-size:12px;color:#9CA3AF;margin-top:24px">© 2025 ReplyPilot · <a href="${BASE_URL}/dashboard.html#settings" style="color:#9CA3AF">Manage notifications</a> · <a href="${BASE_URL}/privacy.html" style="color:#9CA3AF">Privacy</a></p>
+  </div>`;
+}
+
+module.exports = { sendEmail, welcomeEmail, passwordResetEmail, subscriptionEmail, newReviewEmail };
