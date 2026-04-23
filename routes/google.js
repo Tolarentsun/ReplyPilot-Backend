@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const axios = require('axios');
+const { sendEmail, newReviewEmail } = require('./email');
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -102,6 +103,9 @@ router.post('/sync', authenticate, async (req, res) => {
 
     const token = await refreshTokenIfNeeded(user);
     const count = await syncGoogleReviews(user.id, token, user.google_location_id);
+    if (count > 0 && user.notify_new_reviews) {
+      sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail(user.name, count, 'google') }).catch(() => {});
+    }
     res.json({ success: true, synced: count, message: `Synced ${count} reviews from Google` });
   } catch (err) {
     console.error('Sync error:', err.message);
