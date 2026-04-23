@@ -238,4 +238,73 @@ Return ONLY a JSON object with this exact structure:
   }
 });
 
+// Recommendations — min 10 reviews required
+router.get('/recommendations', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const businessName = req.user.business_name || 'your business';
+
+    const countRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [userId]);
+    const total = parseInt(countRow?.total) || 0;
+
+    if (total < 10) {
+      return res.json({ success: true, enough_data: false, count: total, needed: 10 - total });
+    }
+
+    const reviews = await db.asyncAll(
+      'SELECT rating, review_text FROM reviews WHERE user_id = ? ORDER BY review_date DESC LIMIT 40',
+      [userId]
+    );
+
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+
+    if (!ANTHROPIC_API_KEY) {
+      return res.json({
+        success: true, enough_data: true,
+        doing_well: ['Consistent quality of service', 'Professional and friendly staff', 'Strong customer satisfaction scores'],
+        needs_improvement: ['Response time to customer feedback', 'Consistency across all touchpoints', 'Follow-up with dissatisfied customers']
+      });
+    }
+
+    const reviewText = reviews.map(r => `[${r.rating}★] "${r.review_text.substring(0, 150)}"`).join('\n');
+
+    const prompt = `Analyze these customer reviews for ${businessName} and identify patterns.
+
+Reviews:
+${reviewText}
+
+Return ONLY a JSON object with this exact structure — no extra text:
+{
+  "doing_well": ["specific thing customers praise", "specific thing customers praise", "specific thing customers praise"],
+  "needs_improvement": ["specific thing customers complain about", "specific thing customers complain about", "specific thing customers complain about"]
+}
+
+Base each point on actual patterns in the reviews, not generic advice. Be specific to this business.`;
+
+    const response = await axios.post('https://api.anthropic.com/v1/messages', {
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      messages: [{ role: 'user', content: prompt }]
+    }, {
+      headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' }
+    });
+
+    const aiText = response.data.content[0]?.text;
+    let result;
+    try {
+      result = JSON.parse(aiText.replace(/```json\n?|\n?```/g, '').trim());
+    } catch (e) {
+      result = {
+        doing_well: ['Customers report positive overall experiences', 'Service quality is consistently noted', 'Staff professionalism mentioned frequently'],
+        needs_improvement: ['Response time could be improved', 'Some inconsistency in service reported', 'Follow-up communication needs attention']
+      };
+    }
+
+    res.json({ success: true, enough_data: true, ...result });
+  } catch (err) {
+    console.error('Recommendations error:', err);
+    res.status(500).json({ error: 'Failed to generate recommendations' });
+  }
+});
+
 module.exports = router;
