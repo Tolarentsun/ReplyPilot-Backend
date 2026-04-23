@@ -151,3 +151,36 @@ try {
   console.error('Cron setup failed:', e.message);
 }
 
+// Daily Yelp review sync — runs at 3:30am UTC every day (Pro + Business users)
+try {
+  const cron = require('node-cron');
+  const db = require('./db/database');
+  const { syncYelpReviews } = require('./routes/yelp');
+
+  cron.schedule('30 3 * * *', async () => {
+    console.log('[Cron] Starting daily Yelp review sync...');
+    try {
+      const users = await db.asyncAll(
+        "SELECT * FROM users WHERE yelp_business_id IS NOT NULL AND plan IN ('pro', 'business')",
+        []
+      );
+      console.log(`[Cron] Syncing Yelp for ${users.length} account(s)`);
+      for (const user of users) {
+        try {
+          const count = await syncYelpReviews(user.id, user.yelp_business_id);
+          if (count > 0) console.log(`[Cron] Yelp ${user.email}: synced ${count} new review(s)`);
+        } catch (e) {
+          console.error(`[Cron] Yelp failed for ${user.email}:`, e.message);
+        }
+      }
+      console.log('[Cron] Daily Yelp sync complete');
+    } catch (e) {
+      console.error('[Cron] Yelp sync job error:', e.message);
+    }
+  });
+
+  console.log('✅ Daily Yelp sync scheduled (3:30am UTC)');
+} catch (e) {
+  console.error('Yelp cron setup failed:', e.message);
+}
+
