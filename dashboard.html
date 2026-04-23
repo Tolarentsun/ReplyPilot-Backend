@@ -1025,49 +1025,19 @@
           </div>
 
           <!-- Yelp -->
-          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.7">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Yelp</div>
-                  <div style="font-size:12px;color:var(--text-muted)" id="yelp-status-text">Auto-sync — Pro &amp; Business</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Coming soon</div>
                 </div>
               </div>
-              <div id="yelp-btn-area"></div>
+              <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
             </div>
-
-            <!-- Free plan gate -->
-            <div id="yelp-upgrade-panel" style="display:none;margin-top:16px;padding:14px;background:#FEF9EC;border-radius:10px;border:1.5px solid #FDE68A;font-size:13px;color:#92400E">
-              🔒 Yelp auto-sync is available on <strong>Pro and Business</strong> plans. Upgrade to automatically pull in new Yelp reviews every day.
-              <br><button onclick="showTab('subscription')" style="margin-top:10px;padding:8px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">View Plans</button>
-            </div>
-
-            <!-- Search panel (pro/business) -->
-            <div id="yelp-search-panel" style="display:none;margin-top:16px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                <div style="font-size:13px;color:var(--text-muted)">Search for your business to connect it:</div>
-                <button onclick="hideYelpSearch()" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer;line-height:1;padding:0 2px" title="Close">✕</button>
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <input id="yelp-search-term" type="text" placeholder="Business name" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
-                <input id="yelp-search-location" type="text" placeholder="City, State" style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
-                <button onclick="searchYelp()" style="padding:9px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Search</button>
-              </div>
-              <div id="yelp-results" style="margin-top:12px"></div>
-            </div>
-
-            <!-- Connected panel -->
-            <div id="yelp-connected-panel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--mist)">
-              <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <button onclick="syncYelp()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Sync Reviews Now</button>
-                <button onclick="showYelpSearch()" style="padding:9px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Change Business</button>
-                <button onclick="disconnectYelp()" style="padding:9px 18px;background:white;border:1.5px solid #FCA5A5;color:var(--negative);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
-              </div>
-            </div>
-
-            <div style="margin-top:12px;padding:10px 14px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1D4ED8">
-              ℹ️ Reviews sync automatically every day. Yelp does not support posting replies via API — use AI to generate a response, then post it manually on Yelp.
+            <div style="margin-top:14px;font-size:13px;color:var(--text-muted);line-height:1.6">
+              Yelp review sync is in development. We're working on partner API access — check back soon.
             </div>
           </div>
 
