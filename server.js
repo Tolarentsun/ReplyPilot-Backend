@@ -100,6 +100,20 @@ app.get('/api', (req, res) => {
   res.json({ message: 'ReplyPilot API v2.0' });
 });
 
+// Review request redirect — /r/:userId redirects to the user's configured review URL
+app.get('/r/:userId', async (req, res) => {
+  try {
+    const db = require('./db/database');
+    const user = await db.asyncGet('SELECT review_request_url FROM users WHERE id = ?', [req.params.userId]);
+    if (user?.review_request_url) {
+      return res.redirect(user.review_request_url);
+    }
+    res.redirect('/');
+  } catch (e) {
+    res.redirect('/');
+  }
+});
+
 app.use((req, res) => {
   if (req.accepts('html') && !req.path.startsWith('/api/')) {
     return res.status(404).sendFile(path.join(__dirname, '404.html'));
@@ -121,6 +135,7 @@ try {
   const cron = require('node-cron');
   const db = require('./db/database');
   const { syncGoogleReviews, refreshTokenIfNeeded } = require('./routes/google');
+  const { sendEmail, newReviewEmail } = require('./routes/email');
 
   cron.schedule('0 3 * * *', async () => {
     console.log('[Cron] Starting daily Google review sync...');
@@ -135,7 +150,12 @@ try {
         try {
           const token = await refreshTokenIfNeeded(user);
           const count = await syncGoogleReviews(user.id, token, user.google_location_id);
-          if (count > 0) console.log(`[Cron] ${user.email}: synced ${count} new review(s)`);
+          if (count > 0) {
+            console.log(`[Cron] ${user.email}: synced ${count} new review(s)`);
+            if (user.notify_new_reviews) {
+              sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail(user.name, count, 'google') }).catch(() => {});
+            }
+          }
         } catch (e) {
           console.error(`[Cron] Failed for ${user.email}:`, e.message);
         }
@@ -156,6 +176,7 @@ try {
   const cron = require('node-cron');
   const db = require('./db/database');
   const { syncYelpReviews } = require('./routes/yelp');
+  const { sendEmail: sendEmail2, newReviewEmail: newReviewEmail2 } = require('./routes/email');
 
   cron.schedule('30 3 * * *', async () => {
     console.log('[Cron] Starting daily Yelp review sync...');
@@ -168,7 +189,12 @@ try {
       for (const user of users) {
         try {
           const count = await syncYelpReviews(user.id, user.yelp_business_id);
-          if (count > 0) console.log(`[Cron] Yelp ${user.email}: synced ${count} new review(s)`);
+          if (count > 0) {
+            console.log(`[Cron] Yelp ${user.email}: synced ${count} new review(s)`);
+            if (user.notify_new_reviews) {
+              sendEmail2({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail2(user.name, count, 'yelp') }).catch(() => {});
+            }
+          }
         } catch (e) {
           console.error(`[Cron] Yelp failed for ${user.email}:`, e.message);
         }
