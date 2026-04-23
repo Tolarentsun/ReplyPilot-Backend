@@ -114,8 +114,8 @@ router.post('/', authenticate, async (req, res) => {
     // Enforce free plan review limit
     if (req.user.plan === 'free') {
       const countRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [req.user.id]);
-      if ((countRow?.total || 0) >= 25) {
-        return res.status(403).json({ error: 'Free plan limit reached (25 reviews). Upgrade to Pro for unlimited reviews.', upgrade_required: true });
+      if ((countRow?.total || 0) >= 50) {
+        return res.status(403).json({ error: 'Free plan limit reached (50 reviews). Upgrade to Pro for unlimited reviews.', upgrade_required: true });
       }
     }
 
@@ -156,8 +156,8 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
         'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
         [req.user.id, monthStart.toISOString()]
       );
-      if ((usedRow?.total || 0) >= 5) {
-        return res.status(403).json({ error: 'Free plan limit reached (5 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      if ((usedRow?.total || 0) >= 20) {
+        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
       }
     }
 
@@ -195,8 +195,8 @@ router.post('/:id/generate-options', authenticate, async (req, res) => {
         'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
         [req.user.id, monthStart.toISOString()]
       );
-      if ((usedRow?.total || 0) >= 5) {
-        return res.status(403).json({ error: 'Free plan limit reached (5 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      if ((usedRow?.total || 0) >= 20) {
+        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
       }
     }
 
@@ -240,10 +240,6 @@ router.put('/:id/respond', authenticate, async (req, res) => {
 // Bulk generate AI responses (Pro/Business only)
 router.post('/bulk-generate', authenticate, async (req, res) => {
   try {
-    if (req.user.plan === 'free') {
-      return res.status(403).json({ error: 'Bulk AI response generation requires a Pro or Business plan.', upgrade_required: true });
-    }
-
     const { tone = 'professional' } = req.body;
     const userRecord = await db.asyncGet('SELECT business_name, ai_persona FROM users WHERE id = ?', [req.user.id]);
     const businessName = userRecord?.business_name || req.user.business_name || 'our business';
