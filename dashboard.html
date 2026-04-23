@@ -690,12 +690,7 @@
       </div>
 
       <div id="insights-content">
-        <div style="text-align:center; padding:40px">
-          <button class="btn-primary" style="padding:14px 32px; font-size:15px" onclick="generateInsights()">
-            🧠 Generate Full AI Insights Report
-          </button>
-          <p style="margin-top:16px; font-size:14px; color:var(--text-muted)">Deep analysis with health score, themes, and action plan</p>
-        </div>
+        <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px">Loading...</div>
       </div>
     </div>
 
@@ -1366,7 +1361,7 @@
     // subscription tab is static — no load needed
     if (tab === 'settings') loadSettings();
     // platform cards are static — no API calls needed
-    if (tab === 'insights') { loadRecommendations(); }
+    if (tab === 'insights') { loadRecommendations(); initInsightsSection(); }
   }
 
   // ===== OVERVIEW =====
@@ -1829,6 +1824,51 @@
     }
   }
 
+  async function initInsightsSection() {
+    const el = document.getElementById('insights-content');
+    try {
+      const { data, ok } = await API.get('/api/reviews/analytics');
+      const total = data?.total_reviews || 0;
+      if (!ok || total < 10) {
+        const count = total;
+        const needed = Math.max(0, 10 - count);
+        const pct = Math.round((count / 10) * 100);
+        el.innerHTML = `
+          <div style="text-align:center;padding:48px 24px">
+            <div style="font-size:40px;margin-bottom:14px">🔒</div>
+            <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:var(--ink);margin-bottom:8px">
+              ${needed > 0 ? `Add ${needed} more review${needed === 1 ? '' : 's'} to unlock` : 'Almost there!'}
+            </div>
+            <p style="font-size:14px;color:var(--text-muted);max-width:380px;margin:0 auto 24px;line-height:1.7">
+              The full AI Insights Report needs at least <strong>10 reviews</strong> to generate meaningful analysis — health score, action items, customer themes, and benchmarks.
+            </p>
+            <div style="background:var(--mist);border-radius:100px;height:10px;max-width:300px;margin:0 auto">
+              <div style="background:var(--gold);height:10px;border-radius:100px;width:${pct}%;transition:width 0.5s ease"></div>
+            </div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:10px">${count} of 10 reviews</div>
+            <div style="margin-top:24px">
+              <button class="btn-primary" onclick="showTab('reviews')" style="padding:11px 28px;font-size:14px">+ Add Reviews</button>
+            </div>
+          </div>`;
+      } else {
+        el.innerHTML = `
+          <div style="text-align:center;padding:40px">
+            <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="generateInsights()">
+              🧠 Generate Full AI Insights Report
+            </button>
+            <p style="margin-top:16px;font-size:14px;color:var(--text-muted)">Deep analysis with health score, themes, and action plan — based on your ${total} reviews</p>
+          </div>`;
+      }
+    } catch(e) {
+      el.innerHTML = `
+        <div style="text-align:center;padding:40px">
+          <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="generateInsights()">
+            🧠 Generate Full AI Insights Report
+          </button>
+        </div>`;
+    }
+  }
+
   async function generateInsights() {
     document.getElementById('insights-content').innerHTML = '<div class="loading-spinner"><div class="spinner"></div>Analyzing your reviews with AI...</div>';
     try {
@@ -1844,15 +1884,29 @@
   }
 
   function renderInsights(ins) {
-    const healthColor = { 'Excellent': 'var(--positive)', 'Good': 'var(--gold)', 'Needs Attention': 'var(--neutral)', 'Critical': 'var(--negative)' }[ins.overall_health] || 'var(--gold)';
+    const healthColor = { 'Excellent': '#16A34A', 'Good': '#D97706', 'Needs Attention': '#F59E0B', 'Critical': '#DC2626' }[ins.overall_health] || '#D97706';
+    const score = Math.min(100, Math.max(0, ins.health_score || 0));
+    const r = 42, circ = 2 * Math.PI * r;
+    const offset = circ * (1 - score / 100);
     document.getElementById('insights-content').innerHTML = `
       <div class="insights-grid">
         <div class="insight-card">
           <div class="insight-title">Reputation Health Score</div>
           <div class="health-score">
-            <div class="score-circle" style="border-color:${healthColor}">
-              <div class="score-num" style="color:${healthColor}">${ins.health_score}</div>
-              <div class="score-max">/100</div>
+            <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="${r}" fill="none" stroke="#E8E4DC" stroke-width="8"/>
+                <circle id="score-ring" cx="50" cy="50" r="${r}" fill="none" stroke="${healthColor}" stroke-width="8"
+                  stroke-linecap="round"
+                  stroke-dasharray="${circ.toFixed(1)}"
+                  stroke-dashoffset="${circ.toFixed(1)}"
+                  transform="rotate(-90 50 50)"
+                  style="transition:stroke-dashoffset 1s ease"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:${healthColor};line-height:1">${score}</div>
+                <div style="font-size:10px;color:var(--text-muted)">/100</div>
+              </div>
             </div>
             <div>
               <div class="health-status" style="color:${healthColor}">${ins.overall_health}</div>
@@ -1898,6 +1952,11 @@
       <div style="text-align:center;margin-top:12px">
         <button class="btn-primary" onclick="generateInsights()">↺ Refresh Insights</button>
       </div>`;
+    // Animate the ring after render
+    requestAnimationFrame(() => {
+      const ring = document.getElementById('score-ring');
+      if (ring) ring.style.strokeDashoffset = offset.toFixed(1);
+    });
   }
 
   // ===== SUBSCRIPTION =====
