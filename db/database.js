@@ -96,6 +96,10 @@ async function initSchema() {
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TEXT');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS notify_new_reviews BOOLEAN DEFAULT false');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS review_request_url TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_count INTEGER DEFAULT 0');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_reviews INTEGER DEFAULT 0');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_responses INTEGER DEFAULT 0');
     } catch(e) {}
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {
