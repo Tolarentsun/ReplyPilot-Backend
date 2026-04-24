@@ -104,7 +104,7 @@ router.post('/sync', authenticate, async (req, res) => {
     const token = await refreshTokenIfNeeded(user);
     const count = await syncGoogleReviews(user.id, token, user.google_location_id);
     if (count > 0 && user.notify_new_reviews) {
-      sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, html: newReviewEmail(user.name, count, 'google') }).catch(() => {});
+      sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, ...newReviewEmail(user.name, count, 'google') }).catch(() => {});
     }
     res.json({ success: true, synced: count, message: `Synced ${count} reviews from Google` });
   } catch (err) {
@@ -197,6 +197,24 @@ router.post('/location', authenticate, async (req, res) => {
   }
 });
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function apiCallWithRetry(fn, label = 'Google API', retries = 3) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (err.response?.status === 429 && attempt < retries) {
+        const delay = Math.pow(2, attempt) * 1500; // 1.5s, 3s, 6s
+        console.log(`[Google] 429 on ${label}, retry ${attempt + 1}/${retries} in ${delay}ms`);
+        await sleep(delay);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 // Helper: refresh token if expired
 async function refreshTokenIfNeeded(user) {
   if (!user.google_refresh_token) return user.google_access_token;
@@ -220,15 +238,21 @@ async function syncGoogleReviews(userId, token, locationId) {
   if (!locationId) {
     // Try to get first location
     try {
-      const accountsRes = await axios.get('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const accountsRes = await apiCallWithRetry(
+        () => axios.get('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        'list accounts'
+      );
       const accounts = accountsRes.data.accounts || [];
       if (!accounts.length) return 0;
 
-      const locRes = await axios.get(
-        `https://mybusinessbusinessinformation.googleapis.com/v1/${accounts[0].name}/locations?readMask=name,title`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const locRes = await apiCallWithRetry(
+        () => axios.get(
+          `https://mybusinessbusinessinformation.googleapis.com/v1/${accounts[0].name}/locations?readMask=name,title`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        ),
+        'list locations'
       );
       const locs = locRes.data.locations || [];
       if (!locs.length) return 0;
@@ -243,9 +267,12 @@ async function syncGoogleReviews(userId, token, locationId) {
   }
 
   try {
-    const reviewsRes = await axios.get(
-      `https://mybusinessreviews.googleapis.com/v1/${locationId}/reviews?pageSize=50`,
-      { headers: { Authorization: `Bearer ${token}` } }
+    const reviewsRes = await apiCallWithRetry(
+      () => axios.get(
+        `https://mybusinessreviews.googleapis.com/v1/${locationId}/reviews?pageSize=50`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      ),
+      'fetch reviews'
     );
 
     const reviews = reviewsRes.data.reviews || [];
