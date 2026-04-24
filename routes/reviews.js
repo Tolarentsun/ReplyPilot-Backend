@@ -43,6 +43,31 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
+// Quota usage
+router.get('/quota', authenticate, async (req, res) => {
+  try {
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+    const [reviewRow, aiRow] = await Promise.all([
+      db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [req.user.id]),
+      db.asyncGet('SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?', [req.user.id, monthStart.toISOString()])
+    ]);
+    const bonusReviews = req.user.referral_bonus_reviews || 0;
+    const bonusResponses = req.user.referral_bonus_responses || 0;
+    res.json({
+      success: true,
+      reviews_used: parseInt(reviewRow?.total) || 0,
+      reviews_limit: 50 + bonusReviews,
+      ai_used: parseInt(aiRow?.total) || 0,
+      ai_limit: 20 + bonusResponses,
+      referral_count: req.user.referral_count || 0,
+      bonus_reviews: bonusReviews,
+      bonus_responses: bonusResponses
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch quota' });
+  }
+});
+
 // Analytics
 router.get('/analytics', authenticate, async (req, res) => {
   try {
@@ -111,11 +136,13 @@ router.post('/', authenticate, async (req, res) => {
     const { reviewer_name, rating, review_text, platform, review_date } = req.body;
     if (!reviewer_name || !rating || !review_text) return res.status(400).json({ error: 'reviewer_name, rating, and review_text are required' });
 
-    // Enforce free plan review limit
+    // Enforce free plan review limit (base 50 + referral bonus)
     if (req.user.plan === 'free') {
       const countRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [req.user.id]);
-      if ((countRow?.total || 0) >= 50) {
-        return res.status(403).json({ error: 'Free plan limit reached (50 reviews). Upgrade to Pro for unlimited reviews.', upgrade_required: true });
+      const bonusReviews = req.user.referral_bonus_reviews || 0;
+      const reviewLimit = 50 + bonusReviews;
+      if ((countRow?.total || 0) >= reviewLimit) {
+        return res.status(403).json({ error: `Free plan limit reached (${reviewLimit} reviews). Refer friends to earn more or upgrade when available.`, upgrade_required: true });
       }
     }
 
@@ -148,7 +175,7 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
     const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
     if (!review) return res.status(404).json({ error: 'Review not found' });
 
-    // Enforce free plan AI response limit (5 per month)
+    // Enforce free plan AI response limit (base 20/month + referral bonus)
     if (req.user.plan === 'free') {
       const monthStart = new Date();
       monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
@@ -156,8 +183,10 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
         'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
         [req.user.id, monthStart.toISOString()]
       );
-      if ((usedRow?.total || 0) >= 20) {
-        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      const bonusResponses = req.user.referral_bonus_responses || 0;
+      const responseLimit = 20 + bonusResponses;
+      if ((usedRow?.total || 0) >= responseLimit) {
+        return res.status(403).json({ error: `Free plan limit reached (${responseLimit} AI responses/month). Refer friends to earn more or upgrade when available.`, upgrade_required: true });
       }
     }
 
@@ -195,8 +224,10 @@ router.post('/:id/generate-options', authenticate, async (req, res) => {
         'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
         [req.user.id, monthStart.toISOString()]
       );
-      if ((usedRow?.total || 0) >= 20) {
-        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      const bonusResponses = req.user.referral_bonus_responses || 0;
+      const responseLimit = 20 + bonusResponses;
+      if ((usedRow?.total || 0) >= responseLimit) {
+        return res.status(403).json({ error: `Free plan limit reached (${responseLimit} AI responses/month). Refer friends to earn more or upgrade when available.`, upgrade_required: true });
       }
     }
 
