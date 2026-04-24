@@ -6,7 +6,9 @@ const crypto = require('crypto');
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const { seedDemoReviews } = require('../db/seedData');
-const { sendEmail, welcomeEmail, passwordResetEmail } = require('./email');
+const { sendEmail, welcomeEmail, passwordResetEmail, newSignupEmail } = require('./email');
+
+const ADMIN_EMAIL = 'Christophersw1011@gmail.com';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'replypilot-secret-change-in-production';
 
@@ -16,27 +18,43 @@ function generateId() {
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, business_name, business_type } = req.body;
+    const { name, email, password, business_name, business_type, ref } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
     const existing = await db.asyncGet('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
+    // Validate referrer
+    let referrerId = null;
+    if (ref) {
+      const referrer = await db.asyncGet('SELECT id FROM users WHERE id = ?', [ref]);
+      if (referrer) referrerId = referrer.id;
+    }
+
     const id = generateId();
     const passwordHash = await bcrypt.hash(password, 12);
 
     await db.asyncRun(
-      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan) VALUES (?, ?, ?, ?, ?, ?, 'free')`,
-      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null]
+      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by) VALUES (?, ?, ?, ?, ?, ?, 'free', ?)`,
+      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, referrerId]
     );
+
+    // Credit referrer with 15 bonus reviews + 15 bonus responses
+    if (referrerId) {
+      await db.asyncRun(
+        `UPDATE users SET referral_bonus_reviews = referral_bonus_reviews + 15, referral_bonus_responses = referral_bonus_responses + 15, referral_count = referral_count + 1 WHERE id = ?`,
+        [referrerId]
+      );
+    }
 
     await seedDemoReviews(id);
 
-    const user = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, created_at FROM users WHERE id = ?', [id]);
+    const user = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, referral_count, referral_bonus_reviews, referral_bonus_responses, created_at FROM users WHERE id = ?', [id]);
     const token = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
 
-    sendEmail({ to: email, subject: 'Welcome to ReplyPilot', html: welcomeEmail(name) }).catch(() => {});
+    sendEmail({ to: email, subject: 'Welcome to ReplyPilot', ...welcomeEmail(name) }).catch(() => {});
+    sendEmail({ to: ADMIN_EMAIL, subject: `New signup: ${name}`, ...newSignupEmail(name, email) }).catch(() => {});
 
     res.json({ success: true, token, user });
   } catch (err) {
@@ -70,6 +88,9 @@ router.get('/me', authenticate, async (req, res) => {
   const fresh = await db.asyncGet('SELECT * FROM users WHERE id = ?', [req.user.id]);
   if (!fresh) return res.status(404).json({ error: 'User not found' });
   const { password_hash, reset_token, reset_token_expires, ...safeUser } = fresh;
+  safeUser.referral_count = safeUser.referral_count || 0;
+  safeUser.referral_bonus_reviews = safeUser.referral_bonus_reviews || 0;
+  safeUser.referral_bonus_responses = safeUser.referral_bonus_responses || 0;
   res.json({ success: true, user: safeUser });
 });
 
@@ -127,7 +148,7 @@ router.post('/forgot-password', async (req, res) => {
 
     await db.asyncRun('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [token, expires, user.id]);
 
-    await sendEmail({ to: user.email, subject: 'Reset your ReplyPilot password', html: passwordResetEmail(user.name, token) });
+    await sendEmail({ to: user.email, subject: 'Reset your ReplyPilot password', ...passwordResetEmail(user.name, token) });
 
     res.json({ success: true });
   } catch (err) {
