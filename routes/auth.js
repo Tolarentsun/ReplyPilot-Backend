@@ -40,12 +40,15 @@ router.post('/register', async (req, res) => {
       [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, referrerId]
     );
 
-    // Credit referrer with 15 bonus reviews + 15 bonus responses
+    // Credit referrer with 15 bonus reviews + 15 bonus responses (max 5 referrals)
     if (referrerId) {
-      await db.asyncRun(
-        `UPDATE users SET referral_bonus_reviews = referral_bonus_reviews + 15, referral_bonus_responses = referral_bonus_responses + 15, referral_count = referral_count + 1 WHERE id = ?`,
-        [referrerId]
-      );
+      const referrer = await db.asyncGet('SELECT referral_count FROM users WHERE id = ?', [referrerId]);
+      if ((referrer?.referral_count || 0) < 5) {
+        await db.asyncRun(
+          `UPDATE users SET referral_bonus_reviews = referral_bonus_reviews + 15, referral_bonus_responses = referral_bonus_responses + 15, referral_count = referral_count + 1 WHERE id = ?`,
+          [referrerId]
+        );
+      }
     }
 
     await seedDemoReviews(id);
