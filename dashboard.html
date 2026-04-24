@@ -15,7 +15,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard â€” ReplyPilot</title>
+  <title>Dashboard — ReplyPilot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -482,7 +482,7 @@
     .plan-period { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
     .plan-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
     .plan-feature { display: flex; gap: 10px; font-size: 14px; color: var(--text); align-items: flex-start; }
-    .plan-feature::before { content: 'âœ“'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+    .plan-feature::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
     .btn-plan { width: 100%; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: 1.5px solid var(--ink); background: none; color: var(--ink); }
     .btn-plan:hover { background: var(--ink); color: white; }
     .btn-plan.active-plan { background: var(--ink); color: white; cursor: default; }
@@ -545,34 +545,34 @@
 
   <span class="nav-section-label">Main</span>
   <button class="nav-item active" onclick="showTab('overview')" id="tab-overview">
-    <span class="nav-icon">ðŸ“Š</span> Overview
+    <span class="nav-icon">&#x1F4CA;</span> Overview
   </button>
   <button class="nav-item" onclick="showTab('reviews')" id="tab-reviews">
-    <span class="nav-icon">ðŸ“</span> Reviews
+    <span class="nav-icon">&#x1F4DD;</span> Reviews
   </button>
   <button class="nav-item" onclick="showTab('insights')" id="tab-insights">
-    <span class="nav-icon">ðŸ§ </span> AI Insights
+    <span class="nav-icon">&#x1F9E0;</span> AI Insights
   </button>
   <button class="nav-item" onclick="showTab('monthly')" id="tab-monthly">
-    <span class="nav-icon">ðŸ“…</span> Monthly Report <span style="font-size:9px;background:#9CA3AF;color:white;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700">SOON</span>
+    <span class="nav-icon">&#x1F4C5;</span> Monthly Report <span style="font-size:9px;background:#9CA3AF;color:white;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700">SOON</span>
   </button>
   <button class="nav-item" onclick="showTab('platforms')" id="tab-platforms">
-    <span class="nav-icon">ðŸ”—</span> Platforms
+    <span class="nav-icon">&#x1F517;</span> Platforms
   </button>
 
   <button class="nav-item" onclick="showTab('founder')" id="tab-founder">
-    <span class="nav-icon">âœ‰ï¸</span> From the Founder
+    <span class="nav-icon">&#x2709;&#xFE0F;</span> From the Founder
   </button>
   <button class="nav-item" onclick="showTab('roadmap')" id="tab-roadmap">
-    <span class="nav-icon">ðŸ—ºï¸</span> What's Coming
+    <span class="nav-icon">&#x1F5FA;&#xFE0F;</span> What's Coming
   </button>
 
   <span class="nav-section-label">Account</span>
   <button class="nav-item" onclick="showTab('subscription')" id="tab-subscription">
-    <span class="nav-icon">ðŸ’Ž</span> Subscription
+    <span class="nav-icon">&#x1F48E;</span> Subscription
   </button>
   <button class="nav-item" onclick="showTab('settings')" id="tab-settings">
-    <span class="nav-icon">âš™ï¸</span> Settings
+    <span class="nav-icon">&#x2699;&#xFE0F;</span> Settings
   </button>
 
   <div class="sidebar-bottom">
@@ -580,7 +580,7 @@
       <div class="user-name" id="sidebar-user-name">Loading...</div>
       <div class="user-plan" id="sidebar-user-plan">Free Plan</div>
     </div>
-    <button class="btn-logout" onclick="Auth.logout()">â† Log Out</button>
+    <button class="btn-logout" onclick="Auth.logout()">← Log Out</button>
   </div>
 </nav>
 
@@ -637,7 +637,7 @@
     <!-- ===== REVIEWS TAB ===== -->
     <div class="tab-content" id="content-reviews">
       <div class="reviews-controls">
-        <input type="text" class="search-input" placeholder="ðŸ” Search reviews..." id="review-search" oninput="filterReviews()">
+        <input type="text" class="search-input" placeholder="🔍 Search reviews..." id="review-search" oninput="filterReviews()">
         <select class="filter-select" id="filter-platform" onchange="loadReviews()">
           <option value="all">All Platforms</option>
           <option value="google">Google</option>
@@ -664,8 +664,8 @@
           <option value="lowest">Lowest Rating</option>
           <option value="highest">Highest Rating</option>
         </select>
-        <button id="bulk-generate-btn" onclick="bulkGenerateResponses()" style="display:none;align-items:center;gap:6px;padding:10px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">âš¡ Generate All</button>
-        <button onclick="exportCSV()" style="padding:10px 16px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--text);white-space:nowrap">â¬‡ Export CSV</button>
+        <button id="bulk-generate-btn" onclick="bulkGenerateResponses()" style="display:none;align-items:center;gap:6px;padding:10px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">⚡ Generate All</button>
+        <button onclick="exportCSV()" style="padding:10px 16px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--text);white-space:nowrap">⬇ Export CSV</button>
       </div>
       <div class="reviews-list" id="reviews-list">
         <div class="loading-spinner"><div class="spinner"></div>Loading reviews...</div>
@@ -675,14 +675,14 @@
     <!-- ===== INSIGHTS TAB ===== -->
     <div class="tab-content" id="content-insights">
 
-      <!-- Recommendations card â€” auto-loads -->
+      <!-- Recommendations card — auto-loads -->
       <div style="border:1.5px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
           <div>
             <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:var(--ink)">Business Recommendations</div>
             <div style="font-size:13px;color:var(--text-muted);margin-top:2px">Based on patterns across your reviews</div>
           </div>
-          <button onclick="loadRecommendations()" style="padding:8px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">â†º Refresh</button>
+          <button onclick="loadRecommendations()" style="padding:8px 18px;background:white;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">↺ Refresh</button>
         </div>
         <div id="recommendations-content">
           <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Loading...</div>
@@ -697,10 +697,10 @@
     <!-- ===== MONTHLY REPORT TAB ===== -->
     <div class="tab-content" id="content-monthly">
       <div id="monthly-gate" style="display:none;text-align:center;padding:80px 40px">
-        <div style="font-size:48px;margin-bottom:16px">ðŸ“…</div>
+        <div style="font-size:48px;margin-bottom:16px">📅</div>
         <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:12px">Monthly Reports</h2>
-        <p style="font-size:15px;color:var(--text-muted);max-width:420px;margin:0 auto 20px;line-height:1.7">Get a full monthly breakdown â€” what customers praised, recurring issues, your response rate, and one tailored recommendation for the month ahead.</p>
-        <div style="display:inline-block;background:#F5F3EE;border:1px solid #E8E4DC;border-radius:10px;padding:14px 28px;font-size:14px;font-weight:700;color:#6B6878;margin-bottom:16px">ðŸš€ Coming Soon â€” Business Plan</div>
+        <p style="font-size:15px;color:var(--text-muted);max-width:420px;margin:0 auto 20px;line-height:1.7">Get a full monthly breakdown — what customers praised, recurring issues, your response rate, and one tailored recommendation for the month ahead.</p>
+        <div style="display:inline-block;background:#F5F3EE;border:1px solid #E8E4DC;border-radius:10px;padding:14px 28px;font-size:14px;font-weight:700;color:#6B6878;margin-bottom:16px">🚀 Coming Soon — Business Plan</div>
         <p style="font-size:13px;color:#9CA3AF;max-width:360px;margin:0 auto">Monthly Reports will be available when paid plans launch. You'll be the first to know.</p>
       </div>
       <div id="monthly-content" style="display:none;max-width:860px;display:flex;flex-direction:column;gap:24px">
@@ -716,23 +716,23 @@
           <!-- Stats row -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin-bottom:24px">
             <div class="chart-card" style="text-align:center;padding:20px 16px">
-              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-total">â€”</div>
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-total">—</div>
               <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Reviews This Month</div>
             </div>
             <div class="chart-card" style="text-align:center;padding:20px 16px">
-              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-rating">â€”</div>
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-rating">—</div>
               <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Avg Rating</div>
             </div>
             <div class="chart-card" style="text-align:center;padding:20px 16px">
-              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--positive)" id="m-positive">â€”</div>
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--positive)" id="m-positive">—</div>
               <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Positive Reviews</div>
             </div>
             <div class="chart-card" style="text-align:center;padding:20px 16px">
-              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--negative)" id="m-negative">â€”</div>
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--negative)" id="m-negative">—</div>
               <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Negative Reviews</div>
             </div>
             <div class="chart-card" style="text-align:center;padding:20px 16px">
-              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-response-rate">â€”</div>
+              <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink)" id="m-response-rate">—</div>
               <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Response Rate</div>
             </div>
           </div>
@@ -740,17 +740,17 @@
           <!-- Summary -->
           <div class="chart-card" style="margin-bottom:24px">
             <div class="chart-title" style="margin-bottom:10px">Executive Summary</div>
-            <p style="font-size:14px;color:var(--text-muted);line-height:1.75" id="m-summary">â€”</p>
+            <p style="font-size:14px;color:var(--text-muted);line-height:1.75" id="m-summary">—</p>
           </div>
 
           <!-- Praise + Issues -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
             <div class="chart-card">
-              <div class="chart-title" style="margin-bottom:16px;color:var(--positive)">ðŸ‘ What Customers Praised</div>
+              <div class="chart-title" style="margin-bottom:16px;color:var(--positive)">👍 What Customers Praised</div>
               <ul id="m-praise" style="list-style:none;display:flex;flex-direction:column;gap:10px"></ul>
             </div>
             <div class="chart-card">
-              <div class="chart-title" style="margin-bottom:16px;color:var(--negative)">âš ï¸ Common Issues Raised</div>
+              <div class="chart-title" style="margin-bottom:16px;color:var(--negative)">⚠️ Common Issues Raised</div>
               <ul id="m-issues" style="list-style:none;display:flex;flex-direction:column;gap:10px"></ul>
             </div>
           </div>
@@ -759,11 +759,11 @@
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
             <div class="chart-card" style="background:var(--ink);color:white">
               <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Top Topic This Month</div>
-              <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800" id="m-keyword">â€”</div>
+              <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800" id="m-keyword">—</div>
             </div>
             <div class="chart-card" style="border:1.5px solid var(--gold)">
               <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Recommendation for Next Month</div>
-              <p style="font-size:14px;color:var(--text);line-height:1.65" id="m-recommendation">â€”</p>
+              <p style="font-size:14px;color:var(--text);line-height:1.65" id="m-recommendation">—</p>
             </div>
           </div>
         </div>
@@ -780,10 +780,10 @@
 
           <!-- Header -->
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:32px">
-            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1B4080,#0D2040);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">ðŸ§­</div>
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1B4080,#0D2040);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🧭</div>
             <div>
               <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--ink)">A Message from the Founder</div>
-              <div style="font-size:13px;color:var(--text-muted);margin-top:3px">Christopher â€” Founder of ReplyPilot</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:3px">Christopher — Founder of ReplyPilot</div>
             </div>
           </div>
 
@@ -792,19 +792,19 @@
             <p style="margin:0 0 18px 0">To our ReplyPilot community,</p>
 
             <p style="margin:0 0 18px 0">
-              First and foremost â€” <strong>thank you</strong>. Choosing ReplyPilot means you've trusted us with something that matters deeply to your business: your reputation and your relationship with your customers. That trust is something we don't take lightly.
+              First and foremost — <strong>thank you</strong>. Choosing ReplyPilot means you've trusted us with something that matters deeply to your business: your reputation and your relationship with your customers. That trust is something we don't take lightly.
             </p>
 
             <p style="margin:0 0 18px 0">
-              I built ReplyPilot because I believe every business â€” no matter its size â€” deserves the tools to respond to every review, build genuine customer loyalty, and put their best face forward online. You shouldn't need a marketing team or hours of your day to do that. That's what we're here for.
+              I built ReplyPilot because I believe every business — no matter its size — deserves the tools to respond to every review, build genuine customer loyalty, and put their best face forward online. You shouldn't need a marketing team or hours of your day to do that. That's what we're here for.
             </p>
 
             <p style="margin:0 0 18px 0">
-              We are constantly working to improve the platform, add new features, and make sure ReplyPilot not only meets your needs â€” but exceeds them. Your feedback is the engine behind everything we build.
+              We are constantly working to improve the platform, add new features, and make sure ReplyPilot not only meets your needs — but exceeds them. Your feedback is the engine behind everything we build.
             </p>
 
             <p style="margin:0 0 32px 0">
-              If you ever have a question, run into an issue, or just want to share a thought â€” please reach out. I read every message personally.
+              If you ever have a question, run into an issue, or just want to share a thought — please reach out. I read every message personally.
             </p>
 
             <p style="margin:0;font-style:italic;font-size:14px;color:var(--text-muted)">With gratitude,</p>
@@ -814,13 +814,13 @@
 
           <!-- CTA contact box -->
           <div style="margin-top:36px;padding:20px 24px;background:#F0F4FF;border-radius:12px;border:1.5px solid #C7D7F5;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-            <div style="font-size:22px">ðŸ’¬</div>
+            <div style="font-size:22px">💬</div>
             <div style="flex:1;min-width:200px">
               <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:4px">Have a question or need help?</div>
-              <div style="font-size:13px;color:var(--text-muted)">If your question isn't answered in the FAQ, don't hesitate â€” reach out directly and we'll get back to you as soon as possible.</div>
+              <div style="font-size:13px;color:var(--text-muted)">If your question isn't answered in the FAQ, don't hesitate — reach out directly and we'll get back to you as soon as possible.</div>
             </div>
             <a href="mailto:RPCS@reply-pilot.net" style="padding:12px 22px;background:var(--ink);color:white;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;font-family:DM Sans,sans-serif">
-              âœ‰ï¸ Email Us
+              ✉️ Email Us
             </a>
           </div>
 
@@ -836,32 +836,32 @@
         <!-- Header -->
         <div style="margin-bottom:28px">
           <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:800;color:var(--ink);margin-bottom:8px">What's Coming to ReplyPilot</div>
-          <p style="font-size:15px;color:var(--text-muted);line-height:1.7">We're in early access right now â€” here's a look at what the full platform will do once our Google and Facebook integrations are approved, and why it changes everything for your business.</p>
+          <p style="font-size:15px;color:var(--text-muted);line-height:1.7">We're in early access right now — here's a look at what the full platform will do once our Google and Facebook integrations are approved, and why it changes everything for your business.</p>
         </div>
 
         <!-- Google Auto-Sync -->
         <div style="border:1.5px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden">
           <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:#4285F4"></div>
           <div style="display:flex;align-items:flex-start;gap:16px">
-            <div style="font-size:32px;flex-shrink:0">ðŸ”</div>
+            <div style="font-size:32px;flex-shrink:0">🔍</div>
             <div>
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
-                <div style="font-weight:800;font-size:17px;color:var(--ink)">Google Business Profile â€” Full Automation</div>
+                <div style="font-weight:800;font-size:17px;color:var(--ink)">Google Business Profile — Full Automation</div>
                 <span style="padding:3px 10px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700">PENDING APPROVAL</span>
               </div>
-              <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">Once connected, ReplyPilot will monitor your Google Business Profile 24/7. Every new review gets pulled into your dashboard automatically â€” you won't have to check Google manually ever again.</p>
+              <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">Once connected, ReplyPilot will monitor your Google Business Profile 24/7. Every new review gets pulled into your dashboard automatically — you won't have to check Google manually ever again.</p>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#4285F4;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>Auto-sync every 24 hours</strong> â€” new reviews appear in your dashboard without lifting a finger</span>
+                  <span style="color:#4285F4;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>Auto-sync every 24 hours</strong> — new reviews appear in your dashboard without lifting a finger</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#4285F4;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>One-click posting</strong> â€” generate an AI response and post it directly to Google. No copy-paste, no logging in</span>
+                  <span style="color:#4285F4;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>One-click posting</strong> — generate an AI response and post it directly to Google. No copy-paste, no logging in</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#4285F4;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>Never miss a review</strong> â€” fast responses to negative reviews are one of the biggest factors in recovering unhappy customers before they're gone for good</span>
+                  <span style="color:#4285F4;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>Never miss a review</strong> — fast responses to negative reviews are one of the biggest factors in recovering unhappy customers before they're gone for good</span>
                 </div>
               </div>
             </div>
@@ -872,25 +872,25 @@
         <div style="border:1.5px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden">
           <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:#1877F2"></div>
           <div style="display:flex;align-items:flex-start;gap:16px">
-            <div style="font-size:32px;flex-shrink:0">ðŸ‘</div>
+            <div style="font-size:32px;flex-shrink:0">👍</div>
             <div>
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
-                <div style="font-weight:800;font-size:17px;color:var(--ink)">Facebook Reviews â€” Auto-Import</div>
+                <div style="font-weight:800;font-size:17px;color:var(--ink)">Facebook Reviews — Auto-Import</div>
                 <span style="padding:3px 10px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700">PENDING APPROVAL</span>
               </div>
               <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">Facebook reviews are often overlooked because there's no easy way to manage them. ReplyPilot will pull them in automatically so they sit alongside your Google reviews in one place.</p>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#1877F2;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>Daily sync</strong> â€” Facebook reviews pulled in automatically every day</span>
+                  <span style="color:#1877F2;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>Daily sync</strong> — Facebook reviews pulled in automatically every day</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#1877F2;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>AI-generated responses</strong> â€” craft the perfect reply and copy it to Facebook in seconds</span>
+                  <span style="color:#1877F2;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>AI-generated responses</strong> — craft the perfect reply and copy it to Facebook in seconds</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#1877F2;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>Unified inbox</strong> â€” Google + Facebook + Yelp reviews all in one dashboard, one workflow</span>
+                  <span style="color:#1877F2;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>Unified inbox</strong> — Google + Facebook + Yelp reviews all in one dashboard, one workflow</span>
                 </div>
               </div>
             </div>
@@ -901,21 +901,21 @@
         <div style="border:1.5px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden">
           <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:#D32323"></div>
           <div style="display:flex;align-items:flex-start;gap:16px">
-            <div style="font-size:32px;flex-shrink:0">â­</div>
+            <div style="font-size:32px;flex-shrink:0">⭐</div>
             <div>
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
-                <div style="font-weight:800;font-size:17px;color:var(--ink)">Yelp â€” Auto-Sync</div>
+                <div style="font-weight:800;font-size:17px;color:var(--ink)">Yelp — Auto-Sync</div>
                 <span style="padding:3px 10px;background:#FEF9EC;color:#92400E;border-radius:20px;font-size:11px;font-weight:700">IN DEVELOPMENT</span>
               </div>
-              <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">We're working on partner API access with Yelp. Once live, your Yelp reviews will sync automatically â€” giving you a complete picture of your reputation across every major platform.</p>
+              <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">We're working on partner API access with Yelp. Once live, your Yelp reviews will sync automatically — giving you a complete picture of your reputation across every major platform.</p>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#D32323;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>Automatic daily sync</strong> â€” new Yelp reviews appear without manual entry</span>
+                  <span style="color:#D32323;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>Automatic daily sync</strong> — new Yelp reviews appear without manual entry</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text)">
-                  <span style="color:#D32323;font-weight:700;flex-shrink:0">â†’</span>
-                  <span><strong>AI responses</strong> â€” generate and copy replies to Yelp in seconds</span>
+                  <span style="color:#D32323;font-weight:700;flex-shrink:0">→</span>
+                  <span><strong>AI responses</strong> — generate and copy replies to Yelp in seconds</span>
                 </div>
               </div>
             </div>
@@ -926,26 +926,26 @@
         <div style="border:1.5px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden">
           <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--gold)"></div>
           <div style="display:flex;align-items:flex-start;gap:16px">
-            <div style="font-size:32px;flex-shrink:0">ðŸ§ </div>
+            <div style="font-size:32px;flex-shrink:0">🧠</div>
             <div>
               <div style="font-weight:800;font-size:17px;color:var(--ink);margin-bottom:6px">What the AI Analysis Actually Does</div>
-              <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">The AI doesn't just write responses â€” it reads across all your reviews to find patterns you'd never spot manually. It's like having a business analyst who's read every piece of customer feedback you've ever received.</p>
+              <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">The AI doesn't just write responses — it reads across all your reviews to find patterns you'd never spot manually. It's like having a business analyst who's read every piece of customer feedback you've ever received.</p>
               <div style="display:flex;flex-direction:column;gap:10px">
                 <div style="padding:14px;background:#FFFBF0;border-radius:10px;border:1px solid #FDE68A">
                   <div style="font-weight:700;font-size:13px;color:var(--ink);margin-bottom:4px">Business Recommendations</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Scans your reviews and identifies specific things customers love and specific things they complain about â€” so you know exactly where to double down and what to fix. Unlocks after 10 reviews.</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Scans your reviews and identifies specific things customers love and specific things they complain about — so you know exactly where to double down and what to fix. Unlocks after 10 reviews.</div>
                 </div>
                 <div style="padding:14px;background:#FFFBF0;border-radius:10px;border:1px solid #FDE68A">
                   <div style="font-weight:700;font-size:13px;color:var(--ink);margin-bottom:4px">Health Score & Insights Report</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Gives your business a score out of 100 based on sentiment, rating trends, and response rate â€” with an executive summary and prioritized action items ranked by impact.</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Gives your business a score out of 100 based on sentiment, rating trends, and response rate — with an executive summary and prioritized action items ranked by impact.</div>
                 </div>
                 <div style="padding:14px;background:#FFFBF0;border-radius:10px;border:1px solid #FDE68A">
                   <div style="font-weight:700;font-size:13px;color:var(--ink);margin-bottom:4px">Monthly Report (Business Plan)</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">A full monthly breakdown â€” what customers praised, what issues came up, your response rate, and one specific recommendation for the following month. Like a quarterly review, every month.</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">A full monthly breakdown — what customers praised, what issues came up, your response rate, and one specific recommendation for the following month. Like a quarterly review, every month.</div>
                 </div>
                 <div style="padding:14px;background:#FFFBF0;border-radius:10px;border:1px solid #FDE68A">
                   <div style="font-weight:700;font-size:13px;color:var(--ink);margin-bottom:4px">AI Response Options</div>
-                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">For every review, the AI generates 3 response styles â€” Concise, Detailed, and Personal â€” so you pick the tone that fits your brand. Responses are crafted around your business name, type, and persona settings.</div>
+                  <div style="font-size:13px;color:var(--text-muted);line-height:1.6">For every review, the AI generates 3 response styles — Concise, Detailed, and Personal — so you pick the tone that fits your brand. Responses are crafted around your business name, type, and persona settings.</div>
                 </div>
               </div>
             </div>
@@ -957,20 +957,20 @@
           <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;margin-bottom:12px">Why this matters for your business</div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6">
-              <span style="color:var(--gold);font-size:16px;flex-shrink:0">âœ“</span>
-              <span><strong style="color:white">88% of consumers</strong> trust online reviews as much as personal recommendations. Responding to reviews â€” especially negative ones â€” signals that you care.</span>
+              <span style="color:var(--gold);font-size:16px;flex-shrink:0">✓</span>
+              <span><strong style="color:white">88% of consumers</strong> trust online reviews as much as personal recommendations. Responding to reviews — especially negative ones — signals that you care.</span>
             </div>
             <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6">
-              <span style="color:var(--gold);font-size:16px;flex-shrink:0">âœ“</span>
+              <span style="color:var(--gold);font-size:16px;flex-shrink:0">✓</span>
               <span><strong style="color:white">Businesses that respond to reviews</strong> see up to 35% more revenue than those that don't, according to Harvard Business Review.</span>
             </div>
             <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6">
-              <span style="color:var(--gold);font-size:16px;flex-shrink:0">âœ“</span>
-              <span><strong style="color:white">Google rewards engagement</strong> â€” businesses that actively respond to reviews rank higher in local search results.</span>
+              <span style="color:var(--gold);font-size:16px;flex-shrink:0">✓</span>
+              <span><strong style="color:white">Google rewards engagement</strong> — businesses that actively respond to reviews rank higher in local search results.</span>
             </div>
             <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6">
-              <span style="color:var(--gold);font-size:16px;flex-shrink:0">âœ“</span>
-              <span><strong style="color:white">ReplyPilot removes the bottleneck</strong> â€” instead of spending 20+ minutes writing a response, you choose from 3 AI options in under 60 seconds.</span>
+              <span style="color:var(--gold);font-size:16px;flex-shrink:0">✓</span>
+              <span><strong style="color:white">ReplyPilot removes the bottleneck</strong> — instead of spending 20+ minutes writing a response, you choose from 3 AI options in under 60 seconds.</span>
             </div>
           </div>
         </div>
@@ -990,36 +990,36 @@
         <div class="chart-card" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
           <div>
             <div class="chart-title">Your Plan: Free</div>
-            <p style="font-size:13px;color:var(--text-muted);margin-top:6px">50 reviews Â· 20 AI responses/month Â· All core features included â€” no credit card required</p>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:6px">50 reviews · 20 AI responses/month · All core features included — no credit card required</p>
           </div>
           <span style="padding:6px 16px;background:#D1FAE5;color:#065F46;border-radius:20px;font-size:12px;font-weight:700">ACTIVE</span>
         </div>
 
         <!-- Coming soon card -->
         <div style="border:1.5px solid var(--gold);border-radius:14px;padding:40px;text-align:center;background:linear-gradient(135deg,#FFFBF0 0%,#FFF8E7 100%)">
-          <div style="font-size:42px;margin-bottom:16px">ðŸš€</div>
+          <div style="font-size:42px;margin-bottom:16px">🚀</div>
           <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:10px">Pro & Business plans coming soon</h2>
-          <p style="font-size:14px;color:var(--text-muted);max-width:460px;margin:0 auto 28px;line-height:1.7">We're putting the finishing touches on our paid plans â€” including Google & Facebook auto-sync, unlimited reviews, bulk AI responses, and monthly reports. You'll be notified as soon as they launch.</p>
+          <p style="font-size:14px;color:var(--text-muted);max-width:460px;margin:0 auto 28px;line-height:1.7">We're putting the finishing touches on our paid plans — including Google & Facebook auto-sync, unlimited reviews, bulk AI responses, and monthly reports. You'll be notified as soon as they launch.</p>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px;margin:0 auto 32px;text-align:left">
             <div style="background:white;border-radius:10px;padding:18px;border:1.5px solid var(--border)">
-              <div style="font-weight:700;font-size:15px;margin-bottom:10px">Pro <span style="font-size:12px;color:var(--text-muted);font-weight:400">â€” coming soon</span></div>
+              <div style="font-weight:700;font-size:15px;margin-bottom:10px">Pro <span style="font-size:12px;color:var(--text-muted);font-weight:400">— coming soon</span></div>
               <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
-                âœ“ Unlimited reviews<br>
-                âœ“ Unlimited AI responses<br>
-                âœ“ Google auto-sync<br>
-                âœ“ Bulk AI generation<br>
-                âœ“ Priority support
+                ✓ Unlimited reviews<br>
+                ✓ Unlimited AI responses<br>
+                ✓ Google auto-sync<br>
+                ✓ Bulk AI generation<br>
+                ✓ Priority support
               </div>
             </div>
             <div style="background:white;border-radius:10px;padding:18px;border:1.5px solid var(--border)">
-              <div style="font-weight:700;font-size:15px;margin-bottom:10px">Business <span style="font-size:12px;color:var(--text-muted);font-weight:400">â€” coming soon</span></div>
+              <div style="font-weight:700;font-size:15px;margin-bottom:10px">Business <span style="font-size:12px;color:var(--text-muted);font-weight:400">— coming soon</span></div>
               <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
-                âœ“ Everything in Pro<br>
-                âœ“ Facebook auto-sync<br>
-                âœ“ Auto-post to Google<br>
-                âœ“ Monthly AI reports<br>
-                âœ“ Multiple locations
+                ✓ Everything in Pro<br>
+                ✓ Facebook auto-sync<br>
+                ✓ Auto-post to Google<br>
+                ✓ Monthly AI reports<br>
+                ✓ Multiple locations
               </div>
             </div>
           </div>
@@ -1055,7 +1055,7 @@
             <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Business Type</label>
             <select id="settings-type" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif;background:white">
               <option value="">Select industry...</option>
-              <option value="restaurant">Restaurant / CafÃ©</option>
+              <option value="restaurant">Restaurant / Café</option>
               <option value="retail">Retail / Shop</option>
               <option value="healthcare">Healthcare / Medical</option>
               <option value="automotive">Automotive</option>
@@ -1098,14 +1098,14 @@
               <code id="review-link-display" style="font-size:12px;background:white;padding:6px 10px;border-radius:6px;border:1px solid #C7D7F5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
               <button onclick="copyReviewLink()" style="padding:7px 14px;background:var(--ink);color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">Copy</button>
             </div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Send this link via text, email, or receipt â€” customers click it and land directly on your Google review page.</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Send this link via text, email, or receipt — customers click it and land directly on your Google review page.</div>
           </div>
         </div>
 
         <!-- Referral -->
         <div class="chart-card" id="referral-card">
-          <div class="chart-title" style="margin-bottom:6px">ðŸŽ Refer Friends â€” Earn More</div>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Share your referral link. Every friend who signs up gives you <strong>+15 reviews</strong> and <strong>+15 AI responses</strong> added to your account â€” automatically.</p>
+          <div class="chart-title" style="margin-bottom:6px">🎁 Refer Friends — Earn More</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Share your referral link. Every friend who signs up gives you <strong>+15 reviews</strong> and <strong>+15 AI responses</strong> added to your account — automatically.</p>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
             <code id="referral-link-display" style="font-size:12px;background:#F5F3EE;padding:10px 14px;border-radius:8px;border:1px solid var(--mist);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)"></code>
             <button onclick="copyReferralLink()" style="padding:10px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">Copy Link</button>
@@ -1152,15 +1152,15 @@
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Update your password to keep your account secure</p>
           <div style="margin-bottom:16px">
             <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Current Password</label>
-            <input id="settings-current-pw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+            <input id="settings-current-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
           </div>
           <div style="margin-bottom:16px">
             <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">New Password</label>
-            <input id="settings-new-pw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+            <input id="settings-new-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
           </div>
           <div style="margin-bottom:24px">
             <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px">Confirm New Password</label>
-            <input id="settings-confirm-pw" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
+            <input id="settings-confirm-pw" type="password" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid var(--mist);border-radius:8px;font-size:14px;font-family:DM Sans,sans-serif">
           </div>
           <button class="btn-primary" onclick="changePassword()">Update Password</button>
         </div>
@@ -1168,9 +1168,9 @@
         <!-- Custom AI Persona (Business plan only) -->
         <div class="chart-card" id="persona-section" style="display:none">
           <div class="chart-title" style="margin-bottom:6px">Custom AI Persona <span style="font-size:11px;padding:3px 10px;background:var(--ink);color:var(--gold);border-radius:20px;font-weight:700;letter-spacing:0.05em;vertical-align:middle">BUSINESS</span></div>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Define your brand voice so every AI response sounds like <em>your business</em> â€” not a generic template. This context is injected into every AI response you generate.</p>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Define your brand voice so every AI response sounds like <em>your business</em> — not a generic template. This context is injected into every AI response you generate.</p>
           <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px">Brand Voice & Guidelines</label>
-          <textarea id="settings-persona" placeholder="e.g. We are a family-owned Italian restaurant. Always be warm and personal. Sign off with 'Warm regards, The Bella Vita Team'. Never offer refunds in responses â€” invite the customer back instead. Mention our owner Marco by name when thanking staff." style="width:100%;min-height:130px;padding:12px;border:1.5px solid var(--mist);border-radius:8px;font-family:DM Sans,sans-serif;font-size:13px;line-height:1.6;resize:vertical;color:var(--text);outline:none"></textarea>
+          <textarea id="settings-persona" placeholder="e.g. We are a family-owned Italian restaurant. Always be warm and personal. Sign off with 'Warm regards, The Bella Vita Team'. Never offer refunds in responses — invite the customer back instead. Mention our owner Marco by name when thanking staff." style="width:100%;min-height:130px;padding:12px;border:1.5px solid var(--mist);border-radius:8px;font-family:DM Sans,sans-serif;font-size:13px;line-height:1.6;resize:vertical;color:var(--text);outline:none"></textarea>
           <p style="font-size:12px;color:var(--text-muted);margin-top:8px;margin-bottom:16px">Tips: include your sign-off, things to avoid, staff names to mention, and your overall tone.</p>
           <button class="btn-primary" onclick="saveSettings()">Save Persona</button>
         </div>
@@ -1179,7 +1179,7 @@
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:6px">Support</div>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Have a question or need help with your account? Our team typically responds within one business day.</p>
-          <a href="mailto:RPCS@reply-pilot.net" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:white;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='#E8922A';this.style.color='#0F3460'" onmouseout="this.style.background='var(--ink)';this.style.color='white'">âœ‰ï¸ RPCS@reply-pilot.net</a>
+          <a href="mailto:RPCS@reply-pilot.net" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:white;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='#E8922A';this.style.color='#0F3460'" onmouseout="this.style.background='var(--ink)';this.style.color='white'">✉️ RPCS@reply-pilot.net</a>
         </div>
 
         <!-- Danger Zone -->
@@ -1211,13 +1211,13 @@
 
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:6px">Platform Connections</div>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Add reviews manually from any platform â€” automation is coming soon</p>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Add reviews manually from any platform — automation is coming soon</p>
 
           <!-- Google -->
           <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
-                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">ðŸ”</div>
+                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">🔍</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Google Business Profile</div>
                   <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
@@ -1226,7 +1226,7 @@
               <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
             </div>
             <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
-              ðŸ’¡ Add Google reviews manually using the <strong>Add Review</strong> button in the Reviews tab â€” AI will generate a response you can copy and paste directly to Google.
+              💡 Add Google reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste directly to Google.
             </div>
           </div>
 
@@ -1234,7 +1234,7 @@
           <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
-                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">ðŸ‘</div>
+                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">👍</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Facebook Reviews</div>
                   <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
@@ -1243,7 +1243,7 @@
               <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
             </div>
             <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
-              ðŸ’¡ Add Facebook reviews manually using the <strong>Add Review</strong> button in the Reviews tab â€” AI will generate a response you can copy and paste to your Facebook Page.
+              💡 Add Facebook reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste to your Facebook Page.
             </div>
           </div>
 
@@ -1251,7 +1251,7 @@
           <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
-                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">â­</div>
+                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Yelp</div>
                   <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
@@ -1260,7 +1260,7 @@
               <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
             </div>
             <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
-              ðŸ’¡ Add Yelp reviews manually using the <strong>Add Review</strong> button in the Reviews tab â€” AI will generate a response you can copy and paste to Yelp.
+              💡 Add Yelp reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste to Yelp.
             </div>
           </div>
 
@@ -1268,7 +1268,7 @@
           <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;opacity:0.75">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
-                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">âœˆï¸</div>
+                <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">✈️</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">TripAdvisor</div>
                   <div style="font-size:12px;color:var(--text-muted)">Manual only</div>
@@ -1277,7 +1277,7 @@
               <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">MANUAL</span>
             </div>
             <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
-              ðŸ’¡ Add TripAdvisor reviews manually using the <strong>Add Review</strong> button in the Reviews tab â€” AI will generate a response you can copy and paste.
+              💡 Add TripAdvisor reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste.
             </div>
           </div>
         </div>
@@ -1292,7 +1292,7 @@
 <!-- UPGRADE MODAL -->
 <div class="modal-overlay" id="upgrade-modal">
   <div class="modal" style="max-width:420px;text-align:center">
-    <div style="font-size:48px;margin-bottom:16px">ðŸš€</div>
+    <div style="font-size:48px;margin-bottom:16px">🚀</div>
     <h2 class="modal-title">Coming Soon</h2>
     <p class="modal-sub" id="upgrade-modal-msg" style="margin-bottom:8px">This feature is part of our Pro & Business plans, which are launching soon.</p>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:28px">Have questions? Reach us at <a href="mailto:RPCS@reply-pilot.net" style="color:var(--ink);font-weight:600">RPCS@reply-pilot.net</a></p>
@@ -1314,11 +1314,11 @@
 
     <label>Star Rating</label>
     <div class="star-rating" id="star-rating">
-      <button class="star-btn" onclick="setRating(1)">â˜…</button>
-      <button class="star-btn" onclick="setRating(2)">â˜…</button>
-      <button class="star-btn" onclick="setRating(3)">â˜…</button>
-      <button class="star-btn" onclick="setRating(4)">â˜…</button>
-      <button class="star-btn" onclick="setRating(5)">â˜…</button>
+      <button class="star-btn" onclick="setRating(1)">★</button>
+      <button class="star-btn" onclick="setRating(2)">★</button>
+      <button class="star-btn" onclick="setRating(3)">★</button>
+      <button class="star-btn" onclick="setRating(4)">★</button>
+      <button class="star-btn" onclick="setRating(5)">★</button>
     </div>
 
     <label>Platform</label>
@@ -1379,9 +1379,9 @@
 
     if (tab === 'reviews') loadReviews();
     if (tab === 'monthly') initMonthlyTab();
-    // subscription tab is static â€” no load needed
+    // subscription tab is static — no load needed
     if (tab === 'settings') loadSettings();
-    // platform cards are static â€” no API calls needed
+    // platform cards are static — no API calls needed
     if (tab === 'insights') { loadRecommendations(); initInsightsSection(); }
   }
 
@@ -1422,10 +1422,10 @@
     card.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
         <div>
-          <div class="stat-top" style="margin-bottom:4px"><span class="stat-icon">ðŸ“Š</span><span class="stat-change">Free Plan</span></div>
+          <div class="stat-top" style="margin-bottom:4px"><span class="stat-icon">📊</span><span class="stat-change">Free Plan</span></div>
           <div style="font-size:15px;font-weight:700;color:var(--ink)">Monthly Usage</div>
         </div>
-        <button onclick="showTab('settings')" style="font-size:12px;font-weight:700;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">Refer friends for more â†’</button>
+        <button onclick="showTab('settings')" style="font-size:12px;font-weight:700;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">Refer friends for more →</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div>
@@ -1456,7 +1456,7 @@
   function showEmptyDashboard() {
     document.getElementById('stats-row').innerHTML = `
       <div style="grid-column:1/-1; text-align:center; padding:60px 20px;">
-        <div style="font-size:48px; margin-bottom:20px">ðŸ“­</div>
+        <div style="font-size:48px; margin-bottom:20px">📭</div>
         <h2 style="font-family:'Playfair Display',serif; font-size:28px; color:var(--ink); margin-bottom:12px">Welcome to ReplyPilot!</h2>
         <p style="color:var(--text-muted); font-size:16px; margin-bottom:32px; max-width:400px; margin-left:auto; margin-right:auto">Add your first customer review to start seeing analytics, sentiment analysis, and AI-generated responses.</p>
         <button onclick="openAddReview()" style="background:var(--ink);color:white;padding:16px 36px;border-radius:8px;border:none;font-size:16px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">+ Add Your First Review</button>
@@ -1472,22 +1472,22 @@
     const t = analytics.totals;
     document.getElementById('stats-row').innerHTML = `
       <div class="stat-card">
-        <div class="stat-top"><span class="stat-icon">ðŸ“</span><span class="stat-change">Total</span></div>
+        <div class="stat-top"><span class="stat-icon">📝</span><span class="stat-change">Total</span></div>
         <div class="stat-value">${t.total_reviews || 0}</div>
         <div class="stat-label">Total Reviews</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><span class="stat-icon">â­</span><span class="stat-change">${t.avg_rating >= 4 ? 'â–² Good' : 'â–¼ Needs work'}</span></div>
-        <div class="stat-value">${t.avg_rating || 'â€“'}</div>
+        <div class="stat-top"><span class="stat-icon">⭐</span><span class="stat-change">${t.avg_rating >= 4 ? '▲ Good' : '▼ Needs work'}</span></div>
+        <div class="stat-value">${t.avg_rating || '–'}</div>
         <div class="stat-label">Average Rating</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><span class="stat-icon">ðŸ’¬</span><span class="stat-change ${t.response_rate >= 80 ? '' : 'down'}">${t.response_rate >= 80 ? 'â–² Great' : 'â–¼ Low'}</span></div>
+        <div class="stat-top"><span class="stat-icon">💬</span><span class="stat-change ${t.response_rate >= 80 ? '' : 'down'}">${t.response_rate >= 80 ? '▲ Great' : '▼ Low'}</span></div>
         <div class="stat-value">${t.response_rate || 0}%</div>
         <div class="stat-label">Response Rate</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><span class="stat-icon">ðŸ˜Š</span><span class="stat-change">This Month</span></div>
+        <div class="stat-top"><span class="stat-icon">😊</span><span class="stat-change">This Month</span></div>
         <div class="stat-value">${t.positive_count || 0}</div>
         <div class="stat-label">Positive Reviews</div>
       </div>
@@ -1528,7 +1528,7 @@
       const pct = (d.count / maxCount) * 100;
       return `
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <span style="font-size:13px;width:20px;color:var(--gold);font-weight:700">${r}â˜…</span>
+          <span style="font-size:13px;width:20px;color:var(--gold);font-weight:700">${r}★</span>
           <div style="flex:1;height:10px;background:var(--mist);border-radius:5px;overflow:hidden">
             <div style="height:100%;width:${pct}%;background:var(--gold);border-radius:5px;transition:width 0.8s"></div>
           </div>
@@ -1604,7 +1604,7 @@
     if (!reviews.length) {
       document.getElementById('reviews-list').innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">ðŸ“­</div>
+          <div class="empty-icon">📭</div>
           <h3 class="empty-title">No reviews found</h3>
           <p class="empty-sub">Try adjusting your filters or add a review</p>
           <button class="btn-primary" onclick="openAddReview()">+ Add Review</button>
@@ -1613,7 +1613,7 @@
     }
 
     document.getElementById('reviews-list').innerHTML = reviews.map(r => {
-      const stars = 'â˜…'.repeat(r.rating) + 'â˜†'.repeat(5 - r.rating);
+      const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
       const chipClass = `chip-${r.sentiment || 'neutral'}`;
       const chips = `
         <span class="sentiment-chip ${chipClass}">${r.sentiment || 'neutral'}</span>
@@ -1622,7 +1622,7 @@
       const keywords = (r.keywords || []).map(k => `<span class="kw-tag">${k}</span>`).join('');
       const responseHtml = r.ai_response ? `
         <div class="review-response">
-          <div class="review-response-label">AI Generated Response${r.response_status === 'responded' ? ' âœ“ Sent' : ''}</div>
+          <div class="review-response-label">AI Generated Response${r.response_status === 'responded' ? ' ✓ Sent' : ''}</div>
           ${r.ai_response}
         </div>` : '';
 
@@ -1630,21 +1630,21 @@
       const canAutoPost = isGoogle && currentUser.plan === 'business';
       const platformNotice = !isGoogle && r.ai_response ? `
         <div style="margin-top:10px;padding:8px 12px;background:#FEF9EC;border-radius:6px;font-size:12px;color:#92400E">
-          âš ï¸ ${r.platform.charAt(0).toUpperCase()+r.platform.slice(1)} does not support automated posting. Copy this response and paste it manually.
+          ⚠️ ${r.platform.charAt(0).toUpperCase()+r.platform.slice(1)} does not support automated posting. Copy this response and paste it manually.
         </div>` : (isGoogle && r.ai_response && currentUser.plan !== 'business' ? `
         <div style="margin-top:10px;padding:8px 12px;background:#EFF6FF;border-radius:6px;font-size:12px;color:#1D4ED8">
-          ðŸ” <strong>Business plan:</strong> Auto-post this response directly to Google in one click.
+          🔍 <strong>Business plan:</strong> Auto-post this response directly to Google in one click.
         </div>` : '');
 
-      const deleteBtnHtml = `<button class="btn-sm" style="background:none;border:1.5px solid #FECACA;color:#EF4444" onclick="deleteReview('${r.id}')">ðŸ—‘ Delete</button>`;
+      const deleteBtnHtml = `<button class="btn-sm" style="background:none;border:1.5px solid #FECACA;color:#EF4444" onclick="deleteReview('${r.id}')">🗑 Delete</button>`;
 
       const actionBtns = r.ai_response
-        ? `<button class="btn-sm btn-copy" onclick="copyResponse('${r.id}')">ðŸ“‹ Copy Response</button>
-           ${canAutoPost && r.response_status !== 'responded' ? `<button class="btn-sm btn-generate" style="background:#1a73e8;color:white" onclick="postToGoogle('${r.id}')">ðŸ” Post to Google</button>` : ''}
-           ${r.response_status !== 'responded' ? `<button class="btn-sm btn-responded" onclick="markResponded('${r.id}')">âœ“ Mark as Sent</button>` : '<span style="font-size:13px;color:var(--positive);font-weight:600">âœ“ Responded</span>'}
-           <button class="btn-sm" style="background:none;border:1.5px solid var(--mist);color:var(--text-muted)" onclick="generateResponse('${r.id}')">â†º Regenerate</button>
+        ? `<button class="btn-sm btn-copy" onclick="copyResponse('${r.id}')">📋 Copy Response</button>
+           ${canAutoPost && r.response_status !== 'responded' ? `<button class="btn-sm btn-generate" style="background:#1a73e8;color:white" onclick="postToGoogle('${r.id}')">🔍 Post to Google</button>` : ''}
+           ${r.response_status !== 'responded' ? `<button class="btn-sm btn-responded" onclick="markResponded('${r.id}')">✓ Mark as Sent</button>` : '<span style="font-size:13px;color:var(--positive);font-weight:600">✓ Responded</span>'}
+           <button class="btn-sm" style="background:none;border:1.5px solid var(--mist);color:var(--text-muted)" onclick="generateResponse('${r.id}')">↺ Regenerate</button>
            ${deleteBtnHtml}`
-        : `<button class="btn-sm btn-generate" onclick="generateResponse('${r.id}')">âœ¨ Generate AI Response</button>
+        : `<button class="btn-sm btn-generate" onclick="generateResponse('${r.id}')">✨ Generate AI Response</button>
            ${deleteBtnHtml}`;
 
       return `
@@ -1654,7 +1654,7 @@
               <div class="reviewer-avatar">${r.reviewer_name.charAt(0).toUpperCase()}</div>
               <div>
                 <div class="reviewer-name">${escHtml(r.reviewer_name)}</div>
-                <div class="review-meta">${r.review_date} Â· ${r.platform}</div>
+                <div class="review-meta">${r.review_date} · ${r.platform}</div>
               </div>
             </div>
             <div class="review-right">
@@ -1677,7 +1677,7 @@
   async function generateResponse(reviewId) {
     const card = document.getElementById('card-' + reviewId);
     const btn = card.querySelector('.btn-generate, [onclick*="generateResponse"]');
-    if (btn) { btn.textContent = 'â³ Generating options...'; btn.disabled = true; btn.className = 'btn-sm btn-generating'; }
+    if (btn) { btn.textContent = '⏳ Generating options...'; btn.disabled = true; btn.className = 'btn-sm btn-generating'; }
 
     try {
       const tone = localStorage.getItem('rp_tone') || 'professional';
@@ -1687,14 +1687,14 @@
         showResponsePicker(reviewId, data.options);
       } else if (data?.upgrade_required) {
         showUpgradeModal(data.error);
-        if (btn) { btn.textContent = 'âœ¨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
+        if (btn) { btn.textContent = '✨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
       } else {
         toast(data?.error || 'Failed to generate options', 'error');
-        if (btn) { btn.textContent = 'âœ¨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
+        if (btn) { btn.textContent = '✨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
       }
     } catch (e) {
       toast('Could not reach the server. Check your connection.', 'error');
-      if (btn) { btn.textContent = 'âœ¨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
+      if (btn) { btn.textContent = '✨ Generate AI Response'; btn.disabled = false; btn.className = 'btn-sm btn-generate'; }
     }
   }
 
@@ -1704,13 +1704,13 @@
     const labels = ['Concise', 'Detailed', 'Personal'];
     actionsDiv.innerHTML = `
       <div style="width:100%;margin-top:4px">
-        <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--ink)">âœ¨ Choose a response:</div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:var(--ink)">✨ Choose a response:</div>
         ${options.map((opt, i) => `
           <div id="opt-${reviewId}-${i}" onclick="selectResponseOption('${reviewId}', ${i})"
             style="border:1.5px solid var(--mist);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border 0.15s,background 0.15s">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-weight:700;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Option ${i+1} â€” ${labels[i]||''}</span>
-              <span id="opt-check-${reviewId}-${i}" style="display:none;color:var(--positive);font-size:12px;font-weight:700">âœ“ Selected</span>
+              <span style="font-weight:700;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Option ${i+1} — ${labels[i]||''}</span>
+              <span id="opt-check-${reviewId}-${i}" style="display:none;color:var(--positive);font-size:12px;font-weight:700">✓ Selected</span>
             </div>
             <div style="font-size:13px;color:var(--text);line-height:1.6">${escHtml(opt)}</div>
           </div>
@@ -1718,7 +1718,7 @@
         <div style="display:flex;gap:10px;margin-top:4px">
           <button onclick="useSelectedOption('${reviewId}')" id="use-opt-btn-${reviewId}"
             style="padding:10px 22px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;opacity:0.35;pointer-events:none">
-            âœ“ Use This Response
+            ✓ Use This Response
           </button>
           <button onclick="cancelResponsePicker('${reviewId}')"
             style="padding:10px 18px;background:none;border:1.5px solid var(--mist);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text-muted);font-family:DM Sans,sans-serif">
@@ -1758,7 +1758,7 @@
         delete pendingOptions[reviewId];
         delete selectedResponseOption[reviewId];
         renderReviews(allReviews);
-        toast('âœ¨ Response saved!', 'success');
+        toast('✨ Response saved!', 'success');
       } else {
         toast(data?.error || 'Failed to save response', 'error');
       }
@@ -1779,7 +1779,7 @@
       const rev = allReviews.find(r => r.id === reviewId);
       if (rev) rev.response_status = 'responded';
       renderReviews(allReviews);
-      toast('âœ“ Marked as responded', 'success');
+      toast('✓ Marked as responded', 'success');
     }
   }
 
@@ -1787,7 +1787,7 @@
     const rev = allReviews.find(r => r.id === reviewId);
     if (rev && rev.ai_response) {
       navigator.clipboard.writeText(rev.ai_response);
-      toast('ðŸ“‹ Response copied to clipboard!', 'success');
+      toast('📋 Response copied to clipboard!', 'success');
     }
   }
 
@@ -1810,17 +1810,17 @@
 
       const s = data.stats;
       document.getElementById('m-total').textContent = s.total;
-      document.getElementById('m-rating').textContent = s.avg_rating + 'â˜…';
+      document.getElementById('m-rating').textContent = s.avg_rating + '★';
       document.getElementById('m-positive').textContent = s.positive;
       document.getElementById('m-negative').textContent = s.negative;
       document.getElementById('m-response-rate').textContent = s.response_rate + '%';
-      document.getElementById('m-summary').textContent = data.summary || 'â€”';
-      document.getElementById('m-keyword').textContent = data.top_keyword || 'â€”';
-      document.getElementById('m-recommendation').textContent = data.recommendation || 'â€”';
+      document.getElementById('m-summary').textContent = data.summary || '—';
+      document.getElementById('m-keyword').textContent = data.top_keyword || '—';
+      document.getElementById('m-recommendation').textContent = data.recommendation || '—';
 
       const praiseEl = document.getElementById('m-praise');
       praiseEl.innerHTML = (data.praise || []).map(p =>
-        `<li style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--positive);font-size:16px;flex-shrink:0">âœ“</span><span style="font-size:14px;color:var(--text);line-height:1.5">${escHtml(p)}</span></li>`
+        `<li style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--positive);font-size:16px;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.5">${escHtml(p)}</span></li>`
       ).join('') || '<li style="font-size:14px;color:var(--text-muted)">No specific praise identified this month.</li>';
 
       const issuesEl = document.getElementById('m-issues');
@@ -1849,9 +1849,9 @@
         const pct = Math.round((data.count / 10) * 100);
         el.innerHTML = `
           <div style="text-align:center;padding:24px 16px">
-            <div style="font-size:36px;margin-bottom:12px">ðŸ”’</div>
+            <div style="font-size:36px;margin-bottom:12px">🔒</div>
             <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:8px">Not enough reviews yet</div>
-            <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">You need at least <strong>10 reviews</strong> to unlock recommendations. You have ${data.count} â€” ${data.needed} more to go.</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">You need at least <strong>10 reviews</strong> to unlock recommendations. You have ${data.count} — ${data.needed} more to go.</div>
             <div style="background:var(--mist);border-radius:100px;height:8px;max-width:300px;margin:0 auto">
               <div style="background:var(--accent);height:8px;border-radius:100px;width:${pct}%;transition:width 0.4s"></div>
             </div>
@@ -1862,13 +1862,13 @@
 
       const doingWell = (data.doing_well || []).map(s => `
         <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--mist)">
-          <span style="color:#16A34A;font-size:16px;margin-top:1px">âœ“</span>
+          <span style="color:#16A34A;font-size:16px;margin-top:1px">✓</span>
           <span style="font-size:14px;color:var(--ink);line-height:1.5">${s}</span>
         </div>`).join('');
 
       const needsFix = (data.needs_improvement || []).map(s => `
         <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--mist)">
-          <span style="color:#DC2626;font-size:16px;margin-top:1px">â†’</span>
+          <span style="color:#DC2626;font-size:16px;margin-top:1px">→</span>
           <span style="font-size:14px;color:var(--ink);line-height:1.5">${s}</span>
         </div>`).join('');
 
@@ -1889,7 +1889,7 @@
             ${needsFix}
           </div>
         </div>
-        <div style="margin-top:14px;font-size:11px;color:var(--text-muted)">Based on your ${data.count || 'recent'} most recent reviews Â· Refresh anytime for updated analysis</div>`;
+        <div style="margin-top:14px;font-size:11px;color:var(--text-muted)">Based on your ${data.count || 'recent'} most recent reviews · Refresh anytime for updated analysis</div>`;
     } catch(e) {
       el.innerHTML = '<div style="color:var(--negative);font-size:13px;padding:12px">Could not load recommendations.</div>';
     }
@@ -1906,12 +1906,12 @@
         const pct = Math.round((count / 10) * 100);
         el.innerHTML = `
           <div style="text-align:center;padding:48px 24px">
-            <div style="font-size:40px;margin-bottom:14px">ðŸ”’</div>
+            <div style="font-size:40px;margin-bottom:14px">🔒</div>
             <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:var(--ink);margin-bottom:8px">
               ${needed > 0 ? `Add ${needed} more review${needed === 1 ? '' : 's'} to unlock` : 'Almost there!'}
             </div>
             <p style="font-size:14px;color:var(--text-muted);max-width:380px;margin:0 auto 24px;line-height:1.7">
-              The full AI Insights Report needs at least <strong>10 reviews</strong> to generate meaningful analysis â€” health score, action items, customer themes, and benchmarks.
+              The full AI Insights Report needs at least <strong>10 reviews</strong> to generate meaningful analysis — health score, action items, customer themes, and benchmarks.
             </p>
             <div style="background:var(--mist);border-radius:100px;height:10px;max-width:300px;margin:0 auto">
               <div style="background:var(--gold);height:10px;border-radius:100px;width:${pct}%;transition:width 0.5s ease"></div>
@@ -1925,16 +1925,16 @@
         el.innerHTML = `
           <div style="text-align:center;padding:40px">
             <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="generateInsights()">
-              ðŸ§  Generate Full AI Insights Report
+              🧠 Generate Full AI Insights Report
             </button>
-            <p style="margin-top:16px;font-size:14px;color:var(--text-muted)">Deep analysis with health score, themes, and action plan â€” based on your ${total} reviews</p>
+            <p style="margin-top:16px;font-size:14px;color:var(--text-muted)">Deep analysis with health score, themes, and action plan — based on your ${total} reviews</p>
           </div>`;
       }
     } catch(e) {
       el.innerHTML = `
         <div style="text-align:center;padding:40px">
           <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="generateInsights()">
-            ðŸ§  Generate Full AI Insights Report
+            🧠 Generate Full AI Insights Report
           </button>
         </div>`;
     }
@@ -1999,15 +1999,15 @@
           </div>
         </div>
         <div class="insight-card">
-          <div class="insight-title">âœ… What's Working Well</div>
+          <div class="insight-title">✅ What's Working Well</div>
           <div class="strengths-list">
-            ${(ins.strengths || []).map(s => `<div class="list-item"><span>âœ“ ${s}</span></div>`).join('')}
+            ${(ins.strengths || []).map(s => `<div class="list-item"><span>✓ ${s}</span></div>`).join('')}
           </div>
         </div>
         <div class="insight-card">
-          <div class="insight-title">âš ï¸ Areas to Improve</div>
+          <div class="insight-title">⚠️ Areas to Improve</div>
           <div class="improvements-list">
-            ${(ins.improvement_areas || []).map(a => `<div class="list-item"><span>â†’ ${a}</span></div>`).join('')}
+            ${(ins.improvement_areas || []).map(a => `<div class="list-item"><span>→ ${a}</span></div>`).join('')}
           </div>
         </div>
       </div>
@@ -2021,7 +2021,7 @@
           </div>` : ''}
       </div>
       <div style="text-align:center;margin-top:12px">
-        <button class="btn-primary" onclick="generateInsights()">â†º Refresh Insights</button>
+        <button class="btn-primary" onclick="generateInsights()">↺ Refresh Insights</button>
       </div>`;
     // Animate the ring after render
     requestAnimationFrame(() => {
@@ -2164,7 +2164,7 @@
     if (ok) {
       currentUser.notify_new_reviews = checked;
       Auth.save(Auth.getToken(), currentUser);
-      toast(checked ? 'âœ“ Review alerts enabled' : 'Review alerts disabled', 'success');
+      toast(checked ? '✓ Review alerts enabled' : 'Review alerts disabled', 'success');
     }
   }
 
@@ -2176,7 +2176,7 @@
       currentUser.review_request_url = url;
       Auth.save(Auth.getToken(), currentUser);
       showReviewLinkPreview(currentUser.id);
-      toast('âœ“ Review link saved!', 'success');
+      toast('✓ Review link saved!', 'success');
     }
   }
 
@@ -2192,13 +2192,13 @@
   function copyReviewLink() {
     const link = document.getElementById('review-link-display').textContent;
     navigator.clipboard.writeText(link);
-    toast('ðŸ“‹ Review link copied!', 'success');
+    toast('📋 Review link copied!', 'success');
   }
 
   function copyReferralLink() {
     const link = document.getElementById('referral-link-display').textContent;
     navigator.clipboard.writeText(link);
-    toast('ðŸŽ Referral link copied! Share it to earn +15 responses per signup.', 'success');
+    toast('🎁 Referral link copied! Share it to earn +15 responses per signup.', 'success');
   }
 
   function exportCSV() {
@@ -2222,7 +2222,7 @@
     a.download = 'replypilot-reviews-' + new Date().toISOString().split('T')[0] + '.csv';
     a.click();
     URL.revokeObjectURL(url);
-    toast('âœ“ Reviews exported!', 'success');
+    toast('✓ Reviews exported!', 'success');
   }
 
   function setTone(tone, save = true) {
@@ -2245,7 +2245,7 @@
         el.querySelector('div:last-child').style.opacity = '1';
       }
     });
-    if (save) toast('âœ“ Default tone set to ' + tone, 'success');
+    if (save) toast('✓ Default tone set to ' + tone, 'success');
   }
 
   async function saveSettings() {
@@ -2260,7 +2260,7 @@
         currentUser = { ...currentUser, ...data.user };
         Auth.save(Auth.getToken(), currentUser);
         updateSidebar();
-        toast('âœ“ Settings saved!', 'success');
+        toast('✓ Settings saved!', 'success');
       } else {
         toast(data?.error || 'Failed to save settings', 'error');
       }
@@ -2278,7 +2278,7 @@
     if (newPw.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
     const { data, ok } = await API.post('/api/auth/change-password', { current_password: current, new_password: newPw });
     if (ok && data.success) {
-      toast('âœ“ Password updated!', 'success');
+      toast('✓ Password updated!', 'success');
       document.getElementById('settings-current-pw').value = '';
       document.getElementById('settings-new-pw').value = '';
       document.getElementById('settings-confirm-pw').value = '';
@@ -2305,7 +2305,7 @@
       const { data, ok } = await API.get('/api/yelp/status');
       if (ok && data.connected) {
         document.getElementById('yelp-status-text').textContent = data.business_name ? 'Connected: ' + data.business_name : 'Connected';
-        if (btnArea) btnArea.innerHTML = '<span style="color:var(--positive);font-weight:700;font-size:13px">âœ“ Connected</span>';
+        if (btnArea) btnArea.innerHTML = '<span style="color:var(--positive);font-weight:700;font-size:13px">✓ Connected</span>';
         if (searchPanel) searchPanel.style.display = 'none';
         if (connectedPanel) connectedPanel.style.display = 'block';
       } else {
@@ -2353,7 +2353,7 @@
         <div style="border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div>
             <div style="font-weight:600;font-size:14px">${escHtml(b.name)}</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${escHtml(b.address || '')} Â· â­ ${b.rating} Â· ${b.review_count} reviews</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${escHtml(b.address || '')} · ⭐ ${b.rating} · ${b.review_count} reviews</div>
           </div>
           <button onclick="connectYelp('${b.id}', '${escHtml(b.name).replace(/'/g,"\\'")}') "
             style="padding:8px 16px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">
@@ -2370,7 +2370,7 @@
       toast('Connecting Yelp and syncing reviews...', '');
       const { data, ok } = await API.post('/api/yelp/connect/' + businessId, { business_name: businessName });
       if (ok && data.success) {
-        toast('âœ“ ' + data.message, 'success');
+        toast('✓ ' + data.message, 'success');
         loadYelpStatus();
         loadOverview();
       } else if (data?.upgrade_required) {
@@ -2388,14 +2388,14 @@
       toast('Syncing Yelp reviews...', '');
       const { data, ok } = await API.post('/api/yelp/sync', {});
       if (ok && data.success) {
-        toast('âœ“ ' + data.message, 'success');
+        toast('✓ ' + data.message, 'success');
         loadOverview();
         if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
       } else {
         toast(data?.error || 'Sync failed', 'error');
       }
     } catch(e) {
-      toast('Sync failed â€” could not reach the server.', 'error');
+      toast('Sync failed — could not reach the server.', 'error');
     }
   }
 
@@ -2404,7 +2404,7 @@
     try {
       const { ok } = await API.post('/api/yelp/disconnect', {});
       if (ok) {
-        document.getElementById('yelp-status-text').textContent = 'Auto-sync â€” Pro & Business';
+        document.getElementById('yelp-status-text').textContent = 'Auto-sync — Pro & Business';
         document.getElementById('yelp-connected-panel').style.display = 'none';
         document.getElementById('yelp-search-panel').style.display = 'block';
         document.getElementById('yelp-btn-area').innerHTML = '';
@@ -2420,7 +2420,7 @@
       const { data, ok } = await API.get('/api/google/status');
       if (ok && data.connected) {
         document.getElementById('google-status-text').textContent = data.business_name ? `Connected: ${data.business_name}` : 'Connected';
-        document.getElementById('google-connect-btn').textContent = 'âœ“ Connected';
+        document.getElementById('google-connect-btn').textContent = '✓ Connected';
         document.getElementById('google-connect-btn').style.background = 'var(--positive)';
         document.getElementById('google-connected-panel').style.display = 'block';
       }
@@ -2445,14 +2445,14 @@
       toast('Syncing reviews from Google...', '');
       const { data, ok } = await API.post('/api/google/sync', {});
       if (ok && data.success) {
-        toast(`âœ“ ${data.message}`, 'success');
+        toast(`✓ ${data.message}`, 'success');
         loadOverview();
         if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
       } else {
         toast(data?.error || 'Sync failed', 'error');
       }
     } catch (e) {
-      toast('Sync failed â€” could not reach the server.', 'error');
+      toast('Sync failed — could not reach the server.', 'error');
     }
   }
 
@@ -2479,7 +2479,7 @@
       const { data, ok } = await API.get('/api/facebook/status');
       if (ok && data.connected) {
         document.getElementById('facebook-status-text').textContent = data.page_name ? 'Connected: ' + data.page_name : 'Connected';
-        document.getElementById('facebook-connect-btn').textContent = 'âœ“ Connected';
+        document.getElementById('facebook-connect-btn').textContent = '✓ Connected';
         document.getElementById('facebook-connect-btn').style.background = 'var(--positive)';
         document.getElementById('facebook-connected-panel').style.display = 'block';
       }
@@ -2504,14 +2504,14 @@
       toast('Syncing reviews from Facebook...', '');
       const { data, ok } = await API.post('/api/facebook/sync', {});
       if (ok && data.success) {
-        toast('âœ“ ' + data.message, 'success');
+        toast('✓ ' + data.message, 'success');
         loadOverview();
         if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
       } else {
         toast(data?.error || 'Sync failed', 'error');
       }
     } catch (e) {
-      toast('Sync failed â€” could not reach the server.', 'error');
+      toast('Sync failed — could not reach the server.', 'error');
     }
   }
 
@@ -2536,7 +2536,7 @@
   async function checkGoogleCallback() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('google_connected')) {
-      toast('âœ“ Google Business Profile connected!', 'success');
+      toast('✓ Google Business Profile connected!', 'success');
       showTab('platforms');
       history.replaceState({}, '', window.location.pathname);
     }
@@ -2545,7 +2545,7 @@
       history.replaceState({}, '', window.location.pathname);
     }
     if (params.get('facebook_connected')) {
-      toast('âœ“ Facebook Reviews connected!', 'success');
+      toast('✓ Facebook Reviews connected!', 'success');
       showTab('platforms');
       history.replaceState({}, '', window.location.pathname);
     }
@@ -2563,7 +2563,7 @@
         Auth.save(Auth.getToken(), currentUser);
         updateSidebar();
       }
-      toast('âœ“ Subscription upgraded successfully!', 'success');
+      toast('✓ Subscription upgraded successfully!', 'success');
     }
     if (params.get('checkout')) {
       const plan = params.get('checkout');
@@ -2581,7 +2581,7 @@
       if (ok && data.success) {
         rev.response_status = 'responded';
         renderReviews(allReviews);
-        toast('âœ“ Response posted to Google!', 'success');
+        toast('✓ Response posted to Google!', 'success');
       } else {
         toast(data?.error || 'Failed to post to Google', 'error');
       }
@@ -2593,12 +2593,12 @@
   async function bulkGenerateResponses() {
     if (!confirm(`Generate AI responses for all reviews that don't have one yet? This may take a minute.`)) return;
     const btn = document.getElementById('bulk-generate-btn');
-    if (btn) { btn.textContent = 'â³ Generating...'; btn.disabled = true; }
+    if (btn) { btn.textContent = '⏳ Generating...'; btn.disabled = true; }
     try {
       const tone = localStorage.getItem('rp_tone') || 'professional';
       const { data, ok } = await API.post('/api/reviews/bulk-generate', { tone });
       if (ok && data.success) {
-        toast(`âœ“ ${data.message}`, 'success');
+        toast(`✓ ${data.message}`, 'success');
         await loadReviews();
         loadOverview();
       } else if (data?.upgrade_required) {
@@ -2609,7 +2609,7 @@
     } catch (e) {
       toast('Could not reach the server.', 'error');
     } finally {
-      if (btn) { btn.textContent = 'âš¡ Generate All Responses'; btn.disabled = false; }
+      if (btn) { btn.textContent = '⚡ Generate All Responses'; btn.disabled = false; }
     }
   }
 
@@ -2617,7 +2617,7 @@
     if (!confirm('Are you sure you want to delete ALL your reviews? This cannot be undone.')) return;
     const { data, ok } = await API.delete('/api/reviews/all');
     if (ok && data.success) {
-      toast('âœ“ All reviews deleted', 'success');
+      toast('✓ All reviews deleted', 'success');
       allReviews = [];
       loadOverview();
     } else {
@@ -2631,7 +2631,7 @@
     if (ok && data.success) {
       allReviews = allReviews.filter(r => r.id !== id);
       document.getElementById(`card-${id}`)?.remove();
-      toast('âœ“ Review deleted', 'success');
+      toast('✓ Review deleted', 'success');
     } else {
       toast(data.error || 'Failed to delete review', 'error');
     }
@@ -2676,13 +2676,13 @@
     if (!review_text) { toast('Please paste the review text', 'error'); return; }
 
     const btn = document.querySelector('#add-modal .btn-generate');
-    if (btn) { btn.textContent = 'â³ Analyzing...'; btn.disabled = true; }
+    if (btn) { btn.textContent = '⏳ Analyzing...'; btn.disabled = true; }
 
     try {
       const { data, ok } = await API.post('/api/reviews', { reviewer_name, rating: selectedRating, review_text, platform, review_date });
       if (ok && data.success) {
         closeModal();
-        toast('âœ“ Review added and analyzed!', 'success');
+        toast('✓ Review added and analyzed!', 'success');
         if (document.getElementById('content-reviews').classList.contains('active')) loadReviews();
         loadOverview();
       } else if (data?.upgrade_required) {
