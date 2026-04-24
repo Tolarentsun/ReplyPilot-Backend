@@ -1,4 +1,4 @@
-﻿const { Pool } = require('pg');
+const { Pool } = require('pg');
 
 let pool = null;
 
@@ -100,6 +100,7 @@ async function initSchema() {
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_count INTEGER DEFAULT 0');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_reviews INTEGER DEFAULT 0');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_responses INTEGER DEFAULT 0');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_responses_used INTEGER DEFAULT 0');
     } catch(e) {}
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {
