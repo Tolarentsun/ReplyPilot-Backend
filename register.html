@@ -282,7 +282,9 @@
       btn.innerHTML = '<span class="spinner"></span>Creating account...';
 
       try {
-        const { data, ok } = await API.post('/api/auth/register', { name, email, password, business_name, business_type });
+        const ref = new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rp_ref') || null;
+        if (ref) localStorage.removeItem('rp_ref');
+        const { data, ok } = await API.post('/api/auth/register', { name, email, password, business_name, business_type, ref });
         if (ok && data.success) {
           Auth.save(data.token, data.user);
           showMsg('✓ Account created! Setting up your dashboard...', 'success');
@@ -306,6 +308,10 @@
     }
 
     document.addEventListener('keydown', e => { if (e.key === 'Enter') register(); });
+
+    // Persist referral code from URL into localStorage
+    const _ref = new URLSearchParams(window.location.search).get('ref');
+    if (_ref) localStorage.setItem('rp_ref', _ref);
   </script>
 </body>
 </html>
