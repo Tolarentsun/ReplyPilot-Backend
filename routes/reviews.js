@@ -51,17 +51,21 @@ router.get('/quota', authenticate, async (req, res) => {
       db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [req.user.id]),
       db.asyncGet('SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?', [req.user.id, monthStart.toISOString()])
     ]);
-    const bonusReviews = req.user.referral_bonus_reviews || 0;
-    const bonusResponses = req.user.referral_bonus_responses || 0;
+    const freshUser = await db.asyncGet('SELECT referral_bonus_reviews, referral_bonus_responses, referral_bonus_responses_used, referral_count FROM users WHERE id = ?', [req.user.id]);
+    const bonusReviews = freshUser?.referral_bonus_reviews || 0;
+    const bonusResponsesTotal = freshUser?.referral_bonus_responses || 0;
+    const bonusResponsesUsed = freshUser?.referral_bonus_responses_used || 0;
+    const bonusResponsesLeft = Math.max(0, bonusResponsesTotal - bonusResponsesUsed);
     res.json({
       success: true,
       reviews_used: parseInt(reviewRow?.total) || 0,
       reviews_limit: 50 + bonusReviews,
       ai_used: parseInt(aiRow?.total) || 0,
-      ai_limit: 20 + bonusResponses,
-      referral_count: req.user.referral_count || 0,
+      ai_limit: 20,
+      bonus_responses_remaining: bonusResponsesLeft,
+      referral_count: freshUser?.referral_count || 0,
       bonus_reviews: bonusReviews,
-      bonus_responses: bonusResponses
+      bonus_responses: bonusResponsesTotal
     });
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch quota' });
@@ -175,18 +179,20 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
     const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
     if (!review) return res.status(404).json({ error: 'Review not found' });
 
-    // Enforce free plan AI response limit (base 20/month + referral bonus)
+    // Enforce free plan AI response limit: 20/month base + one-time referral bonus pool
     if (req.user.plan === 'free') {
       const monthStart = new Date();
       monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
-      const usedRow = await db.asyncGet(
-        'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
-        [req.user.id, monthStart.toISOString()]
-      );
-      const bonusResponses = req.user.referral_bonus_responses || 0;
-      const responseLimit = 20 + bonusResponses;
-      if ((usedRow?.total || 0) >= responseLimit) {
-        return res.status(403).json({ error: `Free plan limit reached (${responseLimit} AI responses/month). Refer friends to earn more or upgrade when available.`, upgrade_required: true });
+      const monthlyUsed = parseInt((await db.asyncGet('SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?', [req.user.id, monthStart.toISOString()]))?.total) || 0;
+      const freshUser = await db.asyncGet('SELECT referral_bonus_responses, referral_bonus_responses_used FROM users WHERE id = ?', [req.user.id]);
+      const bonusPool = (freshUser?.referral_bonus_responses || 0) - (freshUser?.referral_bonus_responses_used || 0);
+
+      if (monthlyUsed >= 20 && bonusPool <= 0) {
+        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Refer friends for bonus responses or upgrade when available.', upgrade_required: true });
+      }
+      // If monthly exhausted but bonus pool available, deduct from bonus pool
+      if (monthlyUsed >= 20 && bonusPool > 0) {
+        await db.asyncRun('UPDATE users SET referral_bonus_responses_used = referral_bonus_responses_used + 1 WHERE id = ?', [req.user.id]);
       }
     }
 
@@ -220,14 +226,15 @@ router.post('/:id/generate-options', authenticate, async (req, res) => {
     if (req.user.plan === 'free') {
       const monthStart = new Date();
       monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
-      const usedRow = await db.asyncGet(
-        'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
-        [req.user.id, monthStart.toISOString()]
-      );
-      const bonusResponses = req.user.referral_bonus_responses || 0;
-      const responseLimit = 20 + bonusResponses;
-      if ((usedRow?.total || 0) >= responseLimit) {
-        return res.status(403).json({ error: `Free plan limit reached (${responseLimit} AI responses/month). Refer friends to earn more or upgrade when available.`, upgrade_required: true });
+      const monthlyUsed = parseInt((await db.asyncGet('SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?', [req.user.id, monthStart.toISOString()]))?.total) || 0;
+      const freshUser = await db.asyncGet('SELECT referral_bonus_responses, referral_bonus_responses_used FROM users WHERE id = ?', [req.user.id]);
+      const bonusPool = (freshUser?.referral_bonus_responses || 0) - (freshUser?.referral_bonus_responses_used || 0);
+
+      if (monthlyUsed >= 20 && bonusPool <= 0) {
+        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Refer friends for bonus responses or upgrade when available.', upgrade_required: true });
+      }
+      if (monthlyUsed >= 20 && bonusPool > 0) {
+        await db.asyncRun('UPDATE users SET referral_bonus_responses_used = referral_bonus_responses_used + 1 WHERE id = ?', [req.user.id]);
       }
     }
 
@@ -310,7 +317,7 @@ router.post('/bulk-generate', authenticate, async (req, res) => {
   }
 });
 
-// Delete all reviews — must be before /:id to avoid being swallowed as an id param
+// Delete all reviews â€” must be before /:id to avoid being swallowed as an id param
 router.delete('/all', authenticate, async (req, res) => {
   try {
     await db.asyncRun('DELETE FROM reviews WHERE user_id = ?', [req.user.id]);
@@ -352,9 +359,9 @@ async function generateAIResponse(review, businessName, tone, persona, style = '
 
   const toneMap = { professional: 'professional and courteous', friendly: 'warm and friendly', apologetic: 'empathetic and understanding', enthusiastic: 'enthusiastic and grateful' };
   const styleGuide = {
-    concise: 'Keep it brief and punchy — 50-70 words max.',
-    detailed: 'Be thorough and address each point the reviewer raised — 120-160 words.',
-    personal: 'Be conversational and personal, as if speaking directly to them — 80-110 words.',
+    concise: 'Keep it brief and punchy â€” 50-70 words max.',
+    detailed: 'Be thorough and address each point the reviewer raised â€” 120-160 words.',
+    personal: 'Be conversational and personal, as if speaking directly to them â€” 80-110 words.',
     balanced: 'Keep it 80-150 words, address specific points, and sign off naturally.'
   };
   const personaContext = persona ? `\n\nBrand voice guidelines: ${persona}` : '';
@@ -373,7 +380,7 @@ async function generateAIResponse(review, businessName, tone, persona, style = '
 function generateTemplateResponse(review, businessName) {
   if (review.rating >= 4) return `Thank you so much for your wonderful review! We're thrilled to hear you had such a positive experience at ${businessName}. Your kind words mean the world to our team and motivate us to keep delivering excellent service. We look forward to welcoming you back soon!`;
   if (review.rating === 3) return `Thank you for sharing your feedback. We're glad aspects of your visit met your expectations and appreciate your honest review. We're always working to improve and would love to make your next experience even better. Please don't hesitate to reach out to us directly.`;
-  return `Thank you for your feedback. We sincerely apologize that your experience didn't meet the standards we hold ourselves to at ${businessName}. We take your concerns seriously and would appreciate the opportunity to make things right — please contact us directly so we can address this personally.`;
+  return `Thank you for your feedback. We sincerely apologize that your experience didn't meet the standards we hold ourselves to at ${businessName}. We take your concerns seriously and would appreciate the opportunity to make things right â€” please contact us directly so we can address this personally.`;
 }
 
 module.exports = router;
