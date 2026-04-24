@@ -554,7 +554,7 @@
     <span class="nav-icon">🧠</span> AI Insights
   </button>
   <button class="nav-item" onclick="showTab('monthly')" id="tab-monthly">
-    <span class="nav-icon">📅</span> Monthly Report <span style="font-size:9px;background:var(--gold);color:white;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700">BIZ</span>
+    <span class="nav-icon">📅</span> Monthly Report <span style="font-size:9px;background:#9CA3AF;color:white;padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:700">SOON</span>
   </button>
   <button class="nav-item" onclick="showTab('platforms')" id="tab-platforms">
     <span class="nav-icon">🔗</span> Platforms
@@ -699,8 +699,9 @@
       <div id="monthly-gate" style="display:none;text-align:center;padding:80px 40px">
         <div style="font-size:48px;margin-bottom:16px">📅</div>
         <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:12px">Monthly Reports</h2>
-        <p style="font-size:15px;color:var(--text-muted);max-width:400px;margin:0 auto 28px;line-height:1.7">Get a full breakdown of every month — what customers loved, what needs work, and your key stats. Business plan only.</p>
-        <button class="btn-primary" onclick="showTab('subscription')">Upgrade to Business →</button>
+        <p style="font-size:15px;color:var(--text-muted);max-width:420px;margin:0 auto 20px;line-height:1.7">Get a full monthly breakdown — what customers praised, recurring issues, your response rate, and one tailored recommendation for the month ahead.</p>
+        <div style="display:inline-block;background:#F5F3EE;border:1px solid #E8E4DC;border-radius:10px;padding:14px 28px;font-size:14px;font-weight:700;color:#6B6878;margin-bottom:16px">🚀 Coming Soon — Business Plan</div>
+        <p style="font-size:13px;color:#9CA3AF;max-width:360px;margin:0 auto">Monthly Reports will be available when paid plans launch. You'll be the first to know.</p>
       </div>
       <div id="monthly-content" style="display:none;max-width:860px;display:flex;flex-direction:column;gap:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
@@ -1101,6 +1102,26 @@
           </div>
         </div>
 
+        <!-- Referral -->
+        <div class="chart-card" id="referral-card">
+          <div class="chart-title" style="margin-bottom:6px">🎁 Refer Friends — Earn More</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Share your referral link. Every friend who signs up gives you <strong>+15 reviews</strong> and <strong>+15 AI responses</strong> added to your account — automatically.</p>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <code id="referral-link-display" style="font-size:12px;background:#F5F3EE;padding:10px 14px;border-radius:8px;border:1px solid var(--mist);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)"></code>
+            <button onclick="copyReferralLink()" style="padding:10px 18px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">Copy Link</button>
+          </div>
+          <div id="referral-stats" style="display:flex;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:120px;background:#F5F3EE;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:800;color:var(--ink)" id="referral-count-display">0</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px;font-weight:600">Friends Referred</div>
+            </div>
+            <div style="flex:1;min-width:120px;background:#FFF8F0;border:1px solid #FDE8C8;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:800;color:var(--gold)" id="referral-bonus-display">+0</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px;font-weight:600">Bonus Responses Earned</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Preferences -->
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:6px">AI Response Preferences</div>
@@ -1371,6 +1392,7 @@
       if (!data.success) { showEmptyDashboard(); return; }
       if (data.analytics.totals.total_reviews === 0) { showEmptyDashboard(); return; }
       renderStats(data.analytics);
+      renderQuotaCard();
       renderBarChart(data.analytics.monthly_trend);
       renderRatingDist(data.analytics.rating_distribution);
       renderSentiment(data.analytics.totals);
@@ -1379,6 +1401,57 @@
       console.error('Overview load error', e);
       showEmptyDashboard();
     }
+  }
+
+  async function renderQuotaCard() {
+    const { data, ok } = await API.get('/api/reviews/quota');
+    if (!ok) return;
+
+    const totalReviews = data.reviews_used || 0;
+    const reviewLimit = data.reviews_limit || 50;
+    const aiUsed = data.ai_used || 0;
+    const responseLimit = data.ai_limit || 20;
+    const bonusReviews = data.bonus_reviews || 0;
+    const bonusResponses = data.bonus_responses || 0;
+
+    const reviewPct = Math.min((totalReviews / reviewLimit) * 100, 100);
+    const aiPct = Math.min((aiUsed / responseLimit) * 100, 100);
+
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    card.style.cssText = 'grid-column: 1 / -1;';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="stat-top" style="margin-bottom:4px"><span class="stat-icon">📊</span><span class="stat-change">Free Plan</span></div>
+          <div style="font-size:15px;font-weight:700;color:var(--ink)">Monthly Usage</div>
+        </div>
+        <button onclick="showTab('settings')" style="font-size:12px;font-weight:700;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">Refer friends for more →</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;color:var(--text-muted);font-weight:600">Reviews</span>
+            <span style="font-size:13px;font-weight:700;color:var(--ink)">${totalReviews} / ${reviewLimit}</span>
+          </div>
+          <div style="height:8px;background:var(--mist);border-radius:100px;overflow:hidden">
+            <div style="height:100%;width:${reviewPct}%;background:${reviewPct > 80 ? '#EF4444' : 'var(--gold)'};border-radius:100px;transition:width 0.6s ease"></div>
+          </div>
+          ${bonusReviews > 0 ? `<div style="font-size:11px;color:var(--gold);margin-top:4px;font-weight:600">+${bonusReviews} bonus from referrals</div>` : ''}
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;color:var(--text-muted);font-weight:600">AI Responses</span>
+            <span style="font-size:13px;font-weight:700;color:var(--ink)">${aiUsed} / ${responseLimit}</span>
+          </div>
+          <div style="height:8px;background:var(--mist);border-radius:100px;overflow:hidden">
+            <div style="height:100%;width:${aiPct}%;background:${aiPct > 80 ? '#EF4444' : 'var(--gold)'};border-radius:100px;transition:width 0.6s ease"></div>
+          </div>
+          ${bonusResponses > 0 ? `<div style="font-size:11px;color:var(--gold);margin-top:4px;font-weight:600">+${bonusResponses} bonus from referrals</div>` : ''}
+        </div>
+      </div>
+    `;
+    document.getElementById('stats-row').appendChild(card);
   }
 
   function showEmptyDashboard() {
@@ -1721,9 +1794,8 @@
 
   // ===== MONTHLY REPORT =====
   function initMonthlyTab() {
-    const isBusiness = currentUser.plan === 'business';
-    document.getElementById('monthly-gate').style.display = isBusiness ? 'none' : 'block';
-    document.getElementById('monthly-content').style.display = isBusiness ? 'flex' : 'none';
+    document.getElementById('monthly-gate').style.display = 'block';
+    document.getElementById('monthly-content').style.display = 'none';
     const now = new Date();
     document.getElementById('monthly-title').textContent = now.toLocaleString('default', { month: 'long', year: 'numeric' }) + ' Report';
   }
@@ -2065,6 +2137,15 @@
       showReviewLinkPreview(currentUser.id);
     }
 
+    // Referral link
+    const referralLink = `${window.location.origin}/register.html?ref=${currentUser.id}`;
+    const display = document.getElementById('referral-link-display');
+    if (display) display.textContent = referralLink;
+    const countEl = document.getElementById('referral-count-display');
+    const bonusEl = document.getElementById('referral-bonus-display');
+    if (countEl) countEl.textContent = currentUser.referral_count || 0;
+    if (bonusEl) bonusEl.textContent = `+${currentUser.referral_bonus_responses || 0}`;
+
     // Show AI persona section for Business plan only
     const personaSection = document.getElementById('persona-section');
     if (personaSection) {
@@ -2113,6 +2194,12 @@
     const link = document.getElementById('review-link-display').textContent;
     navigator.clipboard.writeText(link);
     toast('📋 Review link copied!', 'success');
+  }
+
+  function copyReferralLink() {
+    const link = document.getElementById('referral-link-display').textContent;
+    navigator.clipboard.writeText(link);
+    toast('🎁 Referral link copied! Share it to earn +15 responses per signup.', 'success');
   }
 
   function exportCSV() {
