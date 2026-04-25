@@ -207,15 +207,9 @@
       <h1 class="form-heading">Create your account.</h1>
       <p class="form-sub">Start for free today — no card needed</p>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" placeholder="Jane Smith" autocomplete="name">
-        </div>
-        <div class="form-group">
-          <label for="business_name">Business Name</label>
-          <input type="text" id="business_name" placeholder="My Business">
-        </div>
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Jane Smith" autocomplete="name">
       </div>
 
       <div class="form-group">
@@ -224,29 +218,8 @@
       </div>
 
       <div class="form-group">
-        <label for="business_type">Business Type</label>
-        <select id="business_type">
-          <option value="">Select your industry...</option>
-          <option value="restaurant">Restaurant / Café</option>
-          <option value="retail">Retail / Shop</option>
-          <option value="healthcare">Healthcare / Medical</option>
-          <option value="automotive">Automotive</option>
-          <option value="salon">Salon / Spa / Beauty</option>
-          <option value="hotel">Hotel / Hospitality</option>
-          <option value="legal">Legal / Professional</option>
-          <option value="fitness">Fitness / Wellness</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <div class="form-group">
         <label for="password">Password</label>
         <input type="password" id="password" placeholder="Min. 6 characters" autocomplete="new-password">
-      </div>
-
-      <div class="form-group">
-        <label for="confirm">Confirm Password</label>
-        <input type="password" id="confirm" placeholder="••••••••" autocomplete="new-password">
       </div>
 
       <button class="btn-submit" id="submit-btn" onclick="register()">Create Free Account</button>
@@ -267,15 +240,11 @@
 
     async function register() {
       const name = document.getElementById('name').value.trim();
-      const business_name = document.getElementById('business_name').value.trim();
       const email = document.getElementById('email').value.trim();
-      const business_type = document.getElementById('business_type').value;
       const password = document.getElementById('password').value;
-      const confirm = document.getElementById('confirm').value;
       const btn = document.getElementById('submit-btn');
 
-      if (!name || !email || !password || !confirm) { showMsg('Please fill in all required fields.', 'error'); return; }
-      if (password !== confirm) { showMsg('Passwords do not match.', 'error'); return; }
+      if (!name || !email || !password) { showMsg('Please fill in all required fields.', 'error'); return; }
       if (password.length < 6) { showMsg('Password must be at least 6 characters.', 'error'); return; }
 
       btn.disabled = true;
@@ -284,7 +253,7 @@
       try {
         const ref = new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rp_ref') || null;
         if (ref) localStorage.removeItem('rp_ref');
-        const { data, ok } = await API.post('/api/auth/register', { name, email, password, business_name, business_type, ref });
+        const { data, ok } = await API.post('/api/auth/register', { name, email, password, ref });
         if (ok && data.success) {
           Auth.save(data.token, data.user);
           showMsg('✓ Account created! Setting up your dashboard...', 'success');
