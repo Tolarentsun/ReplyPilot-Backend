@@ -143,7 +143,7 @@ try {
 
       for (let i = 0; i < users.length; i++) {
         const user = users[i];
-        if (i > 0) await new Promise(r => setTimeout(r, 3000)); // 3s between accounts
+        if (i > 0) await new Promise(r => setTimeout(r, 10000)); // 10s between accounts to avoid Google rate limits
         try {
           const token = await refreshTokenIfNeeded(user);
           const count = await syncGoogleReviews(user.id, token, user.google_location_id);
