@@ -199,14 +199,15 @@ router.post('/location', authenticate, async (req, res) => {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function apiCallWithRetry(fn, label = 'Google API', retries = 3) {
+async function apiCallWithRetry(fn, label = 'Google API', retries = 4) {
+  const backoff = [10000, 30000, 90000, 180000]; // 10s, 30s, 90s, 3min
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await fn();
     } catch (err) {
       if (err.response?.status === 429 && attempt < retries) {
-        const delay = Math.pow(2, attempt) * 1500; // 1.5s, 3s, 6s
-        console.log(`[Google] 429 on ${label}, retry ${attempt + 1}/${retries} in ${delay}ms`);
+        const delay = backoff[attempt] || 180000;
+        console.log(`[Google] 429 on ${label}, retry ${attempt + 1}/${retries} in ${delay / 1000}s...`);
         await sleep(delay);
         continue;
       }
