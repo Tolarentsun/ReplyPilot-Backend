@@ -72,6 +72,10 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey || stripeKey.includes('...')) return res.json({ received: true });
 
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    return res.status(400).json({ error: 'Webhook secret not configured' });
+  }
+
   const stripe = require('stripe')(stripeKey);
   const sig = req.headers['stripe-signature'];
   let event;
