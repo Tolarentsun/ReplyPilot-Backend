@@ -96,11 +96,11 @@ router.post('/generate', authenticate, async (req, res) => {
     const prompt = `You are a business intelligence analyst. Analyze these customer reviews for ${businessName} and provide actionable insights.
 
 Analytics Summary:
-- Total Reviews: ${analytics.total}
-- Average Rating: ${(analytics.avg_rating || 0).toFixed(1)}/5
-- Positive: ${analytics.positive} (${Math.round((analytics.positive/analytics.total)*100)}%)
-- Negative: ${analytics.negative} (${Math.round((analytics.negative/analytics.total)*100)}%)
-- Neutral: ${analytics.neutral}
+- Total Reviews: ${parseInt(analytics.total) || 0}
+- Average Rating: ${parseFloat(analytics.avg_rating || 0).toFixed(1)}/5
+- Positive: ${parseInt(analytics.positive) || 0} (${Math.round(((parseInt(analytics.positive)||0)/(parseInt(analytics.total)||1))*100)}%)
+- Negative: ${parseInt(analytics.negative) || 0} (${Math.round(((parseInt(analytics.negative)||0)/(parseInt(analytics.total)||1))*100)}%)
+- Neutral: ${parseInt(analytics.neutral) || 0}
 
 Recent Reviews Sample:
 ${reviewSummary}
