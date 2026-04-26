@@ -4,6 +4,59 @@ const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const axios = require('axios');
 
+// Business recommendations — requires 10 reviews
+router.get('/recommendations', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const reviews = await db.asyncAll(
+      'SELECT rating, review_text, sentiment FROM reviews WHERE user_id = ? ORDER BY review_date DESC LIMIT 50',
+      [userId]
+    );
+    const count = reviews.length;
+    if (count < 10) {
+      return res.json({ success: true, enough_data: false, count, needed: 10 - count });
+    }
+
+    const positive = reviews.filter(r => r.sentiment === 'positive');
+    const negative = reviews.filter(r => r.sentiment === 'negative');
+
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+    if (!ANTHROPIC_API_KEY) {
+      return res.json({
+        success: true, enough_data: true, count,
+        doing_well: ['Customers consistently mention quality of service', 'Positive reviews highlight friendly and professional staff', 'Strong overall satisfaction reflected in your ratings'],
+        needs_improvement: ['Response time to negative reviews could be faster', 'Some customers mention inconsistency in experience', 'Consider following up with dissatisfied customers directly']
+      });
+    }
+
+    const sample = reviews.slice(0, 20).map(r => `[${r.rating}★] "${r.review_text.substring(0, 100)}"`).join('\n');
+    const prompt = `You are a business consultant. Based on these ${count} customer reviews, give concise bullet points.
+
+Reviews:
+${sample}
+
+Return ONLY a JSON object:
+{
+  "doing_well": ["specific strength 1", "specific strength 2", "specific strength 3"],
+  "needs_improvement": ["specific issue 1", "specific issue 2", "specific issue 3"]
+}`;
+
+    const response = await axios.post('https://api.anthropic.com/v1/messages', {
+      model: 'claude-haiku-4-5-20251001', max_tokens: 400,
+      messages: [{ role: 'user', content: prompt }]
+    }, { headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' } });
+
+    let result;
+    try { result = JSON.parse(response.data.content[0].text.replace(/```json\n?|\n?```/g, '').trim()); }
+    catch (e) { result = { doing_well: ['Quality service noted by customers', 'Positive staff interactions', 'Good overall experience'], needs_improvement: ['Response consistency', 'Wait times mentioned', 'Follow-up communication'] }; }
+
+    res.json({ success: true, enough_data: true, count, ...result });
+  } catch (err) {
+    console.error('Recommendations error:', err.message);
+    res.status(500).json({ error: 'Failed to load recommendations' });
+  }
+});
+
 // Generate AI insights report
 router.post('/generate', authenticate, async (req, res) => {
   try {
@@ -235,75 +288,6 @@ Return ONLY a JSON object with this exact structure:
   } catch (err) {
     console.error('Monthly insights error:', err);
     res.status(500).json({ error: 'Failed to generate monthly report' });
-  }
-});
-
-// Recommendations — min 10 reviews required
-router.get('/recommendations', authenticate, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const businessName = req.user.business_name || 'your business';
-
-    const countRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [userId]);
-    const total = parseInt(countRow?.total) || 0;
-
-    if (total < 10) {
-      return res.json({ success: true, enough_data: false, count: total, needed: 10 - total });
-    }
-
-    const reviews = await db.asyncAll(
-      'SELECT rating, review_text FROM reviews WHERE user_id = ? ORDER BY review_date DESC LIMIT 40',
-      [userId]
-    );
-
-    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-
-    if (!ANTHROPIC_API_KEY) {
-      return res.json({
-        success: true, enough_data: true,
-        doing_well: ['Consistent quality of service', 'Professional and friendly staff', 'Strong customer satisfaction scores'],
-        needs_improvement: ['Response time to customer feedback', 'Consistency across all touchpoints', 'Follow-up with dissatisfied customers']
-      });
-    }
-
-    const reviewText = reviews.map(r => `[${r.rating}★] "${r.review_text.substring(0, 150)}"`).join('\n');
-
-    const prompt = `Analyze these customer reviews for ${businessName} and identify patterns.
-
-Reviews:
-${reviewText}
-
-Return ONLY a JSON object with this exact structure — no extra text:
-{
-  "doing_well": ["specific thing customers praise", "specific thing customers praise", "specific thing customers praise"],
-  "needs_improvement": ["specific thing customers complain about", "specific thing customers complain about", "specific thing customers complain about"]
-}
-
-Base each point on actual patterns in the reviews, not generic advice. Be specific to this business.`;
-
-    const response = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-sonnet-4-6',
-      max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }]
-    }, {
-      headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' }
-    });
-
-    const aiText = response.data.content[0]?.text;
-    let result;
-    try {
-      result = JSON.parse(aiText.replace(/```json\n?|\n?```/g, '').trim());
-    } catch (e) {
-      result = {
-        doing_well: ['Customers report positive overall experiences', 'Service quality is consistently noted', 'Staff professionalism mentioned frequently'],
-        needs_improvement: ['Response time could be improved', 'Some inconsistency in service reported', 'Follow-up communication needs attention']
-      };
-    }
-
-    res.json({ success: true, enough_data: true, ...result });
-  } catch (err) {
-    console.error('Recommendations error:', err);
-    res.status(500).json({ error: 'Failed to generate recommendations' });
   }
 });
 
