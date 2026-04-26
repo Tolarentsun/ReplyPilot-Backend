@@ -155,7 +155,7 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
         'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
         [req.user.id, monthStart.toISOString()]
       );
-      if ((usedRow?.total || 0) >= 5) {
+      if ((parseInt(usedRow?.total) || 0) >= 5) {
         return res.status(403).json({ error: 'Free plan limit reached (5 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
       }
     }
