@@ -38,6 +38,11 @@ router.post('/register', async (req, res) => {
     const token = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
 
     sendEmail({ to: email, subject: 'Welcome to ReplyPilot', html: welcomeEmail(name) }).catch(() => {});
+    sendEmail({
+      to: 'Christophersw1011@gmail.com',
+      subject: `New ReplyPilot signup: ${name}`,
+      html: `<p>New user signed up on ReplyPilot.</p><ul><li><strong>Name:</strong> ${name}</li><li><strong>Email:</strong> ${email}</li><li><strong>Plan:</strong> Free</li><li><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</li></ul>`
+    }).catch(() => {});
 
     res.json({ success: true, token, user });
   } catch (err) {
