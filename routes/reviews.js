@@ -183,6 +183,43 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
   }
 });
 
+// Generate 3 AI response options (Concise / Detailed / Personal)
+router.post('/:id/generate-options', authenticate, async (req, res) => {
+  try {
+    const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+    if (!review) return res.status(404).json({ error: 'Review not found' });
+
+    if (req.user.plan === 'free') {
+      const monthStart = new Date();
+      monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+      const usedRow = await db.asyncGet(
+        'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
+        [req.user.id, monthStart.toISOString()]
+      );
+      const responseLimit = 20 + (parseInt(req.user.referral_bonus_responses) || 0);
+      if ((parseInt(usedRow?.total) || 0) >= responseLimit) {
+        return res.status(403).json({ error: `Free plan limit reached (${responseLimit} AI responses/month). Upgrade to Pro for unlimited responses.`, upgrade_required: true });
+      }
+    }
+
+    const { tone = 'professional' } = req.body;
+    const userRecord = await db.asyncGet('SELECT business_name, ai_persona FROM users WHERE id = ?', [req.user.id]);
+    const businessName = userRecord?.business_name || req.user.business_name || 'our business';
+    const persona = userRecord?.ai_persona || null;
+    const options = await generateResponseOptions(review, businessName, tone, persona);
+
+    await db.asyncRun(
+      'INSERT INTO ai_generations (id, user_id, review_id, model) VALUES (?, ?, ?, ?)',
+      [generateId(), req.user.id, review.id, 'claude-sonnet-4-6']
+    );
+
+    res.json({ success: true, options });
+  } catch (err) {
+    console.error('Generate options error:', err);
+    res.status(500).json({ error: 'Failed to generate response options: ' + err.message });
+  }
+});
+
 // Mark as responded
 router.put('/:id/respond', authenticate, async (req, res) => {
   try {
@@ -193,6 +230,39 @@ router.put('/:id/respond', authenticate, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update review' });
+  }
+});
+
+// Usage quota for free plan dashboard card
+router.get('/quota', authenticate, async (req, res) => {
+  try {
+    const user = req.user;
+    const bonusReviews = parseInt(user.referral_bonus_reviews) || 0;
+    const bonusResponses = parseInt(user.referral_bonus_responses) || 0;
+    const reviewLimit = user.plan === 'free' ? 50 + bonusReviews : -1;
+
+    const reviewCountRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [user.id]);
+    const reviewsUsed = parseInt(reviewCountRow?.total) || 0;
+
+    const monthStart = new Date();
+    monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+    const aiUsedRow = await db.asyncGet(
+      'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
+      [user.id, monthStart.toISOString()]
+    );
+    const aiUsed = parseInt(aiUsedRow?.total) || 0;
+    const bonusResponsesRemaining = Math.max(0, bonusResponses - Math.max(0, aiUsed - 20));
+
+    res.json({
+      success: true,
+      reviews_used: reviewsUsed,
+      reviews_limit: reviewLimit,
+      ai_used: aiUsed,
+      bonus_reviews: bonusReviews,
+      bonus_responses_remaining: bonusResponsesRemaining
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch quota' });
   }
 });
 
@@ -276,6 +346,46 @@ function analyzeSentiment(text, rating) {
   const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','was','is','it','my','i','we','they','have','had','very','so','this','that']);
   const keywords = [...new Set(words.filter(w => w.length > 4 && !stopWords.has(w)))].slice(0, 6);
   return { sentiment, sentiment_score: sentimentScore, keywords };
+}
+
+async function generateResponseOptions(review, businessName, tone, persona) {
+  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+  if (!ANTHROPIC_API_KEY) {
+    const base = generateTemplateResponse(review, businessName);
+    return [base, base, base];
+  }
+
+  const toneMap = { professional: 'professional and courteous', friendly: 'warm and friendly', apologetic: 'empathetic and understanding', enthusiastic: 'enthusiastic and grateful' };
+  const personaContext = persona ? `\n\nBrand voice guidelines: ${persona}` : '';
+
+  const prompt = `You are a customer response specialist for ${businessName}. Write 3 different ${toneMap[tone] || 'professional'} responses to this ${review.rating}-star review: "${review.review_text}".
+
+Style each option differently:
+1. Concise: Short and direct, 50-80 words
+2. Detailed: Thorough and comprehensive, 120-160 words
+3. Personal: Warm and conversational, 80-120 words
+
+All should address specific points and sign off naturally.${personaContext}
+
+Return ONLY a JSON array of exactly 3 strings:
+["concise response", "detailed response", "personal response"]`;
+
+  const response = await axios.post('https://api.anthropic.com/v1/messages', {
+    model: 'claude-sonnet-4-6',
+    max_tokens: 900,
+    messages: [{ role: 'user', content: prompt }]
+  }, { headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' } });
+
+  const text = response.data.content[0]?.text;
+  if (!text) throw new Error('Empty response from AI');
+
+  try {
+    const opts = JSON.parse(text.replace(/```json\n?|\n?```/g, '').trim());
+    if (Array.isArray(opts) && opts.length === 3) return opts;
+  } catch (e) {}
+
+  const fallback = generateTemplateResponse(review, businessName);
+  return [fallback, fallback, fallback];
 }
 
 async function generateAIResponse(review, businessName, tone, persona) {

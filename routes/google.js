@@ -53,11 +53,18 @@ router.get('/callback', async (req, res) => {
 
     const { access_token, refresh_token } = tokenRes.data;
 
-    // Save tokens to user
-    await db.asyncRun(
-      'UPDATE users SET google_access_token = ?, google_refresh_token = ?, google_connected = true WHERE id = ?',
-      [access_token, refresh_token || null, userId]
-    );
+    // Only overwrite refresh_token if Google provided a new one (it won't on re-auth)
+    if (refresh_token) {
+      await db.asyncRun(
+        'UPDATE users SET google_access_token = ?, google_refresh_token = ?, google_connected = true WHERE id = ?',
+        [access_token, refresh_token, userId]
+      );
+    } else {
+      await db.asyncRun(
+        'UPDATE users SET google_access_token = ?, google_connected = true WHERE id = ?',
+        [access_token, userId]
+      );
+    }
 
     // Fetch their business accounts
     await syncGoogleReviews(userId, access_token);
