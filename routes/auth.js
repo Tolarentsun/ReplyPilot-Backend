@@ -17,7 +17,7 @@ function generateId() {
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, business_name, business_type } = req.body;
+    const { name, email, password, business_name, business_type, ref } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
@@ -27,10 +27,25 @@ router.post('/register', async (req, res) => {
     const id = generateId();
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Validate referrer before inserting so we don't credit a fake ID
+    let validRef = null;
+    if (ref && ref !== id) {
+      const referrer = await db.asyncGet('SELECT id FROM users WHERE id = ?', [ref]);
+      if (referrer) validRef = ref;
+    }
+
     await db.asyncRun(
-      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan) VALUES (?, ?, ?, ?, ?, ?, 'free')`,
-      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null]
+      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by) VALUES (?, ?, ?, ?, ?, ?, 'free', ?)`,
+      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, validRef]
     );
+
+    // Credit referrer: +15 bonus reviews and +15 bonus AI responses
+    if (validRef) {
+      await db.asyncRun(
+        `UPDATE users SET referral_count = referral_count + 1, referral_bonus_reviews = referral_bonus_reviews + 15, referral_bonus_responses = referral_bonus_responses + 15 WHERE id = ?`,
+        [validRef]
+      );
+    }
 
     await seedDemoReviews(id);
 
