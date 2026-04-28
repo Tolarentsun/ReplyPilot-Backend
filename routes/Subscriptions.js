@@ -8,7 +8,7 @@ router.get('/plans', (req, res) => {
   res.json({
     success: true,
     plans: [
-      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 25 reviews', 'Sentiment analysis', 'AI responses (5/month)', 'Basic analytics dashboard', 'Email support'], limits: { reviews: 25, ai_responses: 5 } },
+      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 50 reviews', 'Sentiment analysis', 'AI responses (20/month)', 'Basic analytics dashboard', 'Email support'], limits: { reviews: 50, ai_responses: 20 } },
       { id: 'pro', name: 'Professional', price: 49, period: 'month', popular: true, features: ['Unlimited reviews', 'Unlimited AI responses', 'Google auto-sync every 24 hours', 'Bulk generate all pending responses', 'Full trend analytics & AI insights', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } },
       { id: 'business', name: 'Business', price: 149, period: 'month', features: ['Everything in Professional, plus:', '|DIVIDER|Business Exclusive', 'Post responses to Google in 1 click — no copy-paste ever', 'AI learns your brand voice and sign-off — responses sound like you, not a template', 'Manage multiple Google locations from one account', 'Priority email support with faster response times'], limits: { reviews: -1, ai_responses: -1 } }
     ]

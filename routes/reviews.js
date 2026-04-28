@@ -113,8 +113,8 @@ router.post('/', authenticate, async (req, res) => {
     // Enforce free plan review limit
     if (req.user.plan === 'free') {
       const countRow = await db.asyncGet('SELECT COUNT(*) as total FROM reviews WHERE user_id = ?', [req.user.id]);
-      if ((parseInt(countRow?.total) || 0) >= 25) {
-        return res.status(403).json({ error: 'Free plan limit reached (25 reviews). Upgrade to Pro for unlimited reviews.', upgrade_required: true });
+      if ((parseInt(countRow?.total) || 0) >= 50) {
+        return res.status(403).json({ error: 'Free plan limit reached (50 reviews). Upgrade to Pro for unlimited reviews.', upgrade_required: true });
       }
     }
 
@@ -147,7 +147,7 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
     const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
     if (!review) return res.status(404).json({ error: 'Review not found' });
 
-    // Enforce free plan AI response limit (5 per month)
+    // Enforce free plan AI response limit (20 per month)
     if (req.user.plan === 'free') {
       const monthStart = new Date();
       monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
@@ -155,22 +155,22 @@ router.post('/:id/generate-response', authenticate, async (req, res) => {
         'SELECT COUNT(*) as total FROM ai_generations WHERE user_id = ? AND created_at >= ?',
         [req.user.id, monthStart.toISOString()]
       );
-      if ((parseInt(usedRow?.total) || 0) >= 5) {
-        return res.status(403).json({ error: 'Free plan limit reached (5 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
+      if ((parseInt(usedRow?.total) || 0) >= 20) {
+        return res.status(403).json({ error: 'Free plan limit reached (20 AI responses/month). Upgrade to Pro for unlimited responses.', upgrade_required: true });
       }
     }
-
-    // Log this generation
-    await db.asyncRun(
-      'INSERT INTO ai_generations (id, user_id, review_id, model) VALUES (?, ?, ?, ?)',
-      [generateId(), req.user.id, review.id, 'claude-sonnet-4-6']
-    );
 
     const { tone = 'professional' } = req.body;
     const userRecord = await db.asyncGet('SELECT business_name, ai_persona FROM users WHERE id = ?', [req.user.id]);
     const businessName = userRecord?.business_name || req.user.business_name || 'our business';
     const persona = userRecord?.ai_persona || null;
     const response = await generateAIResponse(review, businessName, tone, persona);
+
+    // Log usage only after successful generation
+    await db.asyncRun(
+      'INSERT INTO ai_generations (id, user_id, review_id, model) VALUES (?, ?, ?, ?)',
+      [generateId(), req.user.id, review.id, 'claude-sonnet-4-6']
+    );
 
     await db.asyncRun(`UPDATE reviews SET ai_response = ?, response_status = 'generated' WHERE id = ?`, [response, review.id]);
 
@@ -187,7 +187,7 @@ router.put('/:id/respond', authenticate, async (req, res) => {
     const { response_text } = req.body;
     const review = await db.asyncGet('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
     if (!review) return res.status(404).json({ error: 'Review not found' });
-    await db.asyncRun(`UPDATE reviews SET response_status = 'responded', ai_response = ? WHERE id = ?`, [response_text || review.ai_response, review.id]);
+    await db.asyncRun(`UPDATE reviews SET response_status = 'responded', ai_response = ?, responded_at = ? WHERE id = ?`, [response_text || review.ai_response, new Date().toISOString(), review.id]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update review' });

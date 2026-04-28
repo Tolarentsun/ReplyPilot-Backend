@@ -84,7 +84,7 @@ router.get('/status', authenticate, async (req, res) => {
 router.post('/disconnect', authenticate, async (req, res) => {
   try {
     await db.asyncRun(
-      'UPDATE users SET google_access_token = NULL, google_refresh_token = NULL, google_connected = false, google_location_id = NULL WHERE id = ?',
+      'UPDATE users SET google_access_token = NULL, google_refresh_token = NULL, google_connected = false, google_location_id = NULL, google_business_name = NULL WHERE id = ?',
       [req.user.id]
     );
     res.json({ success: true });
@@ -104,7 +104,7 @@ router.post('/sync', authenticate, async (req, res) => {
     const token = await refreshTokenIfNeeded(user);
     const count = await syncGoogleReviews(user.id, token, user.google_location_id);
     if (count > 0 && user.notify_new_reviews) {
-      sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, ...newReviewEmail(user.name, count, 'google') }).catch(() => {});
+      sendEmail({ to: user.email, subject: `You have ${count} new Google review(s) on ReplyPilot`, html: newReviewEmail(user.name, count, 'google') }).catch(() => {});
     }
     res.json({ success: true, synced: count, message: `Synced ${count} reviews from Google` });
   } catch (err) {

@@ -150,7 +150,7 @@ try {
           if (count > 0) {
             console.log(`[Cron] ${user.email}: synced ${count} new review(s)`);
             if (user.notify_new_reviews) {
-              sendEmail({ to: user.email, subject: `You have ${count} new review(s) on ReplyPilot`, ...newReviewEmail(user.name, count, 'google') }).catch(() => {});
+              sendEmail({ to: user.email, subject: `You have ${count} new Google review(s) on ReplyPilot`, html: newReviewEmail(user.name, count, 'google') }).catch(() => {});
             }
           } else {
             console.log(`[Cron] ${user.email}: no new reviews`);
