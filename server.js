@@ -30,6 +30,7 @@ app.get('/dashboard', (req, res) => { res.set('Cache-Control', 'no-store'); res.
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
 app.get('/forgot-password', (req, res) => res.sendFile(path.join(__dirname, 'forgot-password.html')));
+app.get('/verify-email', (req, res) => { res.set('Cache-Control', 'no-store'); res.sendFile(path.join(__dirname, 'verify-email.html')); });
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'reset-password.html')));
 app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));

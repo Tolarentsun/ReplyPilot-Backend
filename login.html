@@ -282,6 +282,7 @@
       const btn = document.getElementById('submit-btn');
 
       if (!email || !password) { showMsg('Please fill in all fields.', 'error'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showMsg('Please enter a valid email address.', 'error'); return; }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Signing in...';
@@ -292,6 +293,10 @@
           Auth.save(data.token, data.user);
           showMsg('✓ Success! Redirecting...', 'success');
           setTimeout(() => window.location.href = 'dashboard.html', 800);
+        } else if (data.unverified) {
+          showMsg('❌ Email not verified. <a href="#" onclick="resendVerification(\'' + (data.email||email) + '\');return false;" style="color:#991B1B;font-weight:700;text-decoration:underline">Resend verification email</a>', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
         } else {
           showMsg('❌ ' + (data.error || 'Login failed. Please try again.'), 'error');
           btn.disabled = false;
@@ -304,9 +309,19 @@
       }
     }
 
+    async function resendVerification(email) {
+      showMsg('Sending verification email...', 'success');
+      try {
+        await API.post('/api/auth/resend-verification', { email });
+        showMsg('✓ Verification email sent! Check your inbox.', 'success');
+      } catch(e) {
+        showMsg('❌ Could not send email. Please try again.', 'error');
+      }
+    }
+
     function showMsg(text, type) {
       const el = document.getElementById('message');
-      el.textContent = text;
+      el.innerHTML = text;
       el.className = `form-message ${type} show`;
     }
 

@@ -261,6 +261,7 @@
       const btn = document.getElementById('submit-btn');
 
       if (!name || !email || !password) { showMsg('Please fill in all required fields.', 'error'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showMsg('Please enter a valid email address.', 'error'); return; }
       if (password.length < 6) { showMsg('Password must be at least 6 characters.', 'error'); return; }
 
       btn.disabled = true;
@@ -271,9 +272,10 @@
         if (ref) localStorage.removeItem('rp_ref');
         const { data, ok } = await API.post('/api/auth/register', { name, email, password, ref });
         if (ok && data.success) {
-          Auth.save(data.token, data.user);
-          showMsg('✓ Account created! Setting up your dashboard...', 'success');
-          setTimeout(() => window.location.href = _checkoutDest, 1200);
+          showMsg('✓ Account created! Check your email to verify your account before logging in.', 'success');
+          btn.textContent = 'Check your email ✓';
+          document.getElementById('name').value = '';
+          document.getElementById('password').value = '';
         } else {
           showMsg('❌ ' + (data.error || 'Registration failed.'), 'error');
           btn.disabled = false;

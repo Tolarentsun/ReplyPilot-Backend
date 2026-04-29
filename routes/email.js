@@ -76,4 +76,16 @@ function newReviewEmail(name, count, platform) {
   </div>`;
 }
 
-module.exports = { sendEmail, welcomeEmail, passwordResetEmail, subscriptionEmail, newReviewEmail };
+function verifyEmailTemplate(name, token) {
+  const BASE_URL = process.env.FRONTEND_URL || 'https://reply-pilot.net';
+  const link = `${BASE_URL}/verify-email?token=${token}`;
+  return `<div style="max-width:560px;margin:0 auto;padding:40px 24px;font-family:'DM Sans',Helvetica,Arial,sans-serif">
+    <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:800;color:#0A0A0F;margin-bottom:8px">Verify your email</h1>
+    <p style="font-size:15px;color:#6B6878;line-height:1.7;margin-bottom:24px">Hi ${name}, click the button below to verify your email address and activate your ReplyPilot account. This link expires in 24 hours.</p>
+    <a href="${link}" style="display:inline-block;background:#0A0A0F;color:white;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:15px;margin-bottom:32px">Verify Email →</a>
+    <p style="font-size:13px;color:#9CA3AF">If you didn't create an account, you can ignore this email.</p>
+    <p style="font-size:12px;color:#9CA3AF;margin-top:24px">© 2025 ReplyPilot · <a href="${BASE_URL}/privacy.html" style="color:#9CA3AF">Privacy</a></p>
+  </div>`;
+}
+
+module.exports = { sendEmail, welcomeEmail, passwordResetEmail, subscriptionEmail, newReviewEmail, verifyEmailTemplate };

@@ -101,6 +101,11 @@ async function initSchema() {
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_reviews INTEGER DEFAULT 0');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_responses INTEGER DEFAULT 0');
       await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_bonus_responses_used INTEGER DEFAULT 0');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verify_token TEXT');
+      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verify_expires TEXT');
+      // Mark existing users as verified so they aren't locked out
+      await client.query("UPDATE users SET email_verified = true WHERE email_verified = false AND created_at < NOW() - INTERVAL '1 minute'");
     } catch(e) {}
     console.log('✅ PostgreSQL schema ready');
   } catch(e) {

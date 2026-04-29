@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LH21Y6MP7N"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-LH21Y6MP7N');</script>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email — ReplyPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#0A0A0F; --cream:#FAF8F4; --gold:#E8922A; --mist:#E8E4DC; --text:#2A2A35; --text-muted:#6B6878; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--cream); }
+    .card { background:white; border-radius:16px; padding:56px 48px; max-width:440px; width:90%; text-align:center; box-shadow:0 4px 32px rgba(0,0,0,0.08); }
+    .icon { font-size:52px; margin-bottom:24px; }
+    h1 { font-family:'Playfair Display',serif; font-size:28px; font-weight:800; color:var(--ink); margin-bottom:12px; }
+    p { font-size:15px; color:var(--text-muted); line-height:1.7; margin-bottom:24px; }
+    .btn { display:inline-block; padding:14px 32px; background:var(--ink); color:white; border-radius:8px; text-decoration:none; font-weight:600; font-size:15px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; width:100%; transition:background 0.2s; }
+    .btn:hover { background:var(--gold); color:var(--ink); }
+    .btn-outline { background:white; color:var(--ink); border:1.5px solid var(--mist); margin-top:12px; }
+    .btn-outline:hover { background:var(--mist); }
+    .divider { height:1px; background:var(--mist); margin:24px 0; }
+    .msg { padding:12px 16px; border-radius:8px; font-size:14px; margin-bottom:16px; display:none; }
+    .msg.show { display:block; }
+    .msg.success { background:#D1FAE5; color:#065F46; }
+    .msg.error { background:#FEE2E2; color:#991B1B; }
+    input { width:100%; padding:13px 16px; border:1.5px solid var(--mist); border-radius:8px; font-size:15px; font-family:'DM Sans',sans-serif; margin-bottom:12px; }
+    input:focus { outline:none; border-color:var(--gold); }
+    .logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:800; color:var(--ink); text-decoration:none; display:block; margin-bottom:32px; }
+    .logo span { color:var(--gold); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <a href="/" class="logo">Reply<span>Pilot</span></a>
+    <div id="check-inbox" style="display:none">
+      <div class="icon">📬</div>
+      <h1>Check your inbox</h1>
+      <p>We sent a verification link to your email address. Click it to activate your account — it expires in 24 hours.</p>
+      <div class="divider"></div>
+      <p style="font-size:13px;margin-bottom:16px">Didn't get it? Check your spam folder or resend below.</p>
+      <div class="msg" id="resend-msg"></div>
+      <input type="email" id="resend-email" placeholder="Your email address">
+      <button class="btn" onclick="resend()">Resend Verification Email</button>
+      <a href="login.html" class="btn btn-outline" style="display:block;text-align:center;margin-top:12px">Back to Login</a>
+    </div>
+    <div id="expired-view" style="display:none">
+      <div class="icon">⏱️</div>
+      <h1>Link expired</h1>
+      <p>This verification link has expired or already been used. Enter your email to get a new one.</p>
+      <div class="msg" id="resend-msg2"></div>
+      <input type="email" id="resend-email2" placeholder="Your email address">
+      <button class="btn" onclick="resend2()">Send New Link</button>
+      <a href="login.html" class="btn btn-outline" style="display:block;text-align:center;margin-top:12px">Back to Login</a>
+    </div>
+    <div id="loading-view">
+      <div class="icon">⏳</div>
+      <h1>Verifying...</h1>
+      <p>Please wait a moment.</p>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+
+    if (error === 'expired' || error === 'failed' || error === 'invalid_token') {
+      document.getElementById('loading-view').style.display = 'none';
+      document.getElementById('expired-view').style.display = 'block';
+    } else {
+      // No error param = came from register page link, show check-inbox state
+      document.getElementById('loading-view').style.display = 'none';
+      document.getElementById('check-inbox').style.display = 'block';
+    }
+
+    async function resend() {
+      const email = document.getElementById('resend-email').value.trim();
+      const msg = document.getElementById('resend-msg');
+      if (!email) { showMsg(msg, 'Please enter your email.', 'error'); return; }
+      try {
+        await fetch((window.API_BASE || '') + '/api/auth/resend-verification', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        showMsg(msg, '✓ Sent! Check your inbox.', 'success');
+      } catch(e) { showMsg(msg, '❌ Failed. Please try again.', 'error'); }
+    }
+
+    async function resend2() {
+      const email = document.getElementById('resend-email2').value.trim();
+      const msg = document.getElementById('resend-msg2');
+      if (!email) { showMsg(msg, 'Please enter your email.', 'error'); return; }
+      try {
+        await fetch((window.API_BASE || '') + '/api/auth/resend-verification', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        showMsg(msg, '✓ New link sent! Check your inbox.', 'success');
+      } catch(e) { showMsg(msg, '❌ Failed. Please try again.', 'error'); }
+    }
+
+    function showMsg(el, text, type) {
+      el.textContent = text;
+      el.className = 'msg show ' + type;
+    }
+  </script>
+</body>
+</html>

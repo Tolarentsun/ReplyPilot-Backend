@@ -7,7 +7,7 @@ const axios = require('axios');
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const { seedDemoReviews } = require('../db/seedData');
-const { sendEmail, welcomeEmail, passwordResetEmail } = require('./email');
+const { sendEmail, welcomeEmail, passwordResetEmail, verifyEmailTemplate } = require('./email');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set');
@@ -20,6 +20,7 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password, business_name, business_type, ref } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email address' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
     const existing = await db.asyncGet('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
@@ -35,9 +36,12 @@ router.post('/register', async (req, res) => {
       if (referrer) validRef = ref;
     }
 
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
     await db.asyncRun(
-      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by) VALUES (?, ?, ?, ?, ?, ?, 'free', ?)`,
-      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, validRef]
+      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by, email_verified, email_verify_token, email_verify_expires) VALUES (?, ?, ?, ?, ?, ?, 'free', ?, false, ?, ?)`,
+      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, validRef, verifyToken, verifyExpires]
     );
 
     // Credit referrer: +15 bonus reviews and +15 bonus AI responses
@@ -50,17 +54,14 @@ router.post('/register', async (req, res) => {
 
     await seedDemoReviews(id);
 
-    const user = await db.asyncGet('SELECT id, name, email, plan, business_name, business_type, created_at FROM users WHERE id = ?', [id]);
-    const token = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
-
-    sendEmail({ to: email, subject: 'Welcome to ReplyPilot', html: welcomeEmail(name) }).catch(() => {});
+    sendEmail({ to: email, subject: 'Verify your ReplyPilot email', html: verifyEmailTemplate(name, verifyToken) }).catch(() => {});
     sendEmail({
       to: 'Christophersw1011@gmail.com',
       subject: `New ReplyPilot signup: ${name}`,
       html: `<p>New user signed up on ReplyPilot.</p><ul><li><strong>Name:</strong> ${name}</li><li><strong>Email:</strong> ${email}</li><li><strong>Plan:</strong> Free</li><li><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</li></ul>`
     }).catch(() => {});
 
-    res.json({ success: true, token, user });
+    res.json({ success: true, verify: true, message: 'Account created! Please check your email to verify your account.' });
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ error: 'Registration failed: ' + err.message });
@@ -77,6 +78,10 @@ router.post('/login', async (req, res) => {
 
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
+
+    if (!user.email_verified) {
+      return res.status(403).json({ error: 'Please verify your email before logging in. Check your inbox for the verification link.', unverified: true, email: user.email });
+    }
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
     const { password_hash, ...safeUser } = user;
@@ -173,6 +178,50 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// Verify email via token link
+router.get('/verify-email', async (req, res) => {
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'https://reply-pilot.net';
+  const { token } = req.query;
+  if (!token) return res.redirect(`${FRONTEND_URL}/login.html?error=invalid_token`);
+  try {
+    const user = await db.asyncGet(
+      'SELECT id, name FROM users WHERE email_verify_token = ? AND email_verify_expires > ?',
+      [token, new Date().toISOString()]
+    );
+    if (!user) return res.redirect(`${FRONTEND_URL}/verify-email?error=expired`);
+    await db.asyncRun(
+      'UPDATE users SET email_verified = true, email_verify_token = NULL, email_verify_expires = NULL WHERE id = ?',
+      [user.id]
+    );
+    const jwt_token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+    res.redirect(`${FRONTEND_URL}/dashboard.html?token=${jwt_token}&verified=true`);
+  } catch (err) {
+    console.error('Verify email error:', err.message);
+    res.redirect(`${FRONTEND_URL}/verify-email?error=failed`);
+  }
+});
+
+// Resend verification email
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+    const user = await db.asyncGet('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
+    if (!user) return res.json({ success: true }); // don't reveal if email exists
+    if (user.email_verified) return res.json({ success: true, message: 'Already verified' });
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    await db.asyncRun(
+      'UPDATE users SET email_verify_token = ?, email_verify_expires = ? WHERE id = ?',
+      [verifyToken, verifyExpires, user.id]
+    );
+    await sendEmail({ to: user.email, subject: 'Verify your ReplyPilot email', html: verifyEmailTemplate(user.name, verifyToken) });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to resend verification email' });
+  }
+});
+
 // Google OAuth login/signup
 router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -221,7 +270,7 @@ router.get('/google/callback', async (req, res) => {
         if (referrer) validRef = ref;
       }
       await db.asyncRun(
-        `INSERT INTO users (id, name, email, password_hash, plan, referred_by) VALUES (?, ?, ?, '', 'free', ?)`,
+        `INSERT INTO users (id, name, email, password_hash, plan, referred_by, email_verified) VALUES (?, ?, ?, '', 'free', ?, true)`,
         [id, name, email.toLowerCase(), validRef]
       );
       if (validRef) {
