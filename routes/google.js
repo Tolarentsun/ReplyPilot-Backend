@@ -237,7 +237,8 @@ async function refreshTokenIfNeeded(user) {
     await db.asyncRun('UPDATE users SET google_access_token = ? WHERE id = ?', [newToken, user.id]);
     return newToken;
   } catch (e) {
-    return user.google_access_token;
+    console.error('Token refresh failed:', e.response?.data || e.message);
+    throw new Error('Google token refresh failed: ' + (e.response?.data?.error_description || e.message));
   }
 }
 
