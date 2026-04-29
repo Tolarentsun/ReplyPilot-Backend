@@ -2616,6 +2616,11 @@
 
   async function checkGoogleCallback() {
     const params = new URLSearchParams(window.location.search);
+    // Handle Google login redirect — token passed in URL
+    if (params.get('token') && params.get('google_login')) {
+      Auth.setToken(params.get('token'));
+      history.replaceState({}, '', window.location.pathname);
+    }
     if (params.get('google_connected')) {
       toast('✓ Google Business Profile connected!', 'success');
       showTab('platforms');

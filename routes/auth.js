@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const axios = require('axios');
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const { seedDemoReviews } = require('../db/seedData');
@@ -169,6 +170,82 @@ router.post('/reset-password', async (req, res) => {
   } catch (err) {
     console.error('Reset password error:', err);
     res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+// Google OAuth login/signup
+router.get('/google', (req, res) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return res.status(500).json({ error: 'Google login not configured' });
+  const ref = req.query.ref || '';
+  const state = Buffer.from(JSON.stringify({ ref })).toString('base64');
+  const redirect = encodeURIComponent(`${process.env.FRONTEND_URL || 'https://reply-pilot.net'}/api/auth/google/callback`);
+  const scope = encodeURIComponent('openid email profile');
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${state}`);
+});
+
+router.get('/google/callback', async (req, res) => {
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'https://reply-pilot.net';
+  const { code, state, error } = req.query;
+  if (error || !code) return res.redirect(`${FRONTEND_URL}/login.html?error=google_cancelled`);
+
+  try {
+    const redirectUri = `${FRONTEND_URL}/api/auth/google/callback`;
+    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code'
+    });
+
+    const { access_token } = tokenRes.data;
+    const profileRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${access_token}` }
+    });
+    const { email, name, sub: googleId } = profileRes.data;
+    if (!email) return res.redirect(`${FRONTEND_URL}/login.html?error=google_no_email`);
+
+    let ref = null;
+    try { ref = JSON.parse(Buffer.from(state, 'base64').toString()).ref || null; } catch {}
+
+    let user = await db.asyncGet('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
+    let isNew = false;
+
+    if (!user) {
+      // New user — create account
+      const id = generateId();
+      let validRef = null;
+      if (ref && ref !== id) {
+        const referrer = await db.asyncGet('SELECT id FROM users WHERE id = ?', [ref]);
+        if (referrer) validRef = ref;
+      }
+      await db.asyncRun(
+        `INSERT INTO users (id, name, email, password_hash, plan, referred_by) VALUES (?, ?, ?, '', 'free', ?)`,
+        [id, name, email.toLowerCase(), validRef]
+      );
+      if (validRef) {
+        await db.asyncRun(
+          `UPDATE users SET referral_count = referral_count + 1, referral_bonus_reviews = referral_bonus_reviews + 15, referral_bonus_responses = referral_bonus_responses + 15 WHERE id = ?`,
+          [validRef]
+        );
+      }
+      await seedDemoReviews(id);
+      sendEmail({ to: email, subject: 'Welcome to ReplyPilot', html: welcomeEmail(name) }).catch(() => {});
+      sendEmail({
+        to: 'Christophersw1011@gmail.com',
+        subject: `New ReplyPilot signup (Google): ${name}`,
+        html: `<p>New user signed up via Google on ReplyPilot.</p><ul><li><strong>Name:</strong> ${name}</li><li><strong>Email:</strong> ${email}</li><li><strong>Plan:</strong> Free</li><li><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</li></ul>`
+      }).catch(() => {});
+      user = await db.asyncGet('SELECT * FROM users WHERE id = ?', [id]);
+      isNew = true;
+    }
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+    res.redirect(`${FRONTEND_URL}/dashboard.html?token=${token}&google_login=true${isNew ? '&new=true' : ''}`);
+  } catch (err) {
+    console.error('Google auth callback error:', err.message);
+    res.redirect(`${FRONTEND_URL}/login.html?error=google_failed`);
   }
 });
 
