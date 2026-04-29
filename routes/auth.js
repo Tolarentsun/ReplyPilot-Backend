@@ -12,6 +12,29 @@ const { sendEmail, welcomeEmail, passwordResetEmail, verifyEmailTemplate } = req
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set');
 
+
+// Common email domain typos that will cause bounces
+const EMAIL_TYPOS = {
+  'icioud.com': 'icloud.com', 'icoud.com': 'icloud.com', 'iclod.com': 'icloud.com',
+  'iclould.com': 'icloud.com', 'gmial.com': 'gmail.com', 'gmai.com': 'gmail.com',
+  'gmal.com': 'gmail.com', 'gmali.com': 'gmail.com', 'gamil.com': 'gmail.com',
+  'outlok.com': 'outlook.com', 'outook.com': 'outlook.com',
+  'hotmial.com': 'hotmail.com', 'hotmal.com': 'hotmail.com',
+  'yaho.com': 'yahoo.com', 'yahooo.com': 'yahoo.com',
+};
+
+function checkEmailTypo(email) {
+  const domain = email.split('@')[1]?.toLowerCase();
+  return domain ? EMAIL_TYPOS[domain] || null : null;
+}
+
+function extractSignupSource(req) {
+  const { utm_source, utm_medium, utm_campaign } = req.body;
+  const referrer = req.headers['referer'] || req.headers['referrer'] || null;
+  if (!utm_source && !utm_medium && !utm_campaign && !referrer) return null;
+  return JSON.stringify({ utm_source: utm_source || null, utm_medium: utm_medium || null, utm_campaign: utm_campaign || null, referrer: referrer || null });
+}
+
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
@@ -22,6 +45,12 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email address' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
+
+    const typoCorrection = checkEmailTypo(email);
+    if (typoCorrection) {
+      const suggested = email.replace(/@.+$/, '@' + typoCorrection);
+      return res.status(400).json({ error: `Your email domain looks like a typo. Did you mean ${suggested}?`, typo: true, suggested });
+    }
 
     const existing = await db.asyncGet('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
     if (existing) return res.status(409).json({ error: 'Email already registered' });
@@ -38,10 +67,11 @@ router.post('/register', async (req, res) => {
 
     const verifyToken = crypto.randomBytes(32).toString('hex');
     const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const signupSource = extractSignupSource(req);
 
     await db.asyncRun(
-      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by, email_verified, email_verify_token, email_verify_expires) VALUES (?, ?, ?, ?, ?, ?, 'free', ?, false, ?, ?)`,
-      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, validRef, verifyToken, verifyExpires]
+      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by, email_verified, email_verify_token, email_verify_expires, signup_source) VALUES (?, ?, ?, ?, ?, ?, 'free', ?, false, ?, ?, ?)`,
+      [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, validRef, verifyToken, verifyExpires, signupSource]
     );
 
     // Credit referrer: +15 bonus reviews and +15 bonus AI responses
@@ -58,7 +88,7 @@ router.post('/register', async (req, res) => {
     sendEmail({
       to: 'Christophersw1011@gmail.com',
       subject: `New ReplyPilot signup: ${name}`,
-      html: `<p>New user signed up on ReplyPilot.</p><ul><li><strong>Name:</strong> ${name}</li><li><strong>Email:</strong> ${email}</li><li><strong>Plan:</strong> Free</li><li><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</li></ul>`
+      html: `<p>New user signed up on ReplyPilot.</p><ul><li><strong>Name:</strong> ${name}</li><li><strong>Email:</strong> ${email}</li><li><strong>Plan:</strong> Free</li><li><strong>Source:</strong> ${signupSource || 'direct'}</li><li><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</li></ul>`
     }).catch(() => {});
 
     res.json({ success: true, verify: true, message: 'Account created! Please check your email to verify your account.' });
@@ -227,7 +257,11 @@ router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) return res.status(500).json({ error: 'Google login not configured' });
   const ref = req.query.ref || '';
-  const state = Buffer.from(JSON.stringify({ ref })).toString('base64');
+  const utm_source = req.query.utm_source || '';
+  const utm_medium = req.query.utm_medium || '';
+  const utm_campaign = req.query.utm_campaign || '';
+  const referrer = req.headers['referer'] || req.headers['referrer'] || '';
+  const state = Buffer.from(JSON.stringify({ ref, utm_source, utm_medium, utm_campaign, referrer })).toString('base64');
   const redirect = encodeURIComponent(`${process.env.FRONTEND_URL || 'https://reply-pilot.net'}/api/auth/google/callback`);
   const scope = encodeURIComponent('openid email profile');
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${state}`);
@@ -255,8 +289,15 @@ router.get('/google/callback', async (req, res) => {
     const { email, name, sub: googleId } = profileRes.data;
     if (!email) return res.redirect(`${FRONTEND_URL}/login.html?error=google_no_email`);
 
-    let ref = null;
-    try { ref = JSON.parse(Buffer.from(state, 'base64').toString()).ref || null; } catch {}
+    let ref = null, utm_source = null, utm_medium = null, utm_campaign = null, referrer = null;
+    try {
+      const parsed = JSON.parse(Buffer.from(state, 'base64').toString());
+      ref = parsed.ref || null;
+      utm_source = parsed.utm_source || null;
+      utm_medium = parsed.utm_medium || null;
+      utm_campaign = parsed.utm_campaign || null;
+      referrer = parsed.referrer || null;
+    } catch {}
 
     let user = await db.asyncGet('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
     let isNew = false;
@@ -266,12 +307,15 @@ router.get('/google/callback', async (req, res) => {
       const id = generateId();
       let validRef = null;
       if (ref && ref !== id) {
-        const referrer = await db.asyncGet('SELECT id FROM users WHERE id = ?', [ref]);
-        if (referrer) validRef = ref;
+        const referrer_user = await db.asyncGet('SELECT id FROM users WHERE id = ?', [ref]);
+        if (referrer_user) validRef = ref;
       }
+      const signupSource = (utm_source || utm_medium || utm_campaign || referrer)
+        ? JSON.stringify({ utm_source, utm_medium, utm_campaign, referrer })
+        : null;
       await db.asyncRun(
-        `INSERT INTO users (id, name, email, password_hash, plan, referred_by, email_verified) VALUES (?, ?, ?, '', 'free', ?, true)`,
-        [id, name, email.toLowerCase(), validRef]
+        `INSERT INTO users (id, name, email, password_hash, plan, referred_by, email_verified, signup_source) VALUES (?, ?, ?, '', 'free', ?, true, ?)`,
+        [id, name, email.toLowerCase(), validRef, signupSource]
       );
       if (validRef) {
         await db.asyncRun(
