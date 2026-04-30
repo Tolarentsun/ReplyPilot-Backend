@@ -8,9 +8,9 @@ router.get('/plans', (req, res) => {
   res.json({
     success: true,
     plans: [
-      { id: 'free', name: 'Starter', price: 0, period: 'forever', features: ['Up to 50 reviews', 'Sentiment analysis', 'AI responses (20/month)', 'Basic analytics dashboard', 'Email support'], limits: { reviews: 50, ai_responses: 20 } },
-      { id: 'pro', name: 'Professional', price: 49, period: 'month', popular: true, features: ['Unlimited reviews', 'Unlimited AI responses', 'Google auto-sync every 24 hours', 'Bulk generate all pending responses', 'Full trend analytics & AI insights', 'Priority support'], limits: { reviews: -1, ai_responses: -1 } },
-      { id: 'business', name: 'Business', price: 149, period: 'month', features: ['Everything in Professional, plus:', '|DIVIDER|Business Exclusive', 'Post responses to Google in 1 click — no copy-paste ever', 'AI learns your brand voice and sign-off — responses sound like you, not a template', 'Manage multiple Google locations from one account', 'Priority email support with faster response times'], limits: { reviews: -1, ai_responses: -1 } }
+      { id: 'free', name: 'Free', price: 0, period: 'forever', features: ['Up to 5 reviews', 'Sentiment analysis', 'AI responses (3/month)', 'Basic analytics dashboard'], limits: { reviews: 5, ai_responses: 3 } },
+      { id: 'pro', name: 'Starter', price: 10, period: 'month', popular: true, features: ['Unlimited reviews', 'Unlimited AI responses', 'Sentiment analysis & analytics', 'Yelp integration', 'Add reviews from any platform manually', 'Email support'], limits: { reviews: -1, ai_responses: -1 } },
+      { id: 'business', name: 'Pro', price: 30, period: 'month', features: ['Everything in Starter, plus:', '|DIVIDER|Pro Exclusive', 'Google Business Profile auto-sync', 'Facebook review sync', 'Post responses to Google in 1 click', 'Automatic review monitoring'], limits: { reviews: -1, ai_responses: -1 } }
     ]
   });
 });
@@ -92,7 +92,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     await db.asyncRun(`UPDATE users SET plan = ?, stripe_subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? WHERE id = ?`,
       [plan_id, session.subscription, new Date(Date.now() + 30*24*60*60*1000).toISOString(), user_id]);
     const user = await db.asyncGet('SELECT name, email FROM users WHERE id = ?', [user_id]);
-    if (user) sendEmail({ to: user.email, subject: `Your ReplyPilot ${plan_id === 'business' ? 'Business' : 'Professional'} subscription is confirmed`, html: subscriptionEmail(user.name, plan_id) }).catch(() => {});
+    if (user) sendEmail({ to: user.email, subject: `Your ReplyPilot ${plan_id === 'business' ? 'Pro' : 'Starter'} subscription is confirmed`, html: subscriptionEmail(user.name, plan_id === 'business' ? 'business' : 'pro') }).catch(() => {});
   }
 
   if (event.type === 'customer.subscription.deleted') {
