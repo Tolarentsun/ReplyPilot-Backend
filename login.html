@@ -258,6 +258,12 @@
         <div style="flex:1;height:1px;background:var(--mist)"></div>
       </div>
 
+      <!-- Anti-bot: honeypot + timestamp -->
+      <div style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden" aria-hidden="true">
+        <input type="text" name="website" id="hp_website" tabindex="-1" autocomplete="off">
+      </div>
+      <input type="hidden" id="form_ts" value="">
+
       <button class="btn-submit" id="submit-btn" onclick="login()">Sign In</button>
       <div class="form-message" id="message"></div>
 
@@ -269,6 +275,7 @@
 
   <script src="config.js"></script>
   <script>
+    document.getElementById('form_ts').value = Date.now();
     // Redirect if already logged in
     if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
 
@@ -288,7 +295,9 @@
       btn.innerHTML = '<span class="spinner"></span>Signing in...';
 
       try {
-        const { data, ok } = await API.post('/api/auth/login', { email, password });
+        const hp_website = document.getElementById('hp_website').value;
+        const form_ts = document.getElementById('form_ts').value;
+        const { data, ok } = await API.post('/api/auth/login', { email, password, hp_website, form_ts });
         if (ok && data.success) {
           Auth.save(data.token, data.user);
           showMsg('✓ Success! Redirecting...', 'success');

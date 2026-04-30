@@ -59,7 +59,13 @@ app.use(express.urlencoded({ extended: true }));
 
 try {
   const rateLimit = require('express-rate-limit');
+  // Global API limit
   app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
+  // Strict limits on auth endpoints to block credential stuffing and bot signups
+  const authLimit = rateLimit({ windowMs: 60 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many attempts. Please try again in an hour.' } });
+  app.use('/api/auth/register', authLimit);
+  app.use('/api/auth/login', authLimit);
+  app.use('/api/auth/forgot-password', rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { error: 'Too many requests. Please try again later.' } }));
 } catch(e) { console.error('rateLimit failed:', e.message); }
 
 try {

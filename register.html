@@ -233,6 +233,12 @@
         <div style="flex:1;height:1px;background:var(--mist)"></div>
       </div>
 
+      <!-- Anti-bot: honeypot + timestamp -->
+      <div style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden" aria-hidden="true">
+        <input type="text" name="website" id="hp_website" tabindex="-1" autocomplete="off">
+      </div>
+      <input type="hidden" id="form_ts" value="">
+
       <button class="btn-submit" id="submit-btn" onclick="register()">Create Free Account</button>
       <div class="form-message" id="message"></div>
       <p class="terms-note">By creating an account you agree to our <a href="terms.html" style="color:var(--text-muted);text-decoration:underline">Terms of Service</a> and <a href="privacy.html" style="color:var(--text-muted);text-decoration:underline">Privacy Policy</a>.</p>
@@ -245,6 +251,7 @@
 
   <script src="config.js"></script>
   <script>
+    document.getElementById('form_ts').value = Date.now();
     const _planParam = new URLSearchParams(window.location.search).get('plan');
     const _checkoutDest = _planParam ? `dashboard.html?checkout=${_planParam}` : 'dashboard.html';
     if (Auth.isLoggedIn()) window.location.href = _checkoutDest;
@@ -268,14 +275,22 @@
       btn.innerHTML = '<span class="spinner"></span>Creating account...';
 
       try {
-        const ref = new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rp_ref') || null;
+        const _p = new URLSearchParams(window.location.search);
+        const ref = _p.get('ref') || localStorage.getItem('rp_ref') || null;
         if (ref) localStorage.removeItem('rp_ref');
-        const { data, ok } = await API.post('/api/auth/register', { name, email, password, ref });
+        const hp_website = document.getElementById('hp_website').value;
+        const form_ts = document.getElementById('form_ts').value;
+        const utm_source = _p.get('utm_source') || null;
+        const utm_medium = _p.get('utm_medium') || null;
+        const utm_campaign = _p.get('utm_campaign') || null;
+        const { data, ok } = await API.post('/api/auth/register', { name, email, password, ref, hp_website, form_ts, utm_source, utm_medium, utm_campaign });
         if (ok && data.success) {
-          showMsg('✓ Account created! Check your email to verify your account before logging in.', 'success');
-          btn.textContent = 'Check your email ✓';
-          document.getElementById('name').value = '';
-          document.getElementById('password').value = '';
+          if (data.token && data.user) {
+            Auth.save(data.token, data.user);
+            window.location.href = 'dashboard.html?new=true';
+          } else {
+            showMsg('✓ Account created! Redirecting...', 'success');
+          }
         } else {
           showMsg('❌ ' + (data.error || 'Registration failed.'), 'error');
           btn.disabled = false;

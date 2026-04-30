@@ -41,7 +41,10 @@ function generateId() {
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, business_name, business_type, ref } = req.body;
+    const { name, email, password, business_name, business_type, ref, hp_website, form_ts } = req.body;
+    // Anti-bot: honeypot must be empty, form must take at least 2 seconds to fill
+    if (hp_website) return res.status(400).json({ error: 'Bot detected' });
+    if (!form_ts || Date.now() - parseInt(form_ts) < 2000) return res.status(400).json({ error: 'Please fill in the form normally.' });
     if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email address' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
@@ -70,7 +73,7 @@ router.post('/register', async (req, res) => {
     const signupSource = extractSignupSource(req);
 
     await db.asyncRun(
-      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by, email_verified, email_verify_token, email_verify_expires, signup_source) VALUES (?, ?, ?, ?, ?, ?, 'free', ?, false, ?, ?, ?)`,
+      `INSERT INTO users (id, name, email, password_hash, business_name, business_type, plan, referred_by, email_verified, email_verify_token, email_verify_expires, signup_source) VALUES (?, ?, ?, ?, ?, ?, 'free', ?, true, ?, ?, ?)`,
       [id, name, email.toLowerCase(), passwordHash, business_name || null, business_type || null, validRef, verifyToken, verifyExpires, signupSource]
     );
 
@@ -91,7 +94,9 @@ router.post('/register', async (req, res) => {
       html: `<p>New user signed up on ReplyPilot.</p><ul><li><strong>Name:</strong> ${name}</li><li><strong>Email:</strong> ${email}</li><li><strong>Plan:</strong> Free</li><li><strong>Source:</strong> ${signupSource || 'direct'}</li><li><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</li></ul>`
     }).catch(() => {});
 
-    res.json({ success: true, verify: true, message: 'Account created! Please check your email to verify your account.' });
+    const regToken = jwt.sign({ userId: id }, JWT_SECRET, { expiresIn: '30d' });
+    const regUser = await db.asyncGet('SELECT id, name, email, plan FROM users WHERE id = ?', [id]);
+    res.json({ success: true, token: regToken, user: regUser });
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ error: 'Registration failed: ' + err.message });
@@ -100,7 +105,10 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, hp_website, form_ts } = req.body;
+    // Anti-bot: honeypot must be empty, form must take at least 2 seconds to fill
+    if (hp_website) return res.status(400).json({ error: 'Bot detected' });
+    if (!form_ts || Date.now() - parseInt(form_ts) < 2000) return res.status(400).json({ error: 'Please fill in the form normally.' });
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
     const user = await db.asyncGet('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
@@ -108,10 +116,6 @@ router.post('/login', async (req, res) => {
 
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
-
-    if (!user.email_verified) {
-      return res.status(403).json({ error: 'Please verify your email before logging in. Check your inbox for the verification link.', unverified: true, email: user.email });
-    }
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
     const { password_hash, ...safeUser } = user;
