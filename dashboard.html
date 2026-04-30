@@ -1239,19 +1239,40 @@
           </div>
 
           <!-- Yelp -->
-          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;opacity:0.75">
+          <div style="border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="display:flex;align-items:center;gap:14px">
                 <div style="width:44px;height:44px;background:#fff;border:1.5px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
                 <div>
                   <div style="font-weight:700;font-size:15px">Yelp</div>
-                  <div style="font-size:12px;color:var(--text-muted)">Automation coming soon</div>
+                  <div id="yelp-status-text" style="font-size:12px;color:var(--text-muted)">Search &amp; sync up to 9 reviews</div>
                 </div>
               </div>
-              <span style="padding:5px 12px;background:#F3F4F6;color:#6B7280;border-radius:20px;font-size:11px;font-weight:700">COMING SOON</span>
+              <div id="yelp-btn-area"></div>
             </div>
-            <div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
-              💡 Add Yelp reviews manually using the <strong>Add Review</strong> button in the Reviews tab — AI will generate a response you can copy and paste to Yelp.
+
+            <!-- Upgrade prompt (free users) -->
+            <div id="yelp-upgrade-panel" style="display:none;margin-top:12px;padding:12px 16px;background:#FEF3C7;border-radius:8px;font-size:13px;color:#92400E">
+              Yelp sync is included in the <strong>Starter plan ($10/mo)</strong>. <a href="/subscribe.html?plan=pro" style="color:#92400E;font-weight:700;text-decoration:underline">Upgrade to unlock →</a>
+            </div>
+
+            <!-- Search panel (pro, not connected) -->
+            <div id="yelp-search-panel" style="display:none;margin-top:14px">
+              <div style="display:flex;gap:8px;margin-bottom:10px">
+                <input id="yelp-search-term" type="text" placeholder="Business name" style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
+                <input id="yelp-search-location" type="text" placeholder="City, State" style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:DM Sans,sans-serif">
+                <button onclick="searchYelp()" style="padding:8px 16px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">Search</button>
+              </div>
+              <div id="yelp-results"></div>
+              <button onclick="hideYelpSearch()" style="margin-top:6px;font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0">Cancel</button>
+            </div>
+
+            <!-- Connected panel -->
+            <div id="yelp-connected-panel" style="display:none;margin-top:12px">
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button onclick="syncYelp()" style="padding:8px 16px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">↻ Sync Reviews</button>
+                <button onclick="disconnectYelp()" style="padding:8px 16px;background:none;color:var(--text-muted);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Disconnect</button>
+              </div>
             </div>
           </div>
 
@@ -1372,7 +1393,7 @@
     if (tab === 'monthly') initMonthlyTab();
     // subscription tab is static — no load needed
     if (tab === 'settings') loadSettings();
-    // platform cards are static — no API calls needed
+    if (tab === 'platforms') loadYelpStatus();
     if (tab === 'insights') { initInsightsSection(); }
   }
 
