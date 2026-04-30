@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
+const { generatePKCE, consumePKCE } = require('../middleware/pkce');
 const axios = require('axios');
 const { sendEmail, newReviewEmail } = require('./email');
 
@@ -19,6 +20,7 @@ router.get('/connect', authenticate, (req, res) => {
   // Incremental auth: only request the new scope; basic scopes were granted at sign-in
   const scopes = 'https://www.googleapis.com/auth/business.manage';
 
+  const { key: pkceKey, challenge } = generatePKCE();
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}&` +
     `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
@@ -27,14 +29,18 @@ router.get('/connect', authenticate, (req, res) => {
     `access_type=offline&` +
     `prompt=consent&` +
     `include_granted_scopes=true&` +
-    `state=${req.user.id}`;
+    `code_challenge=${challenge}&` +
+    `code_challenge_method=S256&` +
+    `state=${req.user.id}:${pkceKey}`;
 
   res.json({ success: true, auth_url: authUrl });
 });
 
 // Step 2: Handle OAuth callback
 router.get('/callback', async (req, res) => {
-  const { code, state: userId, error } = req.query;
+  const { code, state: rawState, error } = req.query;
+  const [userId, pkceKey] = (rawState || '').split(':');
+  const pkceVerifier = consumePKCE(pkceKey);
 
   if (error) {
     return res.redirect(`${FRONTEND_URL}/dashboard.html?google_error=${error}`);
@@ -42,13 +48,9 @@ router.get('/callback', async (req, res) => {
 
   try {
     // Exchange code for tokens
-    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
-      code,
-      client_id: GOOGLE_CLIENT_ID,
-      client_secret: GOOGLE_CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
-      grant_type: 'authorization_code'
-    });
+    const tokenBody = { code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET, redirect_uri: REDIRECT_URI, grant_type: 'authorization_code' };
+    if (pkceVerifier) tokenBody.code_verifier = pkceVerifier;
+    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', tokenBody);
 
     const { access_token, refresh_token } = tokenRes.data;
 

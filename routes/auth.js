@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const axios = require('axios');
+const { generatePKCE, consumePKCE } = require('../middleware/pkce');
 const db = require('../db/database');
 const { authenticate } = require('../middleware/auth');
 const { seedDemoReviews } = require('../db/seedData');
@@ -265,10 +266,11 @@ router.get('/google', (req, res) => {
   const utm_medium = req.query.utm_medium || '';
   const utm_campaign = req.query.utm_campaign || '';
   const referrer = req.headers['referer'] || req.headers['referrer'] || '';
-  const state = Buffer.from(JSON.stringify({ ref, utm_source, utm_medium, utm_campaign, referrer })).toString('base64');
+  const { key: pkceKey, challenge } = generatePKCE();
+  const state = Buffer.from(JSON.stringify({ ref, utm_source, utm_medium, utm_campaign, referrer, pkce_key: pkceKey })).toString('base64');
   const redirect = encodeURIComponent(`${process.env.FRONTEND_URL || 'https://reply-pilot.net'}/api/auth/google/callback`);
   const scope = encodeURIComponent('openid email profile');
-  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${state}`);
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${state}&code_challenge=${challenge}&code_challenge_method=S256`);
 });
 
 router.get('/google/callback', async (req, res) => {
@@ -276,15 +278,15 @@ router.get('/google/callback', async (req, res) => {
   const { code, state, error } = req.query;
   if (error || !code) return res.redirect(`${FRONTEND_URL}/login.html?error=google_cancelled`);
 
+  // Consume PKCE verifier before token exchange
+  let pkceVerifier = null;
+  try { const ps = JSON.parse(Buffer.from(state || '', 'base64').toString()); pkceVerifier = consumePKCE(ps.pkce_key); } catch {}
+
   try {
     const redirectUri = `${FRONTEND_URL}/api/auth/google/callback`;
-    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
-      code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code'
-    });
+    const tokenBody = { code, client_id: process.env.GOOGLE_CLIENT_ID, client_secret: process.env.GOOGLE_CLIENT_SECRET, redirect_uri: redirectUri, grant_type: 'authorization_code' };
+    if (pkceVerifier) tokenBody.code_verifier = pkceVerifier;
+    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', tokenBody);
 
     const { access_token } = tokenRes.data;
     const profileRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
