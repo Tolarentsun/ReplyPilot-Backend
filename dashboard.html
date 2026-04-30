@@ -996,7 +996,7 @@
               ✓ Sentiment analysis &amp; analytics<br>
               ✓ Email support
             </div>
-            <a href="/subscribe.html?plan=pro" style="display:block;background:var(--ink);color:white;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;text-align:center">Upgrade to Starter →</a>
+            <button onclick="startCheckout('pro')" style="display:block;width:100%;background:var(--ink);color:white;padding:12px;border-radius:8px;border:none;font-weight:600;font-size:14px;text-align:center;cursor:pointer;font-family:DM Sans,sans-serif">Upgrade to Starter →</button>
           </div>
 
           <!-- Pro $30 coming soon -->
@@ -1253,7 +1253,7 @@
 
             <!-- Upgrade prompt (free users) -->
             <div id="yelp-upgrade-panel" style="display:none;margin-top:12px;padding:12px 16px;background:#FEF3C7;border-radius:8px;font-size:13px;color:#92400E">
-              Yelp sync is included in the <strong>Starter plan ($10/mo)</strong>. <a href="/subscribe.html?plan=pro" style="color:#92400E;font-weight:700;text-decoration:underline">Upgrade to unlock →</a>
+              Yelp sync is included in the <strong>Starter plan ($10/mo)</strong>. <button onclick="startCheckout('pro')" style="background:none;border:none;color:#92400E;font-weight:700;text-decoration:underline;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px;padding:0">Upgrade to unlock →</button>
             </div>
 
             <!-- Search panel (pro, not connected) -->
@@ -1395,6 +1395,20 @@
     if (tab === 'settings') loadSettings();
     if (tab === 'platforms') loadYelpStatus();
     if (tab === 'insights') { initInsightsSection(); }
+  }
+
+  async function startCheckout(planId) {
+    try {
+      toast('Redirecting to checkout...', '');
+      const { data, ok } = await API.post('/api/subscriptions/checkout', { plan_id: planId });
+      if (ok && data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        toast(data?.error || 'Could not start checkout', 'error');
+      }
+    } catch(e) {
+      toast('Could not reach the server.', 'error');
+    }
   }
 
   // ===== OVERVIEW =====
