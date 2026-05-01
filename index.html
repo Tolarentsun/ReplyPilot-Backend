@@ -11,10 +11,10 @@
     gtag('config', 'G-LH21Y6MP7N');
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ReplyPilot — AI Review Intelligence for Local Businesses</title>
-  <meta name="description" content="ReplyPilot analyzes your customer reviews, generates professional AI responses, and tracks your reputation over time. Built for local businesses.">
-  <meta property="og:title" content="ReplyPilot — AI Review Intelligence for Local Businesses">
-  <meta property="og:description" content="Analyze reviews, generate AI responses, and track your reputation — all in one dashboard. Start free.">
+  <title>ReplyPilot — AI Replies to Your Google Reviews in Seconds</title>
+  <meta name="description" content="Stop ignoring your Google reviews. ReplyPilot writes professional AI replies in seconds — just copy, paste, and post. Free to start, no credit card required.">
+  <meta property="og:title" content="ReplyPilot — AI Replies to Your Google Reviews in Seconds">
+  <meta property="og:description" content="Stop ignoring your Google reviews. AI writes professional replies in seconds. Free to start — no credit card required.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://reply-pilot.net">
   <meta name="twitter:card" content="summary_large_image">
@@ -266,6 +266,39 @@
     .fade-up.visible { opacity: 1; transform: translateY(0); }
 
     /* RESPONSIVE */
+    /* STICKY MOBILE CTA */
+    .sticky-mobile-cta { display:none; }
+    @media (max-width: 1024px) {
+      .sticky-mobile-cta {
+        display: block;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 200;
+        background: var(--ink);
+        padding: 14px 20px;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.18);
+        border-top: 1px solid rgba(255,255,255,0.08);
+      }
+      .sticky-mobile-cta a {
+        display: block;
+        background: var(--gold);
+        color: var(--ink);
+        text-align: center;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.01em;
+      }
+      .sticky-mobile-cta p {
+        text-align: center;
+        font-size: 11px;
+        color: rgba(255,255,255,0.5);
+        margin-top: 6px;
+      }
+      body { padding-bottom: 90px; }
+    }
     @media (max-width: 1024px) {
       .hero { grid-template-columns: 1fr; }
       .hero-right { display: none; }
@@ -301,19 +334,13 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-left">
-    <span class="hero-eyebrow">AI-Powered Review Intelligence</span>
-    <h1 class="hero-title">Know Your Business <em>Inside Out</em></h1>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
-      <span style="font-size:12px;font-weight:600;padding:5px 12px;background:rgba(15,52,96,0.07);border-radius:20px;color:var(--ink)">🍽 Restaurants</span>
-      <span style="font-size:12px;font-weight:600;padding:5px 12px;background:rgba(15,52,96,0.07);border-radius:20px;color:var(--ink)">🏨 Hotels</span>
-      <span style="font-size:12px;font-weight:600;padding:5px 12px;background:rgba(15,52,96,0.07);border-radius:20px;color:var(--ink)">🔧 Auto Shops</span>
-      <span style="font-size:12px;font-weight:600;padding:5px 12px;background:rgba(15,52,96,0.07);border-radius:20px;color:var(--ink)">🏪 Retail Stores</span>
-      <span style="font-size:12px;font-weight:600;padding:5px 12px;background:rgba(15,52,96,0.07);border-radius:20px;color:var(--ink)">+ any local business</span>
-    </div>
-    <p class="hero-sub">ReplyPilot analyzes every customer review to surface what your customers love, what needs fixing, and exactly where your reputation stands — then writes the perfect response in seconds.</p>
-    <div class="hero-actions">
-      <a href="register.html" class="btn-primary">Start for Free</a>
-      <a href="#demo" class="btn-ghost">See a live demo →</a>
+    <span class="hero-eyebrow">Used by restaurants, shops &amp; service businesses</span>
+    <h1 class="hero-title">Respond to Google reviews in <em>seconds</em> — AI writes it for you</h1>
+
+    <p class="hero-sub">Paste in a review, get a professional reply in 3 seconds. Handle negative reviews with confidence, keep customers coming back, and never fall behind on your reputation again.</p>
+    <div class="hero-actions" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <a href="register.html" class="btn-primary" style="font-size:16px;padding:18px 40px">Start Free — Takes 2 Minutes</a>
+      <span style="font-size:13px;color:var(--text-muted)">✓ No credit card required &nbsp;·&nbsp; ✓ Free forever plan &nbsp;·&nbsp; ✓ Instant access</span>
     </div>
     <div class="hero-stats">
       <div>
@@ -843,6 +870,7 @@
           <li>Basic analytics dashboard</li>
         </ul>
         <a href="register.html" class="pricing-btn">Get Started Free</a>
+        <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">No credit card required</p>
       </div>
       <div class="pricing-card featured fade-up">
         <span class="pricing-tag">Most Popular</span>
@@ -858,6 +886,7 @@
           <li>Email support</li>
         </ul>
         <a href="register.html?plan=pro" class="pricing-btn">Get Started</a>
+        <p style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-top:8px">Cancel anytime</p>
       </div>
       <div class="pricing-card fade-up">
         <p class="pricing-plan">Pro</p>
@@ -921,7 +950,7 @@
         What's included in the free Starter plan?
         <span class="faq-icon">+</span>
       </button>
-      <div class="faq-a">The free plan lets you add up to 50 reviews, run sentiment analysis on all of them, and generate up to 20 AI responses per month. It's a great way to try ReplyPilot with no commitment and no credit card required.</div>
+      <div class="faq-a">The free plan lets you add up to 5 reviews and generate up to 3 AI responses per month — enough to see exactly how it works. No credit card required, and you can upgrade anytime.</div>
     </div>
 
     <div class="faq-item">
@@ -959,10 +988,10 @@
 <!-- CTA -->
 <section class="cta-section">
   <p class="section-label" style="color:var(--gold)">Get Started Today</p>
-  <h2 class="section-title">Ready to take control<br>of your reputation?</h2>
-  <p class="section-sub">Add your first review and ReplyPilot starts working immediately — no setup, no waiting.</p>
+  <h2 class="section-title">Stop leaving reviews<br>unanswered</h2>
+  <p class="section-sub">Every unanswered review is a missed chance to win back a customer. Takes 2 minutes to set up — free forever.</p>
   <div class="cta-actions">
-    <a href="register.html" class="btn-gold">Start for Free</a>
+    <a href="register.html" class="btn-gold">Start Free — No Credit Card</a>
     <a href="login.html" class="btn-outline-white">Sign In</a>
   </div>
 </section>
@@ -1021,5 +1050,17 @@
 
   document.addEventListener('DOMContentLoaded', checkStatus);
 </script>
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-mobile-cta" id="sticky-cta">
+  <a href="register.html">Start Free — No Credit Card Required</a>
+  <p>✓ Free forever plan &nbsp;·&nbsp; ✓ Instant access</p>
+</div>
+
+<script>
+  // Hide sticky CTA once user scrolls past pricing section
+  const stickyCta = document.getElementById('sticky-cta');
+  if (stickyCta && Auth.isLoggedIn()) stickyCta.style.display = 'none';
+</script>
+
 </body>
 </html>
