@@ -15,7 +15,8 @@ router.get('/', authenticate, async (req, res) => {
 
     const sortMap = { newest: 'review_date DESC', oldest: 'review_date ASC', highest: 'rating DESC', lowest: 'rating ASC' };
     const orderBy = sortMap[sort] || 'review_date DESC';
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const safeLimit = Math.min(Math.max(1, parseInt(limit) || 20), 100);
+    const offset = (parseInt(page) - 1) * safeLimit;
 
     let where = 'user_id = ?';
     const params = [req.user.id];
@@ -26,7 +27,7 @@ router.get('/', authenticate, async (req, res) => {
 
     const reviews = await db.asyncAll(
       `SELECT * FROM reviews WHERE ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
-      [...params, parseInt(limit), offset]
+      [...params, safeLimit, offset]
     );
 
     const countRow = await db.asyncGet(`SELECT COUNT(*) as total FROM reviews WHERE ${where}`, params);
@@ -35,7 +36,7 @@ router.get('/', authenticate, async (req, res) => {
     res.json({
       success: true,
       reviews: reviews.map(r => ({ ...r, keywords: r.keywords ? JSON.parse(r.keywords) : [] })),
-      pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / parseInt(limit)) }
+      pagination: { total, page: parseInt(page), limit: safeLimit, pages: Math.ceil(total / safeLimit) }
     });
   } catch (err) {
     console.error('Get reviews error:', err);
@@ -109,6 +110,12 @@ router.post('/', authenticate, async (req, res) => {
   try {
     const { reviewer_name, rating, review_text, platform, review_date } = req.body;
     if (!reviewer_name || !rating || !review_text) return res.status(400).json({ error: 'reviewer_name, rating, and review_text are required' });
+
+    const existing = await db.asyncGet(
+      'SELECT id FROM reviews WHERE user_id = ? AND reviewer_name = ? AND review_text = ?',
+      [req.user.id, reviewer_name, review_text]
+    );
+    if (existing) return res.status(409).json({ error: 'This review has already been added.' });
 
     // Enforce free plan review limit (base 5 + referral bonuses)
     if (req.user.plan === 'free') {
@@ -384,8 +391,10 @@ Return ONLY a JSON array of exactly 3 strings:
     if (Array.isArray(opts) && opts.length === 3) return opts;
   } catch (e) {}
 
-  const fallback = generateTemplateResponse(review, businessName);
-  return [fallback, fallback, fallback];
+  const fallback1 = generateTemplateResponse(review, businessName);
+  const fallback2 = generateTemplateResponse({ ...review, rating: Math.max(1, review.rating - 1) }, businessName);
+  const fallback3 = generateTemplateResponse({ ...review, rating: Math.min(5, review.rating + 1) }, businessName);
+  return [fallback1, fallback2 !== fallback1 ? fallback2 : fallback1 + ' We value your continued support.', fallback3 !== fallback1 ? fallback3 : fallback1 + ' Please reach out if there is anything we can do for you.'];
 }
 
 async function generateAIResponse(review, businessName, tone, persona) {

@@ -10,6 +10,11 @@
     gtag('js', new Date());
     gtag('config', 'G-LH21Y6MP7N');
   </script>
+  <!-- PostHog Session Recording & Analytics -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId setPersonPropertiesForFlags".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||(window.posthog={}));
+    posthog.init('phc_ny4feoVSWHS72X5YvxkyJy86tt4ktDqhPdF7LAEUM6fx', { api_host: 'https://us.i.posthog.com', person_profiles: 'always' });
+  </script>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -1373,6 +1378,7 @@
   window.addEventListener('load', async () => {
     if (!Auth.requireAuth()) return;
     currentUser = Auth.getUser();
+    try { posthog.identify(currentUser.email, { name: currentUser.name, plan: currentUser.plan || 'free' }); } catch(e) {}
     updateSidebar();
     checkGoogleCallback();
     await loadOverview();
@@ -1393,6 +1399,7 @@
 
     const titles = { overview: 'Dashboard Overview', reviews: 'Review Manager', insights: 'AI Insights', monthly: 'Monthly Report', platforms: 'Platform Connections', subscription: 'Subscription', settings: 'Settings', founder: 'From the Founder', roadmap: "What's Coming" };
     document.getElementById('topbar-title').textContent = titles[tab] || tab;
+    try { posthog.capture('tab_viewed', { tab }); } catch(e) {}
 
     if (tab === 'reviews') loadReviews();
     if (tab === 'monthly') initMonthlyTab();
@@ -2198,6 +2205,7 @@
   }
 
   async function upgradePlan(planId) {
+    try { posthog.capture('upgrade_clicked', { plan_id: planId, current_plan: currentUser?.plan || 'free' }); } catch(e) {}
     const { data, ok } = await API.post('/api/subscriptions/checkout', { plan_id: planId });
     if (ok && data.success) {
       if (data.checkout_url) {
@@ -2667,6 +2675,11 @@
       Auth.setToken(params.get('token'));
       history.replaceState({}, '', window.location.pathname);
     }
+    if (params.get('new') === 'true' && !sessionStorage.getItem('rp_conv_fired')) {
+      sessionStorage.setItem('rp_conv_fired', '1');
+      try { gtag('event', 'sign_up', { method: params.get('google_login') ? 'google' : 'email' }); } catch(e) {}
+      history.replaceState({}, '', window.location.pathname);
+    }
     if (params.get('verified')) {
       toast('✓ Email verified! Welcome to ReplyPilot.', 'success');
     }
@@ -2691,12 +2704,26 @@
       history.replaceState({}, '', window.location.pathname);
     }
     if (params.get('upgraded')) {
+      const upgradedPlan = params.get('plan');
       history.replaceState({}, '', window.location.pathname);
       const { data, ok } = await API.get('/api/auth/me');
       if (ok && data.user) {
         currentUser = data.user;
         Auth.save(Auth.getToken(), currentUser);
         updateSidebar();
+        const planValues = { pro: 10, business: 30 };
+        const resolvedPlan = upgradedPlan || data.user.plan;
+        const planValue = planValues[resolvedPlan];
+        if (planValue) {
+          try {
+            gtag('event', 'purchase', {
+              transaction_id: `${data.user.id}_${Date.now()}`,
+              value: planValue,
+              currency: 'USD',
+              items: [{ item_id: resolvedPlan, item_name: resolvedPlan === 'business' ? 'Pro Plan' : 'Starter Plan', price: planValue, quantity: 1 }]
+            });
+          } catch(e) {}
+        }
       }
       toast('✓ Subscription upgraded successfully!', 'success');
     }

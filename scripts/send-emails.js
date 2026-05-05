@@ -38,7 +38,7 @@ const args = process.argv.slice(2).reduce((acc, arg) => {
 
 const CSV_PATH  = args.csv   || 'leads.csv';
 const STEP      = parseInt(args.step || '1');
-const FROM      = args.from  || process.env.OUTREACH_FROM || 'chris@reply-pilot.net';
+const FROM      = args.from  || process.env.OUTREACH_FROM || 'ReplyPilot Team <noreply@reply-pilot.net>';
 const DRY_RUN   = !!args['dry-run'];
 const LIMIT     = args.limit ? parseInt(args.limit) : Infinity;
 const TO_OVERRIDE = args.to || null;
@@ -94,6 +94,33 @@ function toCSV(rows) {
   return [headers.join(','), ...rows.map(r => headers.map(h => cell(r[h])).join(','))].join('\n');
 }
 
+// ─── Email wrapper ─────────────────────────────────────────────────────────────
+function wrapEmail(bodyHtml, bizName) {
+  return `
+<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;background:#f5f3ef;padding:24px 16px">
+
+  <div style="background:#0F3460;padding:18px 28px;border-radius:8px 8px 0 0">
+    <span style="font-family:Georgia,serif;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px">
+      Reply<span style="color:#E8922A">Pilot</span>
+    </span>
+  </div>
+
+  <div style="background:#ffffff;padding:32px 28px;border:1px solid #e8e0d6;border-top:none;border-radius:0 0 8px 8px;color:#1a1a1a;line-height:1.7;font-size:15px">
+    ${bodyHtml}
+  </div>
+
+  <div style="padding:20px 28px;text-align:center">
+    <p style="font-size:11px;color:#999;margin:0">
+      © 2026 ReplyPilot &nbsp;·&nbsp;
+      <a href="https://reply-pilot.net" style="color:#999;text-decoration:none">reply-pilot.net</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:RPCS@reply-pilot.net?subject=Unsubscribe&body=Please unsubscribe ${encodeURIComponent(bizName || '')}" style="color:#999;text-decoration:none">Unsubscribe</a>
+    </p>
+  </div>
+
+</div>`;
+}
+
 // ─── Email templates ───────────────────────────────────────────────────────────
 function getEmail(step, lead) {
   const name        = lead.business_name;
@@ -112,112 +139,115 @@ function getEmail(step, lead) {
   switch (step) {
     case 1: return {
       subject: `${name} has ${unanswered} unanswered Google reviews`,
-      html: `
-<p>Hi ${firstName},</p>
+      html: wrapEmail(`
+<p style="margin-top:0">Hi ${firstName},</p>
 
-<p>I came across ${name} on Google and noticed you have ${unanswered} customer reviews that haven't received a response yet — including a ${starStr} review that says:</p>
+<p>We came across <strong>${name}</strong> on Google and noticed you have <strong>${unanswered} customer reviews</strong> that haven't received a response yet — including a ${starStr} review:</p>
 
-<blockquote style="border-left:3px solid #ccc;padding-left:12px;color:#555;font-style:italic;">
+<blockquote style="border-left:3px solid #E8922A;margin:16px 0;padding:12px 16px;background:#fdf9f4;border-radius:0 6px 6px 0;color:#444;font-style:italic;font-size:14px">
   ${reviewQuote}
 </blockquote>
 
-<p>Unanswered reviews — especially negative ones — are costing you customers. Studies show <strong>89% of consumers</strong> read owner responses before choosing a local business, and Google's algorithm actively rewards accounts that engage.</p>
+<p>Unanswered reviews cost you customers. <strong>89% of consumers</strong> read owner responses before choosing a local business, and Google's algorithm actively rewards businesses that engage.</p>
 
-<p>I built <strong>ReplyPilot</strong> specifically for restaurants and local businesses. It monitors your Google reviews and generates professional, on-brand responses in seconds. You review it, hit send, done.</p>
+<p><strong>ReplyPilot</strong> monitors your Google reviews and generates professional, on-brand responses in seconds — you review it, hit send, done. No more hours spent writing replies.</p>
 
-<p>We have a free plan — no credit card needed. Takes about 2 minutes to connect your Google Business Profile.</p>
+<p style="text-align:center;margin:28px 0">
+  <a href="https://www.reply-pilot.net/register.html"
+     style="background:#0F3460;color:#ffffff;padding:13px 28px;border-radius:6px;text-decoration:none;font-weight:600;font-size:15px;display:inline-block">
+    Try ReplyPilot Free — No Card Required →
+  </a>
+</p>
 
-<p><a href="https://www.reply-pilot.net/register.html" style="background:#0A0A0F;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">Try ReplyPilot Free →</a></p>
+<p style="color:#555;font-size:14px">Takes about 2 minutes to connect your Google Business Profile. Questions? Just reply to this email.</p>
 
-<p>Happy to answer any questions — just reply here.</p>
-
-<p>Chris<br>
-ReplyPilot<br>
-<a href="https://www.reply-pilot.net">reply-pilot.net</a></p>
-
-<p style="font-size:11px;color:#999;">
-  You're receiving this because ${name} has public reviews on Google Maps.
-  <a href="mailto:RPCS@reply-pilot.net?subject=Unsubscribe">Unsubscribe</a>
-</p>`
+<p style="margin-bottom:0">
+  The ReplyPilot Team<br>
+  <a href="https://reply-pilot.net" style="color:#0F3460">reply-pilot.net</a>
+</p>`, name)
     };
 
     case 2: return {
       subject: `Re: ${name}'s Google reviews`,
-      html: `
-<p>Hi ${firstName},</p>
+      html: wrapEmail(`
+<p style="margin-top:0">Hi ${firstName},</p>
 
-<p>Just following up on my note from a few days ago about your unanswered Google reviews.</p>
+<p>Following up on our note about <strong>${name}</strong>'s unanswered Google reviews.</p>
 
-<p>Wanted to share a quick example of what ReplyPilot generates for a 2-star review:</p>
+<p>Here's a real example of what ReplyPilot generates for a 2-star review — in about 8 seconds:</p>
 
-<div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:16px 0">
-  <p style="margin:0 0 8px"><strong>Customer wrote:</strong> <em>"Waited 45 minutes for our food. No apology from the staff."</em></p>
-  <p style="margin:0"><strong>ReplyPilot generated:</strong> <em>"Thank you for sharing your experience. A 45-minute wait is not the standard we hold ourselves to, and I sincerely apologize. We've shared this feedback with our team. We'd love the chance to make it right — please reach out directly and we'll take care of you on your next visit."</em></p>
+<div style="background:#f9f7f4;border-radius:8px;padding:18px;margin:16px 0;border:1px solid #e8e0d6">
+  <p style="margin:0 0 10px;font-size:14px"><strong style="color:#c0392b">⭐⭐ Customer wrote:</strong><br>
+  <em style="color:#555">"Waited 45 minutes for our food. No apology from the staff."</em></p>
+  <p style="margin:0;font-size:14px"><strong style="color:#27ae60">✅ ReplyPilot generated:</strong><br>
+  <em style="color:#555">"Thank you for sharing your experience. A 45-minute wait is not the standard we hold ourselves to, and we sincerely apologize. We've shared this with our team and would love the chance to make it right — please reach out directly and we'll take care of you on your next visit."</em></p>
 </div>
 
-<p>That response took about 8 seconds to generate and approve. It turns a frustrated customer into a potential return visit, and shows everyone else reading your reviews that you care.</p>
+<p>That one response turns a frustrated customer into a potential return visit — and shows everyone else reading your reviews that you care.</p>
 
-<p>ReplyPilot starts free. No contracts, cancel anytime.</p>
+<p><strong>Free plan, no contracts, cancel anytime.</strong></p>
 
-<p><a href="https://www.reply-pilot.net/register.html" style="background:#0A0A0F;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">Start for Free →</a></p>
+<p style="text-align:center;margin:28px 0">
+  <a href="https://www.reply-pilot.net/register.html"
+     style="background:#0F3460;color:#ffffff;padding:13px 28px;border-radius:6px;text-decoration:none;font-weight:600;font-size:15px;display:inline-block">
+    Start for Free →
+  </a>
+</p>
 
-<p>Chris<br>
-ReplyPilot</p>
-
-<p style="font-size:11px;color:#999;">
-  <a href="mailto:RPCS@reply-pilot.net?subject=Unsubscribe&body=Please remove ${encodeURIComponent(name)}">Unsubscribe</a>
-</p>`
+<p style="margin-bottom:0">
+  The ReplyPilot Team<br>
+  <a href="https://reply-pilot.net" style="color:#0F3460">reply-pilot.net</a>
+</p>`, name)
     };
 
     case 3: return {
-      subject: `Free access for ${name} — this week only`,
-      html: `
-<p>Hi ${firstName},</p>
+      subject: `Last note — free access for ${name}`,
+      html: wrapEmail(`
+<p style="margin-top:0">Hi ${firstName},</p>
 
-<p>Third and final note about your Google reviews.</p>
+<p>This is our last follow-up about <strong>${name}</strong>'s Google reviews.</p>
 
-<p>Right now ${name} has a ${rating}-star average with ${unanswered} unanswered reviews. Every week that goes by without responses is another week potential customers see that and choose a competitor.</p>
+<p>Right now you have a <strong>${rating}-star average</strong> with <strong>${unanswered} unanswered reviews</strong>. Every week without responses is another week potential customers see that and choose a competitor who does respond.</p>
 
 <p>Here's what ReplyPilot does in plain terms:</p>
 
-<ul>
-  <li>Pulls in your Google reviews automatically every day</li>
-  <li>Generates a professional, personalized response for each one</li>
-  <li>You read it, approve it, it posts — takes under a minute per review</li>
-  <li>Your response rate goes from 0% to 100%</li>
+<ul style="padding-left:20px;color:#333">
+  <li style="margin-bottom:8px">Pulls in your Google reviews automatically every day</li>
+  <li style="margin-bottom:8px">Generates a professional, personalized response for each one</li>
+  <li style="margin-bottom:8px">You read it, approve it, it posts — under a minute per review</li>
+  <li style="margin-bottom:8px">Your response rate goes from 0% to 100%</li>
 </ul>
 
-<p>The free plan covers everything you need to get started — no card required.</p>
+<p style="text-align:center;margin:28px 0">
+  <a href="https://www.reply-pilot.net/register.html"
+     style="background:#E8922A;color:#ffffff;padding:13px 28px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
+    Claim Your Free Account →
+  </a>
+</p>
 
-<p><a href="https://www.reply-pilot.net/register.html" style="background:#E8922A;color:#0A0A0F;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:700;display:inline-block">Claim Your Free Account →</a></p>
+<p style="color:#555;font-size:14px">If review management isn't a priority right now, no worries — we won't follow up again. But if you ever have questions, we're always at <a href="mailto:RPCS@reply-pilot.net" style="color:#0F3460">RPCS@reply-pilot.net</a>.</p>
 
-<p>If review management isn't a priority right now, no worries — I won't follow up again. But if you have any questions at all, just reply and I'll help.</p>
-
-<p>Chris<br>
-ReplyPilot</p>
-
-<p style="font-size:11px;color:#999;">
-  <a href="mailto:RPCS@reply-pilot.net?subject=Unsubscribe">Unsubscribe</a>
-</p>`
+<p style="margin-bottom:0">
+  The ReplyPilot Team<br>
+  <a href="https://reply-pilot.net" style="color:#0F3460">reply-pilot.net</a>
+</p>`, name)
     };
 
     case 4: return {
       subject: `Closing the loop on ${name}`,
-      html: `
-<p>Hi ${firstName},</p>
+      html: wrapEmail(`
+<p style="margin-top:0">Hi ${firstName},</p>
 
-<p>I've reached out a few times about ReplyPilot and haven't heard back — so I'll take that as a no for now and stop messaging you.</p>
+<p>We've reached out a few times and haven't heard back — so we'll take that as a no for now and won't message you again.</p>
 
-<p>If your situation ever changes — more reviews coming in, a negative review that needs attention, or you just want to improve your Google ranking — ReplyPilot is at <a href="https://www.reply-pilot.net">reply-pilot.net</a> and the free plan is always open.</p>
+<p>If your situation ever changes — more reviews coming in, a negative review that needs attention, or you want to improve your Google presence — ReplyPilot is at <a href="https://reply-pilot.net" style="color:#0F3460">reply-pilot.net</a> and the free plan is always open.</p>
 
-<p>Wishing ${name} a busy season.</p>
+<p>Wishing <strong>${name}</strong> a busy and successful season ahead.</p>
 
-<p>Chris<br>
-ReplyPilot</p>
-
-<p style="font-size:11px;color:#999;">
-  <a href="mailto:RPCS@reply-pilot.net?subject=Unsubscribe">Unsubscribe</a>
-</p>`
+<p style="margin-bottom:0">
+  The ReplyPilot Team<br>
+  <a href="https://reply-pilot.net" style="color:#0F3460">reply-pilot.net</a>
+</p>`, name)
     };
   }
 }
@@ -225,7 +255,7 @@ ReplyPilot</p>
 // ─── Resend API ────────────────────────────────────────────────────────────────
 function sendEmail({ to, from, subject, html }) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify({ from, to: [to], subject, html });
+    const body = JSON.stringify({ from, to: [to], subject, html, reply_to: 'RPCS@reply-pilot.net' });
     const req = https.request({
       hostname: 'api.resend.com',
       path: '/emails',
@@ -270,15 +300,18 @@ async function main() {
   const blocklist = loadBlocklist();
   console.log(`🚫  Blocklist loaded: ${blocklist.size} emails already contacted across all campaigns`);
 
-  // Filter: only send step N to leads that haven't received it yet AND aren't on the global blocklist
+  // Filter: only send step N to leads that haven't received it yet
+  // Blocklist only gates step 1 — for follow-ups, the CSV tracking column is the gate
   const stepKey = `email_step${STEP}_sent`;
   const eligible = leads.filter(l => {
     if (!l.website && !l.phone) return false;
     if (l[stepKey]) return false;
-    const email = (TO_OVERRIDE || l.email || '').toLowerCase();
-    if (email && blocklist.has(email)) {
-      console.log(`  ⛔  ${l.business_name} — already contacted (blocklist), skipping`);
-      return false;
+    if (STEP === 1) {
+      const email = (TO_OVERRIDE || l.email || '').toLowerCase();
+      if (email && blocklist.has(email)) {
+        console.log(`  ⛔  ${l.business_name} — already contacted (blocklist), skipping`);
+        return false;
+      }
     }
     return true;
   }).slice(0, LIMIT);

@@ -56,7 +56,7 @@ router.post('/checkout', authenticate, async (req, res) => {
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${frontendUrl}/dashboard.html?upgraded=true`,
+      success_url: `${frontendUrl}/dashboard.html?upgraded=true&plan=${plan_id}`,
       cancel_url: `${frontendUrl}/dashboard.html`,
       metadata: { user_id: req.user.id, plan_id }
     });

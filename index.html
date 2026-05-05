@@ -10,6 +10,11 @@
     gtag('js', new Date());
     gtag('config', 'G-LH21Y6MP7N');
   </script>
+  <!-- PostHog Session Recording & Analytics -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId setPersonPropertiesForFlags".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||(window.posthog={}));
+    posthog.init('phc_ny4feoVSWHS72X5YvxkyJy86tt4ktDqhPdF7LAEUM6fx', { api_host: 'https://us.i.posthog.com', person_profiles: 'always' });
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ReplyPilot — AI Replies for Google, Yelp, Facebook &amp; TripAdvisor Reviews</title>
   <meta name="description" content="Stop ignoring your reviews. ReplyPilot writes professional AI replies for Google, Yelp, Facebook, and TripAdvisor in seconds. Free to start, no credit card required.">
@@ -327,7 +332,7 @@
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#faq">FAQ</a></li>
     <li><a href="login.html">Log In</a></li>
-    <li><a href="register.html" class="nav-cta">Start for Free</a></li>
+    <li><a href="register.html" class="nav-cta" onclick="try{posthog.capture('cta_clicked',{location:'nav'})}catch(e){}">Start for Free</a></li>
   </ul>
 </nav>
 
@@ -339,7 +344,7 @@
 
     <p class="hero-sub">Works with Google, Yelp, Facebook, and TripAdvisor. Paste in any review and get a professional reply in seconds — handle negatives with confidence and never fall behind again.</p>
     <div class="hero-actions" style="flex-direction:column;align-items:flex-start;gap:10px">
-      <a href="register.html" class="btn-primary" style="font-size:16px;padding:18px 40px">Start Free — Takes 2 Minutes</a>
+      <a href="register.html" class="btn-primary" style="font-size:16px;padding:18px 40px" onclick="try{posthog.capture('cta_clicked',{location:'hero'})}catch(e){}">Start Free — Takes 2 Minutes</a>
       <span style="font-size:13px;color:var(--text-muted)">✓ No credit card required &nbsp;·&nbsp; ✓ Free forever plan &nbsp;·&nbsp; ✓ Instant access</span>
     </div>
     <div class="hero-stats">
@@ -869,7 +874,7 @@
           <li>Sentiment analysis</li>
           <li>Basic analytics dashboard</li>
         </ul>
-        <a href="register.html" class="pricing-btn">Get Started Free</a>
+        <a href="register.html" class="pricing-btn" onclick="try{posthog.capture('cta_clicked',{location:'pricing',plan:'free'})}catch(e){}">Get Started Free</a>
         <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">No credit card required</p>
       </div>
       <div class="pricing-card featured fade-up">
@@ -885,7 +890,7 @@
           <li>Sentiment analysis &amp; analytics</li>
           <li>Email support</li>
         </ul>
-        <a href="register.html?plan=pro" class="pricing-btn">Get Started</a>
+        <a href="register.html?plan=pro" class="pricing-btn" onclick="try{posthog.capture('cta_clicked',{location:'pricing',plan:'starter'})}catch(e){}">Get Started</a>
         <p style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-top:8px">Cancel anytime</p>
       </div>
       <div class="pricing-card fade-up">
@@ -991,7 +996,7 @@
   <h2 class="section-title">Stop leaving reviews<br>unanswered</h2>
   <p class="section-sub">Every unanswered review is a missed chance to win back a customer. Takes 2 minutes to set up — free forever.</p>
   <div class="cta-actions">
-    <a href="register.html" class="btn-gold">Start Free — No Credit Card</a>
+    <a href="register.html" class="btn-gold" onclick="try{posthog.capture('cta_clicked',{location:'bottom_cta'})}catch(e){}">Start Free — No Credit Card</a>
     <a href="login.html" class="btn-outline-white">Sign In</a>
   </div>
 </section>
@@ -1052,7 +1057,7 @@
 </script>
 <!-- STICKY MOBILE CTA -->
 <div class="sticky-mobile-cta" id="sticky-cta">
-  <a href="register.html">Start Free — No Credit Card Required</a>
+  <a href="register.html" onclick="try{posthog.capture('cta_clicked',{location:'sticky_mobile'})}catch(e){}">Start Free — No Credit Card Required</a>
   <p>✓ Free forever plan &nbsp;·&nbsp; ✓ Instant access</p>
 </div>
 
@@ -1060,6 +1065,22 @@
   // Hide sticky CTA once user scrolls past pricing section
   const stickyCta = document.getElementById('sticky-cta');
   if (stickyCta && Auth.isLoggedIn()) stickyCta.style.display = 'none';
+</script>
+
+<script>
+  // Track when the pricing section scrolls into view (once per page load)
+  try {
+    const pricingEl = document.getElementById('pricing');
+    if (pricingEl && window.IntersectionObserver) {
+      let pricingFired = false;
+      new IntersectionObserver((entries) => {
+        if (!pricingFired && entries[0].isIntersecting) {
+          pricingFired = true;
+          posthog.capture('pricing_viewed');
+        }
+      }, { threshold: 0.2 }).observe(pricingEl);
+    }
+  } catch(e) {}
 </script>
 
 </body>
