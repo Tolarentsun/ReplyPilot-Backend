@@ -89,8 +89,16 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const { user_id, plan_id } = session.metadata;
+    let subscriptionEndsAt = new Date(Date.now() + 30*24*60*60*1000).toISOString();
+    if (session.subscription) {
+      try {
+        const stripe = require('stripe')(stripeKey);
+        const sub = await stripe.subscriptions.retrieve(session.subscription);
+        if (sub.current_period_end) subscriptionEndsAt = new Date(sub.current_period_end * 1000).toISOString();
+      } catch(e) {}
+    }
     await db.asyncRun(`UPDATE users SET plan = ?, stripe_subscription_id = ?, subscription_status = 'active', subscription_ends_at = ? WHERE id = ?`,
-      [plan_id, session.subscription, new Date(Date.now() + 30*24*60*60*1000).toISOString(), user_id]);
+      [plan_id, session.subscription, subscriptionEndsAt, user_id]);
     const user = await db.asyncGet('SELECT name, email FROM users WHERE id = ?', [user_id]);
     if (user) sendEmail({ to: user.email, subject: `Your ReplyPilot ${plan_id === 'business' ? 'Pro' : 'Starter'} subscription is confirmed`, html: subscriptionEmail(user.name, plan_id === 'business' ? 'business' : 'pro') }).catch(() => {});
   }

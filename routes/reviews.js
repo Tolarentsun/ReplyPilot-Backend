@@ -258,13 +258,17 @@ router.get('/quota', authenticate, async (req, res) => {
       [user.id, monthStart.toISOString()]
     );
     const aiUsed = parseInt(aiUsedRow?.total) || 0;
-    const bonusResponsesRemaining = Math.max(0, bonusResponses - Math.max(0, aiUsed - 20));
+    const BASE_AI_LIMIT = 3;
+    const bonusUsed = Math.max(0, aiUsed - BASE_AI_LIMIT);
+    const bonusResponsesRemaining = Math.max(0, bonusResponses - bonusUsed);
+    const aiLimit = user.plan === 'free' ? BASE_AI_LIMIT + bonusResponses : -1;
 
     res.json({
       success: true,
       reviews_used: reviewsUsed,
       reviews_limit: reviewLimit,
       ai_used: aiUsed,
+      ai_limit: aiLimit,
       bonus_reviews: bonusReviews,
       bonus_responses_remaining: bonusResponsesRemaining
     });
@@ -277,7 +281,7 @@ router.get('/quota', authenticate, async (req, res) => {
 router.post('/bulk-generate', authenticate, async (req, res) => {
   try {
     if (req.user.plan === 'free') {
-      return res.status(403).json({ error: 'Bulk AI response generation requires a Pro or Business plan.', upgrade_required: true });
+      return res.status(403).json({ error: 'Bulk AI response generation requires a paid plan (Starter or Pro).', upgrade_required: true });
     }
 
     const { tone = 'professional' } = req.body;
