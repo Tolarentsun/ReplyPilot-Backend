@@ -10,7 +10,7 @@ const { Resend } = require('resend');
 
 const BASE = 'C:/Users/chris/AppData/Local/Temp/ReplyPilot-Backend/';
 const SENT_FILE = BASE + 'sent-emails.txt';
-const BATCH_OUT = BASE + 'sent-batch11-2026-05-07.txt';
+const BATCH_OUT = BASE + 'sent-batch13-2026-05-10.txt';
 
 const sentSet = new Set(fs.readFileSync(SENT_FILE, 'utf8').toLowerCase().split('\n').map(e => e.trim()).filter(Boolean));
 const batchSent = [];
@@ -114,12 +114,18 @@ function fetchFast(url, redirects = 0) {
   });
 }
 
+const JUNK_EXTS = new Set(['png','jpg','jpeg','gif','svg','webp','ico','pdf','zip','css','js','woff','ttf']);
+
 function extractEmail(html, domain) {
   const rx = /\b([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,6})\b/gi;
   const emails = new Set(); let m;
   while ((m = rx.exec(html)) !== null) emails.add(m[1].toLowerCase());
   return [...emails].filter(e => {
     const [local, dom] = e.split('@'); if (!dom) return false;
+    const ext = dom.split('.').pop();
+    if (JUNK_EXTS.has(ext)) return false;
+    if (local.includes('@')) return false;
+    if (/\.(png|jpg|gif|svg|webp|ico|pdf|css|js)\b/i.test(e)) return false;
     if (JUNK_DOMAINS.has(dom)) return false;
     if (JUNK_PREFIXES.some(p => local.startsWith(p))) return false;
     return true;
@@ -218,7 +224,7 @@ async function main() {
   console.log('OSM v8 -- multi-namespace: amenity + shop + leisure tags');
   console.log('Resend key:', RESEND_KEY ? RESEND_KEY.slice(0,12) + '...' : 'MISSING');
   console.log('Already sent:', sentSet.size, '\n');
-  const globalState = { sent: 0, target: 500 };
+  const globalState = { sent: 0, target: 1000 };
   for (const city of CITIES) {
     if (globalState.sent >= globalState.target) break;
     await processCity(city, globalState);
