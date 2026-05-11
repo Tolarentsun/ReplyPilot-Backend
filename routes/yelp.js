@@ -9,7 +9,7 @@ const YELP_API_KEY = process.env.YELP_API_KEY;
 
 function requireProOrBusiness(req, res, next) {
   if (!['pro', 'business'].includes(req.user.plan)) {
-    return res.status(403).json({ error: 'Yelp auto-sync requires a Pro or Business plan.', upgrade_required: true });
+    return res.status(403).json({ error: 'Yelp integration requires a paid plan (Starter or Pro).', upgrade_required: true });
   }
   next();
 }
