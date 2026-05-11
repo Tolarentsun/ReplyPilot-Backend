@@ -823,7 +823,7 @@
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#4285F4"></div>
         <div style="font-size:28px;margin-bottom:12px">🔍</div>
         <div style="font-weight:800;font-size:17px;color:var(--ink);margin-bottom:4px">Google — Full Automation</div>
-        <div style="display:inline-block;padding:2px 10px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">PENDING APPROVAL</div>
+        <div style="display:inline-block;padding:2px 10px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">COMING SOON</div>
         <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">New Google reviews sync to your dashboard every 24 hours automatically. Generate a response and post it directly to Google with one click — no copy-paste, no logging in.</p>
         <div style="font-size:13px;color:var(--text);line-height:1.8">✓ Auto-sync every 24 hours<br>✓ One-click posting to Google<br>✓ Never miss a review again</div>
       </div>
@@ -832,7 +832,7 @@
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#1877F2"></div>
         <div style="font-size:28px;margin-bottom:12px">👍</div>
         <div style="font-weight:800;font-size:17px;color:var(--ink);margin-bottom:4px">Facebook — Auto-Import</div>
-        <div style="display:inline-block;padding:2px 10px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">PENDING APPROVAL</div>
+        <div style="display:inline-block;padding:2px 10px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">COMING SOON</div>
         <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">Facebook reviews pulled in daily alongside your Google reviews. One dashboard, every platform, one AI-powered workflow.</p>
         <div style="font-size:13px;color:var(--text);line-height:1.8">✓ Daily auto-sync<br>✓ AI responses ready to paste<br>✓ Unified review inbox</div>
       </div>
@@ -841,8 +841,8 @@
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#D32323"></div>
         <div style="font-size:28px;margin-bottom:12px">⭐</div>
         <div style="font-weight:800;font-size:17px;color:var(--ink);margin-bottom:4px">Yelp — Auto-Sync</div>
-        <div style="display:inline-block;padding:2px 10px;background:#FEF9EC;color:#92400E;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">IN DEVELOPMENT</div>
-        <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">Yelp reviews will sync automatically once partner API access is approved — completing your full reputation dashboard across all major platforms.</p>
+        <div style="display:inline-block;padding:2px 10px;background:#FEF9EC;color:#92400E;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">COMING SOON</div>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">Yelp reviews will sync automatically — completing your full reputation dashboard across all major platforms.</p>
         <div style="font-size:13px;color:var(--text);line-height:1.8">✓ Automatic daily sync<br>✓ AI-generated responses<br>✓ Full platform coverage</div>
       </div>
 
@@ -902,6 +902,7 @@
         <p style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-top:8px">Cancel anytime</p>
       </div>
       <div class="pricing-card fade-up">
+        <span class="pricing-tag" style="background:#6B7280">Launching Soon</span>
         <p class="pricing-plan">Pro</p>
         <div class="pricing-price">$30</div>
         <p class="pricing-period">per month</p>
@@ -912,7 +913,8 @@
           <li>Post responses to Google in 1 click</li>
           <li>Automatic review monitoring</li>
         </ul>
-        <span class="pricing-btn" style="opacity:0.45;cursor:default;pointer-events:none;border-style:dashed">Coming Soon</span>
+        <a href="mailto:RPCS@reply-pilot.net?subject=Pro Plan Waitlist&body=I'd like to be notified when the Pro plan launches." class="pricing-btn" style="background:transparent;border:2px solid var(--ink);color:var(--ink)" onclick="try{posthog.capture('cta_clicked',{location:'pricing',plan:'pro_waitlist'})}catch(e){}">Join the Waitlist</a>
+        <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">Be first when it goes live</p>
       </div>
     </div>
   </div>
@@ -1028,7 +1030,7 @@
   </div>
   <div class="footer-bottom">
     <span>© 2026 ReplyPilot. All rights reserved.</span>
-    <span id="status-indicator">Checking system...</span>
+    <span id="status-indicator"></span>
   </div>
 </footer>
 
